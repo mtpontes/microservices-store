@@ -28,15 +28,15 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import br.com.ecommerce.orders.annotations.ContextualizeUserWithRoles;
-import br.com.ecommerce.orders.builder.OrderTestBuilder;
-import br.com.ecommerce.orders.config.TestConfigBeans;
-import br.com.ecommerce.orders.http.ProductClient;
-import br.com.ecommerce.orders.model.Order;
-import br.com.ecommerce.orders.model.OrderStatus;
-import br.com.ecommerce.orders.model.Product;
-import br.com.ecommerce.orders.repository.OrderRepository;
-import br.com.ecommerce.orders.utils.RandomUtils;
+import br.com.ecommerce.orders.api.http.ProductClient;
+import br.com.ecommerce.orders.infra.entity.Order;
+import br.com.ecommerce.orders.infra.entity.OrderStatus;
+import br.com.ecommerce.orders.infra.entity.Product;
+import br.com.ecommerce.orders.infra.repository.OrderRepository;
+import br.com.ecommerce.orders.tools.annotations.ContextualizeUserWithRoles;
+import br.com.ecommerce.orders.tools.builder.OrderTestBuilder;
+import br.com.ecommerce.orders.tools.config.TestConfigBeans;
+import br.com.ecommerce.orders.tools.utils.RandomUtils;
 import jakarta.transaction.Transactional;
 
 @Transactional

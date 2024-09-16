@@ -25,18 +25,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import br.com.ecommerce.orders.dto.order.OrderDTO;
-import br.com.ecommerce.orders.dto.product.ProductAndPriceDTO;
-import br.com.ecommerce.orders.dto.product.ProductDTO;
-import br.com.ecommerce.orders.exception.OutOfStockException;
-import br.com.ecommerce.orders.exception.ProductOutOfStockDTO;
-import br.com.ecommerce.orders.http.ProductClient;
-import br.com.ecommerce.orders.mapper.OrderMapper;
-import br.com.ecommerce.orders.mapper.ProductMapper;
-import br.com.ecommerce.orders.model.Order;
-import br.com.ecommerce.orders.model.OrderStatus;
-import br.com.ecommerce.orders.repository.OrderRepository;
-import br.com.ecommerce.orders.service.OrderService;
+import br.com.ecommerce.orders.api.dto.order.OrderDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductAndPriceDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductDTO;
+import br.com.ecommerce.orders.api.http.ProductClient;
+import br.com.ecommerce.orders.api.mapper.OrderMapper;
+import br.com.ecommerce.orders.api.mapper.ProductMapper;
+import br.com.ecommerce.orders.business.service.OrderService;
+import br.com.ecommerce.orders.infra.entity.Order;
+import br.com.ecommerce.orders.infra.entity.OrderStatus;
+import br.com.ecommerce.orders.infra.exception.OutOfStockException;
+import br.com.ecommerce.orders.infra.exception.ProductOutOfStockDTO;
+import br.com.ecommerce.orders.infra.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)

@@ -12,10 +12,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.ecommerce.orders.builder.OrderTestBuilder;
-import br.com.ecommerce.orders.model.Order;
-import br.com.ecommerce.orders.model.OrderStatus;
-import br.com.ecommerce.orders.model.Product;
+import br.com.ecommerce.orders.infra.entity.Order;
+import br.com.ecommerce.orders.infra.entity.OrderStatus;
+import br.com.ecommerce.orders.infra.entity.Product;
+import br.com.ecommerce.orders.tools.builder.OrderTestBuilder;
 
 class OrderUnitTest {
 

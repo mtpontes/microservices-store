@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
-import br.com.ecommerce.orders.testcontainers.RabbitMQTestContainerConfig;
+import br.com.ecommerce.orders.tools.testcontainers.RabbitMQTestContainerConfig;
 
 
 @SpringBootTest

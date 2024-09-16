@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import br.com.ecommerce.orders.model.OrderStatus;
+import br.com.ecommerce.orders.infra.entity.OrderStatus;
 
 
 class OrderStatusUnitTest {

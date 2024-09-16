@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import br.com.ecommerce.orders.model.Product;
+import br.com.ecommerce.orders.infra.entity.Product;
 
 class ProductUnitTest {
 
