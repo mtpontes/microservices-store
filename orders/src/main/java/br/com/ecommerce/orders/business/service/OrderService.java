@@ -16,6 +16,7 @@ import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductAndPriceDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
 import br.com.ecommerce.orders.api.http.ProductClient;
 import br.com.ecommerce.orders.api.mapper.OrderMapper;
 import br.com.ecommerce.orders.api.mapper.ProductMapper;
@@ -23,7 +24,6 @@ import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
 import br.com.ecommerce.orders.infra.entity.Product;
 import br.com.ecommerce.orders.infra.exception.OutOfStockException;
-import br.com.ecommerce.orders.infra.exception.ProductOutOfStockDTO;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 

@@ -3,6 +3,7 @@ package br.com.ecommerce.orders.infra.exception;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
 import lombok.Getter;
 
 @Getter

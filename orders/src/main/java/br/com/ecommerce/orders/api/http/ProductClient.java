@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import br.com.ecommerce.orders.api.dto.product.ProductAndPriceDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductDTO;
-import br.com.ecommerce.orders.infra.exception.ProductOutOfStockDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
 
 @FeignClient(value = "products-ms")
 public interface ProductClient {
