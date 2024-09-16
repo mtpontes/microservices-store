@@ -38,3 +38,4 @@ build/
 ### logs ###
 /log
 *.log
+.dio
