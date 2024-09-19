@@ -23,6 +23,7 @@
     <module>auth</module>
     <module>accounts</module>
     <module>products</module>
+    <module>cart</module>
     <module>orders</module>
     <module>payments</module>
   </modules>
