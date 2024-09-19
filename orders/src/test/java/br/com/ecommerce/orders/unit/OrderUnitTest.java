@@ -20,6 +20,7 @@ import br.com.ecommerce.orders.tools.builder.OrderTestBuilder;
 class OrderUnitTest {
 
     private final long PRODUCT_ID = 1L;
+    private final String NAME = "Name";
     private final BigDecimal PRICE = BigDecimal.valueOf(100);
     private final int UNITS = 1;
     
@@ -27,7 +28,7 @@ class OrderUnitTest {
     @Test
     @DisplayName("Test creating order with valid data")
     void createOrderTest01() {
-        assertDoesNotThrow(() -> new Order(1L, List.of(new Product(1L, BigDecimal.TEN, 1))),
+        assertDoesNotThrow(() -> new Order(1L, List.of(new Product(1L, NAME, BigDecimal.TEN, 1))),
             "Should not throw exception when creating order with valid data");
     }
 
@@ -35,7 +36,10 @@ class OrderUnitTest {
     @DisplayName("Test creating order with valid data")
     void createOrderTest02_calculationOfTotal() {
         assertAll(() -> {
-            var products = List.of(new Product(PRODUCT_ID, PRICE, UNITS), new Product(2L, PRICE, UNITS), new Product(3L, PRICE, UNITS));
+            var products = List.of(
+                new Product(PRODUCT_ID, NAME, PRICE, UNITS), 
+                new Product(2L, NAME, PRICE, UNITS), 
+                new Product(3L, NAME, PRICE, UNITS));
             var order = new Order(PRODUCT_ID, products);
 
             assertEquals(PRICE.multiply(BigDecimal.valueOf(products.size())), order.getTotal());
@@ -46,7 +50,7 @@ class OrderUnitTest {
     @DisplayName("Test creating order with invalid data")
     void createOrderTest03() {
         assertThrows(IllegalArgumentException.class, 
-            () -> new Order(null, List.of(new Product(PRODUCT_ID, BigDecimal.TEN, UNITS))),
+            () -> new Order(null, List.of(new Product(PRODUCT_ID, NAME, BigDecimal.TEN, UNITS))),
             "Should throw IllegalArgumentException when userId is null");
         
         assertThrows(IllegalArgumentException.class, 
@@ -62,9 +66,9 @@ class OrderUnitTest {
     @DisplayName("Test creating order with valid data")
     void createOrderTest04_validateStatusAndDate() {
         var products = List.of(
-            new Product(1L, PRICE, UNITS), 
-            new Product(2L, PRICE, UNITS), 
-            new Product(3L, PRICE, UNITS));
+            new Product(1L, NAME, PRICE, UNITS), 
+            new Product(2L, NAME, PRICE, UNITS), 
+            new Product(3L, NAME, PRICE, UNITS));
         var order = new Order(PRODUCT_ID, products);
 
         assertEquals(OrderStatus.AWAITING_PAYMENT, order.getStatus());

@@ -18,8 +18,8 @@ public class OrderMapper {
             data.getUserId(), 
             products, 
             data.getTotal(), 
-            data.getDate(), 
-            data.getStatus());
+            data.getStatus(),
+            data.getDate());
     }
 
     public OrderBasicInfDTO toOrderBasicInfoDTO(Order data) {

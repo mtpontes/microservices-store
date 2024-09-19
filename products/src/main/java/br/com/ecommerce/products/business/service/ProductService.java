@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,9 +16,9 @@ import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
 import br.com.ecommerce.products.api.dto.product.CompletePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.CreateProductDTO;
 import br.com.ecommerce.products.api.dto.product.DataProductDTO;
-import br.com.ecommerce.products.api.dto.product.DataProductPriceDTO;
 import br.com.ecommerce.products.api.dto.product.DataProductStockDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
+import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
 import br.com.ecommerce.products.api.dto.product.ProductUnitsRequestedDTO;
 import br.com.ecommerce.products.api.dto.product.SimplePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.StockWriteOffDTO;
@@ -41,7 +42,9 @@ import br.com.ecommerce.products.infra.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProductService {
@@ -64,6 +67,12 @@ public class ProductService {
 	public DataProductDTO getProduct(Long id) {
 		return productRepository.findById(id)
 			.map(this::createDataProductDTO)
+			.orElseThrow(EntityNotFoundException::new);
+	}
+
+	public InternalProductDataDTO getProductPriceInternal(Long id) {
+		return productRepository.findById(id)
+			.map(productMapper::toInternalProductDataDTO)
 			.orElseThrow(EntityNotFoundException::new);
 	}
 
@@ -191,13 +200,14 @@ public class ProductService {
 		return this.createDataProductDTO(product);
 	}
 
-	public List<DataProductPriceDTO> getAllProductsByListOfIds(List<Long> productsIds) {
+	public Map<String, InternalProductDataDTO> getAllProductsByListOfIds(Set<Long> productsIds) {
 		return productRepository.findAllById(productsIds).stream()
-			.map(productMapper::toProductPriceDTO)
-			.toList();
+			.collect(Collectors.toMap(
+				product -> String.valueOf(product.getId()), 
+				product -> productMapper.toInternalProductDataDTO(product)));
 	}
 
-	
+
 	private DataProductDTO createDataProductDTO(Product product) {
 		SimplePriceDataDTO priceData = priceMapper.toSimplePriceDataDTO(product.getPrice());
 		DataStockDTO stockData = stockMapper.toDataStockDTO(product.getStock());

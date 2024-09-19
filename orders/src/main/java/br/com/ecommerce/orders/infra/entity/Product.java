@@ -28,7 +28,7 @@ import lombok.ToString;
 public class Product {
 
 	private static final BigDecimal MINIMAL_PRICE = BigDecimal.ZERO;
-	private static final int MINIMAL_UNITS = 1;
+	private static final int MINIMAL_UNIT = 1;
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -39,13 +39,14 @@ public class Product {
 	private Order order;
 
 	private Long productId;
+	private String name;
 	private Integer unit;
 	private BigDecimal price;
 
-	public Product(Long productId, BigDecimal price, Integer unit) {
+	public Product(Long productId, String name, BigDecimal price, Integer unit) {
 		this.productId = this.checkNotNull(productId, "productId");
 		this.price = this.checkPrice(price);
-		this.unit = this.checkUnits(unit);
+		this.unit = this.checkUnit(unit);
 	}
 
 	private <T> T checkNotNull(T field, String fieldName) {
@@ -59,9 +60,9 @@ public class Product {
 			.orElseThrow(() -> new IllegalArgumentException("Price cannot be lass than " + MINIMAL_PRICE));
 	}
 
-	private Integer checkUnits(Integer units) {
-		return Optional.ofNullable(units)
-			.filter(unit -> unit.compareTo(MINIMAL_UNITS) >= 0)
-			.orElseThrow(() -> new IllegalArgumentException("Units cannot be lower than: " + MINIMAL_UNITS));
+	private Integer checkUnit(Integer unit) {
+		return Optional.ofNullable(unit)
+			.filter(units -> units.compareTo(MINIMAL_UNIT) >= 0)
+			.orElseThrow(() -> new IllegalArgumentException("Unit cannot be lower than: " + MINIMAL_UNIT));
 	}
 }

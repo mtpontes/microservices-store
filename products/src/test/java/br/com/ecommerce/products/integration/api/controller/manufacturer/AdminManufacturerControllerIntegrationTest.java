@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
@@ -20,8 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import br.com.ecommerce.common.annotations.TestWithRoles;
 import br.com.ecommerce.products.annotations.ControllerIntegrationTest;
-import br.com.ecommerce.products.annotations.security.ContextualizeUserWithRoles;
 import br.com.ecommerce.products.api.dto.manufacturer.CreateManufacturerDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.DataAddressDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.UpdateManufacturerDTO;
@@ -73,8 +72,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createTest01_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -105,8 +103,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createTest02_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -137,8 +134,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createTest03_withInvalidNameInput() throws Exception {
         // arrange
         String path = basePath;
@@ -177,8 +173,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void createTest01_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -192,8 +187,7 @@ class AdminManufacturerControllerIntegrationTest {
         act.andExpect(status().isForbidden());
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getOneTest() throws Exception {
         // arrange
         Long manufacturerId = manufacturersPersisted.get(0).getId();
@@ -215,8 +209,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.address").isNotEmpty());
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void getOneTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Long manufacturerId = manufacturersPersisted.get(0).getId();
@@ -231,8 +224,7 @@ class AdminManufacturerControllerIntegrationTest {
         act.andExpect(status().isForbidden());
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest01_withoutParams() throws Exception {
         // arrange
         String path = basePath;
@@ -253,8 +245,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content[0].address").exists());
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest02_withNameParam() throws Exception {
         // arrange
         String path = basePath;
@@ -273,8 +264,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest03_withPhoneParam() throws Exception {
         // arrange
         String path = basePath;
@@ -293,8 +283,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest04_withEmailParam() throws Exception {
         // arrange
         String path = basePath;
@@ -313,8 +302,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest05_withContactPersonParam() throws Exception {
         // arrange
         String path = basePath;
@@ -333,8 +321,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest06_withAllParams() throws Exception {
         // arrange
         String path = basePath;
@@ -359,8 +346,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void getAllWithDiverseParamsTest07_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -375,8 +361,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void updateTest01_withValidData() throws Exception {
         // arrange
         Long manufacturerId = 1L;
@@ -407,8 +392,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void updateTest02_withInvalidData() throws Exception {
         // arrange
         Long manufacturerId = 1L;

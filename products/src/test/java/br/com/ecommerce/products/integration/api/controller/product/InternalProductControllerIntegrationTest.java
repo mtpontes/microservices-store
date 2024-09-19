@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -157,6 +158,8 @@ class InternalProductControllerIntegrationTest {
     void getPricesTest01_exceedingAvailableStock() throws Exception {
         // arrange
         String path = basePath + "/prices";
+        BigDecimal expectedPrice1 = productsPersisted.get(0).getPrice().getCurrentPrice();
+        BigDecimal expectedPrice2 = productsPersisted.get(1).getPrice().getCurrentPrice();
 
         // act
         var requestMock = MockMvcRequestBuilders.get(path)
@@ -165,12 +168,9 @@ class InternalProductControllerIntegrationTest {
             .param("productIds", "2");
         ResultActions act = mvc.perform(requestMock);
 
-
         // assert
         act.andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$", hasSize(2)))
-            .andExpect(jsonPath("$.[0].id").exists())
-            .andExpect(jsonPath("$.[0].price").exists());
+            .andExpect(jsonPath("$.1.price").value(expectedPrice1.doubleValue()))
+            .andExpect(jsonPath("$.2.price").value(expectedPrice2.doubleValue()));
     }
 }

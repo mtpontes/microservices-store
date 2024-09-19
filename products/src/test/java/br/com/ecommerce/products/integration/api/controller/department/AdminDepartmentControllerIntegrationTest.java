@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
@@ -19,8 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import br.com.ecommerce.common.annotations.TestWithRoles;
 import br.com.ecommerce.products.annotations.ControllerIntegrationTest;
-import br.com.ecommerce.products.annotations.security.ContextualizeUserWithRoles;
 import br.com.ecommerce.products.api.dto.category.CreateCategoryDTO;
 import br.com.ecommerce.products.api.dto.category.UpdateCategoryDTO;
 import br.com.ecommerce.products.api.dto.department.CreateDepartmentDTO;
@@ -32,7 +31,9 @@ import br.com.ecommerce.products.infra.repository.DepartmentRepository;
 import br.com.ecommerce.products.utils.util.CategoryUtils;
 import br.com.ecommerce.products.utils.util.DepartmentUtils;
 import br.com.ecommerce.products.utils.util.RandomUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ControllerIntegrationTest
 class AdminDepartmentControllerIntegrationTest {
 
@@ -66,7 +67,7 @@ class AdminDepartmentControllerIntegrationTest {
         @Autowired CategoryRepository categoryRepository
     ) {
         IntStream.range(0, 3)
-            .mapToObj(flux -> {
+            .forEach(flux -> {
                 Department department = departmentUtils.getDepartmentInstance();
                 department = departmentRepository.save(department);
                 
@@ -77,13 +78,13 @@ class AdminDepartmentControllerIntegrationTest {
 
                 departmentsPersisted.add(department);
                 categoriesPersisted.add(category);
-                return flux;
+                System.out.println("DEPARTAMENTOS: " + departmentRepository.count());
             });
     }
 
+
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createDepartmentTest01_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -103,8 +104,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createDepartmentTest02_withNameNull() throws Exception {
         // arrange
         String path = basePath;
@@ -131,8 +131,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void createDepartmentTest03_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -147,12 +146,14 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void updateDepartmentTest01() throws Exception {
         // arrange
-        Long manufacturerId = 1L;
-        String path = baseCategoryPath + "/" + manufacturerId;
+        System.out.println("AQUI: " + departmentsPersisted);
+        System.out.println("AQUI: " + categoriesPersisted);
+
+        Long departmentId = 1L;
+        String path = basePath + "/" + departmentId;
         var requestBody = new UpdateDepartmentoDTO(randomUtils.getRandomString());
 
         // act
@@ -169,12 +170,11 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void updateDepartmentTest02_withUnauthorizedRoles() throws Exception {
         // arrange
-        Long manufacturerId = 1L;
-        String path = baseCategoryPath + "/" + manufacturerId;
+        Long departmentId = 1L;
+        String path = baseCategoryPath + "/" + departmentId;
 
         // act
         var requestMock = MockMvcRequestBuilders.put(path)
@@ -186,8 +186,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createCategoryTest01_withValidData() throws Exception {
         // arrange
         String path = baseCategoryPath;
@@ -208,8 +207,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void createCategoryTest02_withInvalidValues() throws Exception {
         // arrange
         String path = baseCategoryPath;
@@ -240,8 +238,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void createCategoryTest03_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = baseCategoryPath;
@@ -256,8 +253,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void updateCategoryTest01() throws Exception {
         // arrange
         Long manufacturerId = 1L;
@@ -278,8 +274,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void updateCategoryTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Long manufacturerId = 1L;

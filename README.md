@@ -14,8 +14,10 @@ The project is still under development, is currently using development settings.
 - [x] Add more behaviors to entities, reducing dependence on external services for basic domain rules
 - [x] Add a promotional price scheduler, so that when you set a promotional price, you also set a deadline for the promotional
 - [x] Implement Spring Security
-- [ ] Add discount coupon system
+- [ ] Create a Cart service
 - [ ] Create evaluation service
+- [ ] Create discount coupon system
+- [ ] Currently microservices identify the user from the headers. In the future we will remove this and replace it with each microservice having the ability to decode the JWT, retrieving the claims from the body and forming a UserDetailsImpl
 - [ ] Improvements in authentication, such as sending tokens by Email and authentication via third parties
 - [ ] Sending emails regarding orders
 - [ ] Create fallbacks for failures between services

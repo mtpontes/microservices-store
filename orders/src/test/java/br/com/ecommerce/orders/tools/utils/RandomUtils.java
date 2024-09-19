@@ -17,14 +17,14 @@ public class RandomUtils {
     }
 
     public Integer getRandomInt() {
-        return random.nextInt(100);
+        return random.nextInt(1, 100);
     }
     public Integer getRandomInt(int value) {
-        return random.nextInt(value);
+        return random.nextInt(1, value);
     }
 
     public BigDecimal getRandomBigDecimal() {
-        return BigDecimal.valueOf(random.nextInt(100));
+        return BigDecimal.valueOf(random.nextInt(1, 100));
     }
 
     public String getRandomString() {

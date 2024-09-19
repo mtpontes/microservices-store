@@ -48,7 +48,7 @@ class DepartmentControllerIntegrationTest {
         @Autowired CategoryRepository categoryRepository
     ) {
         IntStream.range(0, 3)
-            .mapToObj(flux -> {
+            .forEach(flux -> {
                 Department department = departmentUtils.getDepartmentInstance();
                 department = departmentRepository.save(department);
                 
@@ -59,9 +59,7 @@ class DepartmentControllerIntegrationTest {
 
                 departmentsPersisted.add(department);
                 categoriesPersisted.add(category);
-                return flux;
-            })
-            .toList();
+            });
     }
 
 
