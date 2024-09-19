@@ -1,16 +1,25 @@
 package br.com.ecommerce.products.api.mapper;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
 import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
-import br.com.ecommerce.products.api.dto.product.*;
+import br.com.ecommerce.products.api.dto.product.CompletePriceDataDTO;
+import br.com.ecommerce.products.api.dto.product.CreateProductDTO;
+import br.com.ecommerce.products.api.dto.product.DataProductDTO;
+import br.com.ecommerce.products.api.dto.product.DataProductPriceDTO;
+import br.com.ecommerce.products.api.dto.product.DataStockDTO;
+import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
+import br.com.ecommerce.products.api.dto.product.SimplePriceDataDTO;
+import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
+import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
 import br.com.ecommerce.products.infra.entity.category.Category;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.product.Product;
 import br.com.ecommerce.products.infra.entity.tools.factory.ProductFactory;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @AllArgsConstructor
 @Component
@@ -27,6 +36,10 @@ public class ProductMapper {
             category,
             manufacturer
         );
+    }
+
+    public InternalProductDataDTO toInternalProductDataDTO(Product data) {
+        return new InternalProductDataDTO(data.getName(), data.getPrice().getCurrentPrice());
     }
 
     public DataProductDTO toDataProductDTO(

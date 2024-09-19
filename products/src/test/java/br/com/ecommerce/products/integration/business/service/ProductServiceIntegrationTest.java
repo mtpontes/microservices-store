@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -117,7 +118,7 @@ class ProductServiceIntegrationTest {
     @DisplayName("Integration - getAllProductsByListOfIds - Getting all products by ID list")
     void getAllProductsByListOfIdsTest01() {
         // act
-        var result = service.getAllProductsByListOfIds(List.of(1L, 2L, 3L));
+        var result = service.getAllProductsByListOfIds(Set.of(1L, 2L, 3L));
 
         // assert
         assertEquals(3, result.size());
@@ -127,7 +128,7 @@ class ProductServiceIntegrationTest {
     @DisplayName("Integration - getAllProductsByListOfIds - Getting all products by list of non-existent IDs")
     void getAllProductsByListOfIdsTest02() {
         // act
-        var result = service.getAllProductsByListOfIds(List.of(1000L, 2000L, 3000L));
+        var result = service.getAllProductsByListOfIds(Set.of(1000L, 2000L, 3000L));
 
         // assert
         assertEquals(0, result.size());
