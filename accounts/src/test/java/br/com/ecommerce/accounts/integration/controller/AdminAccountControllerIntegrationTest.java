@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.TestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -23,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.ecommerce.accounts.api.dto.CreateUserEmployeeDTO;
-import br.com.ecommerce.accounts.config.ContextualizeUserTypeWithRoles;
+import br.com.ecommerce.common.annotations.TestWithRoles;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -46,8 +45,7 @@ class AdminAccountControllerIntegrationTest {
 
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"ADMIN"})
+    @TestWithRoles(roles = {"ADMIN"})
     @DisplayName("Integration - createAdminUser - must return status 200 and user data")
     void createAdminUserTest01() throws IOException, Exception {
         // arrange
@@ -69,8 +67,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"ADMIN"})
+    @TestWithRoles(roles = {"ADMIN"})
     @DisplayName("Integration - createAdminUser - Must return status 400 and fields with error")
     void createAdminUserTest02() throws IOException, Exception {
         // arrange
@@ -93,8 +90,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"EMPLOYEE", "CLIENT"})
+    @TestWithRoles(roles = {"EMPLOYEE", "CLIENT"})
     void createAdminUserTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(
@@ -106,8 +102,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     @DisplayName("Integration - createEmployeeUser - must return status 200 and user data")
     void createEmployeeUserTest01() throws IOException, Exception {
         // arrange
@@ -129,8 +124,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     @DisplayName("Integration - createEmployeeUser - Must return status 400 and fields with error")
     void createEmployeeUserTest02() throws IOException, Exception {
         // arrange
@@ -153,8 +147,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void createEmployeeUserTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(

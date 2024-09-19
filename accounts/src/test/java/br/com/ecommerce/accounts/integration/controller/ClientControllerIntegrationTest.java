@@ -11,7 +11,6 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -30,11 +29,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import br.com.ecommerce.accounts.api.dto.AddressDTO;
 import br.com.ecommerce.accounts.api.dto.CreateUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.UpdateUserClientDTO;
-import br.com.ecommerce.accounts.config.ContextualizeUserTypeWithRoles;
 import br.com.ecommerce.accounts.infra.repository.UserRepository;
 import br.com.ecommerce.accounts.model.User;
 import br.com.ecommerce.accounts.model.valueobjects.Address;
 import br.com.ecommerce.accounts.utils.UserBuilderTestUtils;
+import br.com.ecommerce.common.annotations.TestWithRoles;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -162,8 +161,7 @@ class ClientControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     @DisplayName("Integration - updateCurrentClientData - Must return status 200 and user data")
     void updateCurrentClientDataTest01() throws IOException, Exception {
         // arrange
@@ -202,8 +200,7 @@ class ClientControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     @DisplayName("Integration - updateCurrentClientData - Must return status 200 and non-updated user data")
     void updateCurrentClientDataTest02() throws IOException, Exception {
         // arrange
@@ -243,8 +240,7 @@ class ClientControllerIntegrationTest {
     }
 
     @Rollback
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void updateCurrentClientDataTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         String currentUserID = "2";
@@ -257,8 +253,7 @@ class ClientControllerIntegrationTest {
         .andExpect(status().isForbidden());
     }
 
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"CLIENT"})
+    @TestWithRoles(roles = {"CLIENT"})
     void getCurrentUserClientDataTest01() throws IOException, Exception {
         // act
         mvc.perform(
@@ -270,8 +265,7 @@ class ClientControllerIntegrationTest {
         .andExpect(status().isUnauthorized());
     }
 
-    @TestTemplate
-    @ContextualizeUserTypeWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
     void getCurrentUserClientDataTest01_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(
