@@ -10,7 +10,11 @@ import br.com.ecommerce.orders.tools.testcontainers.RabbitMQTestContainerConfig;
 
 
 @SpringBootTest
-@TestPropertySource(properties = {"eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false"})
+@TestPropertySource(properties = {
+	"eureka.client.enabled=false", 
+	"eureka.client.register-with-eureka=false", 
+	"eureka.client.fetch-registry=false",
+	"api.security.ips.allowed=localhost,127.0.0.1"})
 @AutoConfigureTestDatabase
 @Import({RabbitMQTestContainerConfig.class})
 class OrdersApplicationTests {

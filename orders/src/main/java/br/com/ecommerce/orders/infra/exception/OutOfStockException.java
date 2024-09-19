@@ -1,18 +1,17 @@
 package br.com.ecommerce.orders.infra.exception;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
 import lombok.Getter;
 
 @Getter
 public class OutOfStockException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-	private List<ProductOutOfStockDTO> products = new ArrayList<>();
+	private static final String defaultMessage = "Out of stock products";
+	private Set<ProductOutOfStockDTO> products;
 
-	public OutOfStockException(String message, List<ProductOutOfStockDTO> products) {
-		super(message);
+	public OutOfStockException(Set<ProductOutOfStockDTO> products) {
+		super(defaultMessage);
 		this.products = products;
 	}
 }

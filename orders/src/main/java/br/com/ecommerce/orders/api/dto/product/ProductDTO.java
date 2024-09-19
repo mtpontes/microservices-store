@@ -1,5 +1,8 @@
 package br.com.ecommerce.orders.api.dto.product;
 
+import java.math.BigDecimal;
+
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +16,12 @@ public class ProductDTO {
     @NotNull
     private Long id;
 
-    @NotNull
+    @NotBlank
+    private String name;
+
+    @NotBlank
     private Integer unit;
+
+    @NotNull
+    private BigDecimal price;
 }

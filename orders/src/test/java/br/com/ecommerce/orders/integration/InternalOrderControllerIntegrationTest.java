@@ -1,12 +1,21 @@
 package br.com.ecommerce.orders.integration;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -16,7 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -28,6 +39,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.ecommerce.common.annotations.TestWithRoles;
 import br.com.ecommerce.orders.api.client.ProductClient;
+import br.com.ecommerce.orders.api.dto.product.InternalProductDataDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductAndUnitDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
 import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
 import br.com.ecommerce.orders.infra.entity.Product;
@@ -39,16 +53,16 @@ import jakarta.transaction.Transactional;
 
 @Transactional
 @SpringBootTest
+@AutoConfigureWebMvc
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestConfigBeans.class)
 @AutoConfigureJsonTesters
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class AdminOrderControllerIntegrationTest {
+class InternalOrderControllerIntegrationTest {
 
-    private final String basePath = "/admin/orders";
-    private static List<Order> ordersPersisted = new ArrayList<>();
+    private final String basePath = "/internal/orders";
 
     @MockBean
     private RabbitTemplate template;
@@ -56,6 +70,9 @@ class AdminOrderControllerIntegrationTest {
     private ProductClient productClient;
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private JacksonTester<List<ProductAndUnitDTO>> listOfProductAndUnitDTOJson;
 
     @BeforeAll
     static void setup(
@@ -88,77 +105,70 @@ class AdminOrderControllerIntegrationTest {
                     .total(randomUtils.getRandomBigDecimal())
                     .status(OrderStatus.AWAITING_PAYMENT)
                     .build();
-                ordersPersisted.add(orderRepository.save(order));
+                orderRepository.save(order);
             });
     }
     
 
-    @TestWithRoles(roles = {"ADMIN"})
-    void getAllBasicsInfoOrdersByUserTest01() throws Exception {
-        // act
-        mvc.perform(
-            get(basePath + "/1")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        // assert
-        .andExpect(status().isOk());
-    }
-
-    @TestWithRoles(roles = {"CLIENT", "EMPLOYEE"})
-    void getAllBasicsInfoOrdersByUserTest02_withUnauthorizedRoles() throws Exception {
-        mvc.perform(
-            get(basePath)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        // assert
-        .andExpect(status().isForbidden());
-    }
-
-    @TestWithRoles(roles = {"ADMIN"})
-    void getOrderByIdAndUserIdTest01() throws Exception {
-        Long orderId = ordersPersisted.get(0).getId();
-        Long userId = ordersPersisted.get(0).getUserId();
-
-        mvc.perform(
-            get(String.format("%s/%d/%d", basePath, orderId, userId))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        // assert
-        .andExpect(status().isOk());
-    }
-
-    @TestWithRoles(roles = {"CLIENT", "EMPLOYEE"})
-    void getOrderByIdAndUserIdTest02_withUnauthorizedRoles() throws Exception {
-        mvc.perform(
-            get(basePath + "/1/1")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        // assert
-        .andExpect(status().isForbidden());
-    }
-
     @Rollback
-    @TestWithRoles(roles = {"ADMIN"})
-    @DisplayName("Unit - cancelOrder - Should return status 204")
-    void cancelOrderTest01() throws IOException, Exception {
+    @TestWithRoles(roles = {"CLIENT"})
+    @DisplayName("Unit - createOrder - Should return status 201 and created order details")
+    void createOrderTest01() throws IOException, Exception {
+        // arrange
+        var requestBody = List.of(new ProductAndUnitDTO(1L, 100));
+
+        when(productClient.verifyStocks(anySet()))
+            .thenReturn(Collections.emptySet());
+
+        Set<Long> listOfIds = requestBody.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
+        InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE);
+        Map<Long, InternalProductDataDTO> priceMap = listOfIds.stream()
+            .collect(Collectors.toMap(id -> id, id -> nameAndPrice));
+        when(productClient.getPrices(eq(listOfIds)))
+            .thenReturn(priceMap);
+
         // act
         mvc.perform(
-            patch(basePath + "/1")
+            post(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
+                .content(listOfProductAndUnitDTOJson.write(requestBody).getJson())
                 .header("X-auth-user-id", "1")
         )
         // assert
-        .andExpect(status().isNoContent());
+        .andExpect(status().isCreated());
+
+        verify(template, times(2)).convertAndSend(any(), any(), any(Object.class));
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT", "EMPLOYEE"})
-    void cancelOrderTest02_withUnauthorizedRoles() throws IOException, Exception {
+    @TestWithRoles(roles = {"CLIENT"})
+    @DisplayName("Unit - createOrder - Should return status 400 when the product list is empty or null")
+    void createOrderTest02() throws IOException, Exception {
+        // arrange
+        List<ProductAndUnitDTO> requestBody = List.of();
+        var stockResponse = Set.of(new ProductOutOfStockDTO(null, null, null));
+        when(productClient.verifyStocks(anySet()))
+            .thenReturn(stockResponse);
+
         // act
         mvc.perform(
-            patch(basePath + "/1")
+            post(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
+                .content(listOfProductAndUnitDTOJson.write(requestBody).getJson())
                 .header("X-auth-user-id", "1")
+        )
+        // assert
+        .andExpect(status().isBadRequest());
+    }
+
+    @Rollback
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE", "CLIENT"})
+    void createOrderTest03_withUnauthorizedRoles() throws IOException, Exception {
+        // act
+        mvc.perform(
+            post(basePath)
+                .contentType(MediaType.APPLICATION_JSON)
+                .remoteAddress("192.168.1.1")
         )
         // assert
         .andExpect(status().isForbidden());

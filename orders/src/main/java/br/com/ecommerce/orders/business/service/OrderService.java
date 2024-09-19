@@ -1,23 +1,21 @@
 package br.com.ecommerce.orders.business.service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import br.com.ecommerce.orders.api.client.ProductClient;
 import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
-import br.com.ecommerce.orders.api.dto.product.ProductAndPriceDTO;
-import br.com.ecommerce.orders.api.dto.product.ProductDTO;
+import br.com.ecommerce.orders.api.dto.product.InternalProductDataDTO;
+import br.com.ecommerce.orders.api.dto.product.ProductAndUnitDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
-import br.com.ecommerce.orders.api.http.ProductClient;
 import br.com.ecommerce.orders.api.mapper.OrderMapper;
 import br.com.ecommerce.orders.api.mapper.ProductMapper;
 import br.com.ecommerce.orders.infra.entity.Order;
@@ -40,41 +38,25 @@ public class OrderService {
 	private ProductMapper productMapper;
 
 
-	public Order saveOrder(List<ProductDTO> dtos, Long userId) {
+	public Order saveOrder(Set<ProductAndUnitDTO> dtos, Long userId) {
 		// validate stock
-		this.validateProductsStocks(dtos);
+		Set<ProductOutOfStockDTO> outOfStockProducts = this.productClient.verifyStocks(dtos);
+		if (!outOfStockProducts.isEmpty()) throw new OutOfStockException(outOfStockProducts);
 		
 		// get products
-		return dtos.stream()
-			.collect(Collectors.collectingAndThen(
-				Collectors.toMap(ProductDTO::getId, ProductDTO::getUnit), 
-				mapIdToUnits -> this.getPricedProducts(mapIdToUnits.keySet()).stream()
-					.map(p -> new Product(p.getId(), p.getPrice(), mapIdToUnits.get(p.getId())))
-					.collect(Collectors.collectingAndThen(
-						Collectors.toList(), 
-						products -> {
-							Order newOrder = new Order(userId, products);
-							products.forEach(p -> p.setOrder(newOrder));
-							return orderRepository.save(newOrder);
-						}))));
-	}
+		Set<Long> ids = dtos.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
+		Map<Long, InternalProductDataDTO> priceMap = this.productClient.getPrices(ids);
+		List<Product> products = dtos.stream()
+			.map(data -> new Product(
+				data.getId(), 
+				priceMap.get(data.getId()).getName(), 
+				priceMap.get(data.getId()).getPrice(), 
+				data.getUnit()))
+			.toList();
 
-	private void validateProductsStocks(List<ProductDTO> dtos) {
-		ResponseEntity<List<ProductOutOfStockDTO>> response = this.productClient.verifyStocks(dtos);
-		if (response.getStatusCode().equals(HttpStatus.MULTI_STATUS))
-			throw new OutOfStockException("There are products out of stock", response.getBody());
-		
-		if (!response.getStatusCode().equals(HttpStatus.OK)) 
-			throw new RuntimeException("Internal server error");
-	}
-	
-	private Set<ProductAndPriceDTO> getPricedProducts(Set<Long> productsId) {
-		return Optional.of(productsId)
-			.filter(list -> !list.isEmpty())
-			.map(list -> productClient.getPrices(productsId))
-			.filter(response -> response.getStatusCode().equals(HttpStatus.OK))
-			.map(response -> response.getBody())
-			.orElseThrow(() -> new IllegalArgumentException("Cannot send an empty list"));
+		Order newOrder = new Order(userId, products);
+		products.forEach(p -> p.setOrder(newOrder));
+		return orderRepository.save(newOrder);
 	}
 
 	public OrderDTO getOrderById(Long id, Long userId) {
@@ -101,10 +83,9 @@ public class OrderService {
 			})
 			.map(order -> order.getProducts().stream()
 				.map(productMapper::toProductDTO)
-				.collect(Collectors.collectingAndThen(Collectors.toList(), products -> {
-					return orderMapper.toOrderDTO(order, products);
-				}))
-			)
+				.collect(Collectors.collectingAndThen(
+					Collectors.toList(), 
+					products -> orderMapper.toOrderDTO(order, products))))
 			.orElseThrow(EntityNotFoundException::new);
 	}
 }

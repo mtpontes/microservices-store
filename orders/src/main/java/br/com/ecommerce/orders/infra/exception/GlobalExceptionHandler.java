@@ -1,6 +1,6 @@
 package br.com.ecommerce.orders.infra.exception;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import br.com.ecommerce.orders.api.dto.product.ProductOutOfStockDTO;
@@ -60,6 +61,11 @@ public class GlobalExceptionHandler {
 				fields
 				)
 			);
+	}
+
+	@ExceptionHandler(HandlerMethodValidationException.class)
+	public ResponseEntity<ErrorMessage> handleError400(HandlerMethodValidationException ex) {
+		return ResponseEntity.badRequest().build();
 	}
 
 	@ExceptionHandler(MissingRequestHeaderException.class)
@@ -124,5 +130,5 @@ public class GlobalExceptionHandler {
 
 	private record ErrorMessage(int status, String error) {}
 	private record ErrorMessageWithFields(int status, String error, Object fields) {}
-	private record ErrorMessageWithProducts(int status, String error, List<ProductOutOfStockDTO> products) {}
+	private record ErrorMessageWithProducts(int status, String error, Collection<ProductOutOfStockDTO> products) {}
 }

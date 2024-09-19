@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "api.security.ips.allowed",
+    "type": "java.lang.String",
+    "description": "A description for 'api.security.ips.allowed'"
+  },
+  {
+    "name": "api.security.token.secret",
+    "type": "java.lang.String",
+    "description": "A description for 'api.security.token.secret'"
+  }
+]}

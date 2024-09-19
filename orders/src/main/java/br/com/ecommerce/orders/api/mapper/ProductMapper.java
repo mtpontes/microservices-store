@@ -9,6 +9,6 @@ import br.com.ecommerce.orders.infra.entity.Product;
 public class ProductMapper {
 
     public ProductDTO toProductDTO(Product data) {
-        return new ProductDTO(data.getId(), data.getUnit());
+        return new ProductDTO(data.getId(), data.getName(), data.getUnit(), data.getPrice());
     }
 }
