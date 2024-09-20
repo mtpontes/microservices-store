@@ -2,7 +2,7 @@
 
 ## 🔎 About the project
 
-E-CommerceApp is a REST API for an e-commerce store aimed at the PC-Gaming market, based on microservices architecture, it has both operations carried out for the customer and operations carried out by employees and administrators.
+E-CommerceApp is a REST API for an e-commerce store, based on microservices architecture, it has both operations performed for the customer and operations performed by employees and administrators.
 
 ## 🔧 Adjustments and improvements
 
@@ -34,22 +34,23 @@ Before you begin, make sure you've met the following requirements:
 - Java 17
 - Server RabbitMQ 3.7
 - Database MySQL 8.0
+- MongoDB 8
 
 ## 🖥️ Functionalities
 
-- ✅ Authentication on `account-ms`
-- ✅ Authorization on `auth-ms`
+- [x] Authentication on `account-ms`
+- [x] Authorization on `auth-ms`
 
-- ✅ Scheduling promotions
+- [x] Scheduling promotions
 
-- ✅ CRUD of customers and system administrators in the `account-ms` microservice
-- ✅ Products CRUD
-- ✅ Order CRUD and direct and indirect communication with the Products and Payments microservices
-- ✅ Payment persistence based on messaging
+- [x] CRUD of customers and system administrators in the `account-ms` microservice
+- [x] Products CRUD
+- [x] Order CRUD and direct and indirect communication with the Products and Payments microservices
+- [x] Payment persistence based on messaging
 
-- ✅ Highly parameterized search
+- [x] Highly parameterized search
 
-- ✅ Updates from related entities in different services through messaging
+- [x] Updates from related entities in different services through messaging
 
 ## 🛠️ Tecnologies
 
