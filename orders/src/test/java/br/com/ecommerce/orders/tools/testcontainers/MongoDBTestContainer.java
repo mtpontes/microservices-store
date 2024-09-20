@@ -1,4 +1,4 @@
-package br.com.ecommerce.cart.config;
+package br.com.ecommerce.orders.tools.testcontainers;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework. context.annotation. Bean;

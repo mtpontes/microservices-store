@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import br.com.ecommerce.orders.api.dto.order.StatusTransitionDTO;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
-import jakarta.transaction.Transactional;
 
 @Component
 public class OrderListener {
@@ -16,8 +15,8 @@ public class OrderListener {
 	@Autowired
 	private OrderService service;
 
+	
 	@RabbitListener(queues = "orders.status-payment")
-	@Transactional
 	public void consumesPaymentConfirmation(@Payload StatusTransitionDTO dto) {
 		service.updateOrderStatus(dto.getOrderId(), OrderStatus.CONFIRMED_PAYMENT);
 	}

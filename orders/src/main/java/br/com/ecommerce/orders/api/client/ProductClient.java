@@ -24,5 +24,5 @@ public interface ProductClient {
 	@GetMapping(
 		value = "/internal/products/prices",
 		headers = {"Content-Type: application/json"})
-	Map<Long, InternalProductDataDTO> getPrices(@RequestParam("productIds") Set<Long> productsId);
+	Map<String, InternalProductDataDTO> getPrices(@RequestParam("productIds") Set<String> productsId);
 }

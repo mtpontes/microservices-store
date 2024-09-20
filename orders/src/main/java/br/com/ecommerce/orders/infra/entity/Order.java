@@ -6,44 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@NoArgsConstructor
 @Getter
-@Entity(name = "Order")
-@Table(name = "orders")
+@ToString
+@NoArgsConstructor
+@Document
 public class Order {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	private Long userId;
-
-	@OneToMany(
-		mappedBy = "order", 
-		cascade = CascadeType.ALL, 
-		orphanRemoval = true)
+	@Id
+	private String id;
+	private String userId;
 	private List<Product> products = new ArrayList<>();
-
 	private BigDecimal total;
-
 	private LocalDate date;
-
-	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
 
-	public Order(Long userId, List<Product> products) {
+	public Order(String userId, List<Product> products) {
 		this.userId = this.checkNotNull(userId, "userId");
 		this.products = Optional.ofNullable(products)
 			.filter(p -> !p.isEmpty())
@@ -73,14 +58,5 @@ public class Order {
 
 	private boolean isValidStatusTransition(OrderStatus newStatus) {
 		return this.status.isValidTransition(newStatus);
-	}
-
-	@Override
-	public String toString() {
-		return String.format(
-			"Order[userId=%d, total=%s, status=%s]", 
-			this.userId, 
-			this.total.toString(), 
-			this.status);
 	}
 }

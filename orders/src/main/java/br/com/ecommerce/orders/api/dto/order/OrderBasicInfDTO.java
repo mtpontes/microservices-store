@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderBasicInfDTO {
 
-    private Long id;
+    private String id;
     private BigDecimal totalOrder;
 
     @JsonFormat(pattern = "dd/MM/yyyy")

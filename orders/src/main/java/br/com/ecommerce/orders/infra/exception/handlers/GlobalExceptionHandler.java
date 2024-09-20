@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
 import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
-import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,13 +40,13 @@ public class GlobalExceptionHandler {
 				notFound.getReasonPhrase()));
 	}
 
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError401(EntityNotFoundException ex) {
+	@ExceptionHandler(OrderNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError401(OrderNotFoundException ex) {
 		return ResponseEntity
-			.status(unauthorized.value())
+			.status(badRequest.value())
 			.body(new ResponseError(
-				unauthorized.value(),
-				unauthorized.getReasonPhrase(),
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
 				ENTITY_NOT_FOUND_EXCEPTION));
 	}
 

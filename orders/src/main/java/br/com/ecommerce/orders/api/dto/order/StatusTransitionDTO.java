@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StatusTransitionDTO {
 
-    private Long orderId;
+    private String orderId;
     private OrderStatus status;
 }

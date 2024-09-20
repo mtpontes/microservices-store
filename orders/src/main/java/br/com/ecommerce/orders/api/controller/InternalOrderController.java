@@ -22,7 +22,6 @@ import br.com.ecommerce.orders.api.mapper.OrderMapper;
 import br.com.ecommerce.orders.api.mapper.ProductMapper;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.Order;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -41,9 +40,8 @@ public class InternalOrderController {
 
 
 	@PostMapping
-	@Transactional
 	public ResponseEntity<OrderDTO> createOrder(
-		@RequestHeader("X-auth-user-id") Long userId,
+		@RequestHeader("X-auth-user-id") String userId,
 		@RequestBody @Valid @NotEmpty(message = "Product list is empty") Set<ProductAndUnitDTO> data, 
 		UriComponentsBuilder uriBuilder
 	) {
@@ -51,7 +49,7 @@ public class InternalOrderController {
 		
 		PaymentDTO paymentCreateRabbit = new PaymentDTO(order.getId(), order.getUserId(), order.getTotal());
 		List<StockWriteOffDTO> stockUpdateRabbit = order.getProducts().stream()
-			.map(o -> new StockWriteOffDTO(o.getProductId(), o.getUnit() * -1))
+			.map(o -> new StockWriteOffDTO(o.getId(), Math.negateExact(o.getUnit())))
 			.toList();
 
 		List<ProductDTO> productsData = order.getProducts().stream()

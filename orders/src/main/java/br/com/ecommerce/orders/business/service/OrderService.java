@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.ecommerce.orders.api.client.ProductClient;
 import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
@@ -21,9 +22,9 @@ import br.com.ecommerce.orders.api.mapper.ProductMapper;
 import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
 import br.com.ecommerce.orders.infra.entity.Product;
+import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
 import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class OrderService {
@@ -38,14 +39,15 @@ public class OrderService {
 	private ProductMapper productMapper;
 
 
-	public Order saveOrder(Set<ProductAndUnitDTO> dtos, Long userId) {
+	@Transactional
+	public Order saveOrder(Set<ProductAndUnitDTO> dtos, String userId) {
 		// validate stock
 		Set<ProductOutOfStockDTO> outOfStockProducts = this.productClient.verifyStocks(dtos);
 		if (!outOfStockProducts.isEmpty()) throw new OutOfStockException(outOfStockProducts);
 		
 		// get products
-		Set<Long> ids = dtos.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
-		Map<Long, InternalProductDataDTO> priceMap = this.productClient.getPrices(ids);
+		Set<String> ids = dtos.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
+		Map<String, InternalProductDataDTO> priceMap = this.productClient.getPrices(ids);
 		List<Product> products = dtos.stream()
 			.map(data -> new Product(
 				data.getId(), 
@@ -55,11 +57,10 @@ public class OrderService {
 			.toList();
 
 		Order newOrder = new Order(userId, products);
-		products.forEach(p -> p.setOrder(newOrder));
 		return orderRepository.save(newOrder);
 	}
 
-	public OrderDTO getOrderById(Long id, Long userId) {
+	public OrderDTO getOrderById(String id, String userId) {
 		return orderRepository.findByIdAndUserId(id, userId)
 			.map(order -> order.getProducts().stream()
 				.map(productMapper::toProductDTO)
@@ -67,15 +68,16 @@ public class OrderService {
 					Collectors.toList(), 
 					productsData -> orderMapper.toOrderDTO(order, productsData)))
 			)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(OrderNotFoundException::new);
 	}
 
-	public Page<OrderBasicInfDTO> getAllOrdersByUser(Pageable pageable, Long userId) {
+	public Page<OrderBasicInfDTO> getAllOrdersByUser(Pageable pageable, String userId) {
 		return this.orderRepository.findAllByUserId(pageable, userId)
 			.map(orderMapper::toOrderBasicInfoDTO);
 	}
 
-	public OrderDTO updateOrderStatus(Long orderId, OrderStatus newStatus) {
+	@Transactional
+	public OrderDTO updateOrderStatus(String orderId, OrderStatus newStatus) {
 		return orderRepository.findById(orderId)
 			.map(order -> {
 				order.updateOrderStatus(newStatus);
@@ -86,6 +88,6 @@ public class OrderService {
 				.collect(Collectors.collectingAndThen(
 					Collectors.toList(), 
 					products -> orderMapper.toOrderDTO(order, products))))
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(OrderNotFoundException::new);
 	}
 }
