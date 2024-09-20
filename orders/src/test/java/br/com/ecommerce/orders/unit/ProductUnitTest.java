@@ -12,7 +12,7 @@ import br.com.ecommerce.orders.infra.entity.Product;
 
 class ProductUnitTest {
 
-    private final long PRODUCT_ID = 1L;
+    private final String PRODUCT_ID = "1";
     private final String NAME = "Name";
     private final BigDecimal PRICE = BigDecimal.valueOf(100);
     private final int UNITS = 10;

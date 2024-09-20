@@ -16,7 +16,6 @@ import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
-import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/admin/orders")
@@ -30,7 +29,7 @@ public class AdminOrderController {
 
 	@GetMapping("/{userId}")
 	public ResponseEntity<Page<OrderBasicInfDTO>> getAllBasicsInfoOrdersByUser(
-		@PathVariable Long userId,
+		@PathVariable String userId,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
 		return ResponseEntity.ok(service.getAllOrdersByUser(pageable, userId));
@@ -38,16 +37,15 @@ public class AdminOrderController {
 
 	@GetMapping("/{orderId}/{userId}")
 	public ResponseEntity<OrderDTO> getOrderByIdAndUserId(
-		@PathVariable Long orderId,
-		@PathVariable Long userId,
+		@PathVariable String orderId,
+		@PathVariable String userId,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
 		return ResponseEntity.ok(service.getOrderById(orderId, userId));
 	}
 
 	@PatchMapping("/{orderId}")
-	@Transactional
-	public ResponseEntity<?> cancelOrder(@PathVariable Long orderId) {
+	public ResponseEntity<?> cancelOrder(@PathVariable String orderId) {
 		service.updateOrderStatus(orderId, OrderStatus.CANCELED);
 		
 		// cancel payment

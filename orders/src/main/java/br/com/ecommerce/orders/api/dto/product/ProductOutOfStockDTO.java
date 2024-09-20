@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class ProductOutOfStockDTO {
 	
 	@JsonAlias("productId")
-	private Long id;
+	private String id;
 
 	private String name;
 

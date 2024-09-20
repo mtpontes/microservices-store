@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,9 +37,9 @@ import br.com.ecommerce.orders.api.mapper.ProductMapper;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
+import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
 import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceUnitTest {
@@ -68,22 +68,22 @@ class OrderServiceUnitTest {
 	void saveOrderValidateProductsStocksTest01() {
 		// arrange
 		var input = Set.of(
-			new ProductAndUnitDTO(1L, 100),
-			new ProductAndUnitDTO(2L, 100),
-			new ProductAndUnitDTO(3L, 100)
+			new ProductAndUnitDTO("1", 100),
+			new ProductAndUnitDTO("2", 100),
+			new ProductAndUnitDTO("3", 100)
 		);
 
 		var responseBodyVerifyStocks = Set.of(
-			new ProductOutOfStockDTO(1L, "product-1", 1), 
-			new ProductOutOfStockDTO(2L, "product-2", 1), 
-			new ProductOutOfStockDTO(3L, "product-3", 1)
+			new ProductOutOfStockDTO("1", "product-1", 1), 
+			new ProductOutOfStockDTO("2", "product-2", 1), 
+			new ProductOutOfStockDTO("3", "product-3", 1)
 		);
 		when(productClient.verifyStocks(any()))
 			.thenReturn(responseBodyVerifyStocks);
 
 		// act and assert
 		assertThrows(OutOfStockException.class, 
-			() -> service.saveOrder(input, 1L));
+			() -> service.saveOrder(input, "1"));
 	}
 
 	@Test
@@ -91,8 +91,8 @@ class OrderServiceUnitTest {
 	void saveOrder01() {
 		// arrange
 		var input = Set.of(
-			new ProductAndUnitDTO(1L, 100),
-			new ProductAndUnitDTO(2L, 100)
+			new ProductAndUnitDTO("1", 100),
+			new ProductAndUnitDTO("2", 100)
 		);
 
 		// simulates that all products have sufficient stock to create the order
@@ -100,20 +100,20 @@ class OrderServiceUnitTest {
 		when(productClient.verifyStocks(any()))
 			.thenReturn(responseBodyVerifyStocks);
 
-        Set<Long> listOfIds = input.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
+        Set<String> listOfIds = input.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
         InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE);
-        Map<Long, InternalProductDataDTO> priceMap = listOfIds.stream()
+        Map<String, InternalProductDataDTO> priceMap = listOfIds.stream()
             .collect(Collectors.toMap(id -> id, id -> nameAndPrice));
         when(productClient.getPrices(eq(listOfIds)))
             .thenReturn(priceMap);
 
 		// act
-		service.saveOrder(input, 1L);
+		service.saveOrder(input, "1");
 		verify(repository).save(orderCaptor.capture());
 
 		// assert
 		var result = orderCaptor.getValue();
-		assertEquals(Long.valueOf(1L), result.getUserId());
+		assertEquals("1", result.getUserId());
 		assertEquals(200, result.getTotal().intValue());
 		assertEquals(OrderStatus.AWAITING_PAYMENT, result.getStatus());
 		assertEquals(2, result.getProducts().size());
@@ -122,26 +122,26 @@ class OrderServiceUnitTest {
 	@Test
 	@DisplayName("Unit - getOrderById - Should throw exception when not finding the product by ID")
 	void getOrderByIdTest01() {
-		when(repository.findByIdAndUserId(anyLong(), anyLong()))
+		when(repository.findByIdAndUserId(anyString(), anyString()))
 			.thenReturn(Optional.empty());
 
-		assertThrows(EntityNotFoundException.class, 
-			() -> service.getOrderById(1L, 1L));
+		assertThrows(OrderNotFoundException.class, 
+			() -> service.getOrderById("1", "1"));
 	}
 
 	@Test
     @DisplayName("Unit - getOrderById - Checks if the status update was made")
 	void updateOrderStatusTest01() {
 		// arrange
-		when(repository.findById(anyLong()))
+		when(repository.findById(anyString()))
 			.thenReturn(Optional.of(orderMock));
 		when(repository.save(orderMock))
 			.thenReturn(orderMock);
 	
-		ProductDTO mockProductDTO = new ProductDTO(1L, null, 1, price);
+		ProductDTO mockProductDTO = new ProductDTO("1", null, 1, price);
 		OrderDTO mockOrderDTO = new OrderDTO(
-            1L, 
-            1L, 
+            "1", 
+            "1", 
             List.of(mockProductDTO), 
             BigDecimal.ZERO, 
             OrderStatus.CANCELED, 
@@ -150,7 +150,7 @@ class OrderServiceUnitTest {
 			.thenReturn(mockOrderDTO);
 	
 		// act
-		service.updateOrderStatus(1L, OrderStatus.CANCELED);
+		service.updateOrderStatus("1", OrderStatus.CANCELED);
 	
 		verify(orderMock).updateOrderStatus(any());
 		verify(orderMapper).toOrderDTO(orderCaptor.capture(), anyList());

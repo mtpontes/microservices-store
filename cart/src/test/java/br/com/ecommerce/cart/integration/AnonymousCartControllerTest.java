@@ -42,8 +42,8 @@ import br.com.ecommerce.cart.infra.repository.CartRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(MongoDBTestContainer.class)
 @AutoConfigureJsonTesters
+@Import(MongoDBTestContainer.class)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class AnonymousCartControllerTest {
 

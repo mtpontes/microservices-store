@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,16 +34,14 @@ import br.com.ecommerce.orders.infra.entity.Product;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
 import br.com.ecommerce.orders.tools.builder.OrderTestBuilder;
 import br.com.ecommerce.orders.tools.config.TestConfigBeans;
+import br.com.ecommerce.orders.tools.testcontainers.MongoDBTestContainer;
 import br.com.ecommerce.orders.tools.utils.RandomUtils;
-import jakarta.transaction.Transactional;
 
-@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestConfigBeans.class)
 @AutoConfigureJsonTesters
-@AutoConfigureTestDatabase
+@Import({TestConfigBeans.class, MongoDBTestContainer.class})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class AdminOrderControllerIntegrationTest {
 
@@ -54,42 +52,51 @@ class AdminOrderControllerIntegrationTest {
     private RabbitTemplate template;
     @MockBean
     private ProductClient productClient;
+
     @Autowired
     private MockMvc mvc;
+    @Autowired 
+    private OrderRepository repository;
+    @Autowired 
+    private RandomUtils randomUtils;
 
-    @BeforeAll
-    static void setup(
-        @Autowired OrderRepository orderRepository,
-        @Autowired RandomUtils randomUtils
-    ) {
+    @BeforeEach
+    void setup() {
         IntStream.range(0, 3)
             .forEach(flux -> {
                 List<Product> products = List.of(
                     new Product(
-                        randomUtils.getRandomLong(),
+                        randomUtils.getRandomString(),
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
                         randomUtils.getRandomInt()),
                     new Product(
-                        randomUtils.getRandomLong(),
+                        randomUtils.getRandomString(),
                         randomUtils.getRandomString(10), 
                         randomUtils.getRandomBigDecimal(), 
                         randomUtils.getRandomInt()),
                     new Product(
-                        randomUtils.getRandomLong(), 
+                        randomUtils.getRandomString(), 
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
                         randomUtils.getRandomInt())
                 );
 
                 Order order = new OrderTestBuilder()
-                    .userId(randomUtils.getRandomLong())
+                    .id(randomUtils.getRandomString())
+                    .userId(randomUtils.getRandomString())
                     .products(products)
                     .total(randomUtils.getRandomBigDecimal())
                     .status(OrderStatus.AWAITING_PAYMENT)
                     .build();
-                ordersPersisted.add(orderRepository.save(order));
+                repository.save(order);
+                ordersPersisted = List.of(order);
             });
+    }
+
+    @AfterEach
+    void cleanup() {
+        this.repository.deleteAll();
     }
     
 
@@ -116,11 +123,11 @@ class AdminOrderControllerIntegrationTest {
 
     @TestWithRoles(roles = {"ADMIN"})
     void getOrderByIdAndUserIdTest01() throws Exception {
-        Long orderId = ordersPersisted.get(0).getId();
-        Long userId = ordersPersisted.get(0).getUserId();
+        String orderId = ordersPersisted.get(0).getId();
+        String userId = ordersPersisted.get(0).getUserId();
 
         mvc.perform(
-            get(String.format("%s/%d/%d", basePath, orderId, userId))
+            get(String.format("%s/%s/%s", basePath, orderId, userId))
                 .contentType(MediaType.APPLICATION_JSON)
         )
         // assert
@@ -141,11 +148,14 @@ class AdminOrderControllerIntegrationTest {
     @TestWithRoles(roles = {"ADMIN"})
     @DisplayName("Unit - cancelOrder - Should return status 204")
     void cancelOrderTest01() throws IOException, Exception {
+        // arrange
+        String orderId = ordersPersisted.iterator().next().getId();
+
         // act
         mvc.perform(
-            patch(basePath + "/1")
+            patch(basePath + "/" + orderId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", "1")
+                .header("X-auth-user-id", 1)
         )
         // assert
         .andExpect(status().isNoContent());

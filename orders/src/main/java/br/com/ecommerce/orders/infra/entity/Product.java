@@ -3,48 +3,32 @@ package br.com.ecommerce.orders.infra.entity;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
+@Getter
 @Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@ToString
-@Entity(name = "Product")
-@Table(name = "products")
+@Document
 public class Product {
 
 	private static final BigDecimal MINIMAL_PRICE = BigDecimal.ZERO;
 	private static final int MINIMAL_UNIT = 1;
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@Setter
-	@ManyToOne(fetch = FetchType.LAZY) 
-	@JoinColumn(name = "order_id") 
-	private Order order;
-
-	private Long productId;
+	private String id;
 	private String name;
 	private Integer unit;
 	private BigDecimal price;
 
-	public Product(Long productId, String name, BigDecimal price, Integer unit) {
-		this.productId = this.checkNotNull(productId, "productId");
+	public Product(String id, String name, BigDecimal price, Integer unit) {
+		this.id = this.checkNotNull(id, "product ID");
 		this.price = this.checkPrice(price);
 		this.unit = this.checkUnit(unit);
 	}

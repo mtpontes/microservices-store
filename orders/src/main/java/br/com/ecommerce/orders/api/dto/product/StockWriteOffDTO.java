@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StockWriteOffDTO {
 
-    private Long productId;
+    private String productId;
     private Integer unit;
 }

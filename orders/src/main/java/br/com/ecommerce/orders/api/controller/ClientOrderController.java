@@ -17,7 +17,6 @@ import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
-import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/orders")
@@ -31,7 +30,7 @@ public class ClientOrderController {
 
 	@GetMapping
 	public ResponseEntity<Page<OrderBasicInfDTO>> getAllBasicsInfoOrdersByUser(
-		@RequestHeader("X-auth-user-id") Long userId,
+		@RequestHeader("X-auth-user-id") String userId,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
 		return ResponseEntity.ok(service.getAllOrdersByUser(pageable, userId));
@@ -39,17 +38,16 @@ public class ClientOrderController {
 
 	@GetMapping("/{orderId}")
 	public ResponseEntity<OrderDTO> getOrderByIdAndUserId(
-		@PathVariable Long orderId,
-		@RequestHeader("X-auth-user-id") Long userId,
+		@PathVariable String orderId,
+		@RequestHeader("X-auth-user-id") String userId,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
 		return ResponseEntity.ok(service.getOrderById(orderId, userId));
 	}
 
-	@Transactional
 	@PatchMapping("/{orderId}")
 	public ResponseEntity<Void> cancelOrder(
-		@PathVariable Long orderId, 
+		@PathVariable String orderId, 
 		@RequestHeader("X-auth-user-id") String token
 	) {
 		service.updateOrderStatus(orderId, OrderStatus.CANCELED);

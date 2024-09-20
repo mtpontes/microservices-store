@@ -14,20 +14,20 @@ import br.com.ecommerce.orders.infra.entity.Product;
 
 public class OrderTestBuilder {
 
-    private Long id;
-    private Long userId;
+    private String id;
+    private String userId;
     private List<Product> products = new ArrayList<>();
     private BigDecimal total;
     private LocalDate date;
     private OrderStatus status;
 
 
-    public OrderTestBuilder id(Long id) {
+    public OrderTestBuilder id(String id) {
         this.id = id;
         return this;
     }
 
-    public OrderTestBuilder userId(Long userId) {
+    public OrderTestBuilder userId(String userId) {
         this.userId = userId;
         return this;
     }

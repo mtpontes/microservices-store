@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PaymentDTO {
 
-    private Long orderId;
-    private Long userId;
+    private String orderId;
+    private String userId;
     private BigDecimal paymentAmount;
 }

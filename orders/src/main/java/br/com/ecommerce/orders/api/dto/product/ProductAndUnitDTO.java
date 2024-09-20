@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductAndUnitDTO {
 
-    private Long id;
+    private String id;
     private Integer unit;
 }

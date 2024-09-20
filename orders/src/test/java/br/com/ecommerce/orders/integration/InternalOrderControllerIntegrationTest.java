@@ -22,10 +22,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -48,17 +46,14 @@ import br.com.ecommerce.orders.infra.entity.Product;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
 import br.com.ecommerce.orders.tools.builder.OrderTestBuilder;
 import br.com.ecommerce.orders.tools.config.TestConfigBeans;
+import br.com.ecommerce.orders.tools.testcontainers.MongoDBTestContainer;
 import br.com.ecommerce.orders.tools.utils.RandomUtils;
-import jakarta.transaction.Transactional;
 
-@Transactional
 @SpringBootTest
-@AutoConfigureWebMvc
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestConfigBeans.class)
 @AutoConfigureJsonTesters
-@AutoConfigureTestDatabase
+@Import({TestConfigBeans.class, MongoDBTestContainer.class})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class InternalOrderControllerIntegrationTest {
 
@@ -83,24 +78,25 @@ class InternalOrderControllerIntegrationTest {
             .forEach(flux -> {
                 List<Product> products = List.of(
                     new Product(
-                        randomUtils.getRandomLong(),
+                        randomUtils.getRandomString(),
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
                         randomUtils.getRandomInt()),
                     new Product(
-                        randomUtils.getRandomLong(),
+                        randomUtils.getRandomString(),
                         randomUtils.getRandomString(10), 
                         randomUtils.getRandomBigDecimal(), 
                         randomUtils.getRandomInt()),
                     new Product(
-                        randomUtils.getRandomLong(), 
+                        randomUtils.getRandomString(), 
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
                         randomUtils.getRandomInt())
                 );
 
                 Order order = new OrderTestBuilder()
-                    .userId(randomUtils.getRandomLong())
+                    .id(randomUtils.getRandomString())
+                    .userId(randomUtils.getRandomString())
                     .products(products)
                     .total(randomUtils.getRandomBigDecimal())
                     .status(OrderStatus.AWAITING_PAYMENT)
@@ -115,14 +111,14 @@ class InternalOrderControllerIntegrationTest {
     @DisplayName("Unit - createOrder - Should return status 201 and created order details")
     void createOrderTest01() throws IOException, Exception {
         // arrange
-        var requestBody = List.of(new ProductAndUnitDTO(1L, 100));
+        var requestBody = List.of(new ProductAndUnitDTO("1", 100));
 
         when(productClient.verifyStocks(anySet()))
             .thenReturn(Collections.emptySet());
 
-        Set<Long> listOfIds = requestBody.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
+        Set<String> listOfIds = requestBody.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
         InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE);
-        Map<Long, InternalProductDataDTO> priceMap = listOfIds.stream()
+        Map<String, InternalProductDataDTO> priceMap = listOfIds.stream()
             .collect(Collectors.toMap(id -> id, id -> nameAndPrice));
         when(productClient.getPrices(eq(listOfIds)))
             .thenReturn(priceMap);
