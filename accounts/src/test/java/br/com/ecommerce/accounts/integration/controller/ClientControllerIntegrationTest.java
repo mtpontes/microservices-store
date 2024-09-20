@@ -146,18 +146,18 @@ class ClientControllerIntegrationTest {
         )
         // assert
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.fields.username").exists())
-        .andExpect(jsonPath("$.fields.password").exists())
-        .andExpect(jsonPath("$.fields.name").exists())
-        .andExpect(jsonPath("$.fields.email").exists())
-        .andExpect(jsonPath("$.fields.phone_number").exists())
-        .andExpect(jsonPath("$.fields.['address.street']").exists())
-        .andExpect(jsonPath("$.fields.['address.neighborhood']").exists())
-        .andExpect(jsonPath("$.fields.['address.postal_code']").exists())
-        .andExpect(jsonPath("$.fields.['address.number']").exists())
-        .andExpect(jsonPath("$.fields.['address.complement']").exists())
-        .andExpect(jsonPath("$.fields.['address.city']").exists())
-        .andExpect(jsonPath("$.fields.['address.state']").exists());
+        .andExpect(jsonPath("$.message.username").exists())
+        .andExpect(jsonPath("$.message.password").exists())
+        .andExpect(jsonPath("$.message.name").exists())
+        .andExpect(jsonPath("$.message.email").exists())
+        .andExpect(jsonPath("$.message.phone_number").exists())
+        .andExpect(jsonPath("$.message.['address.street']").exists())
+        .andExpect(jsonPath("$.message.['address.neighborhood']").exists())
+        .andExpect(jsonPath("$.message.['address.postal_code']").exists())
+        .andExpect(jsonPath("$.message.['address.number']").exists())
+        .andExpect(jsonPath("$.message.['address.complement']").exists())
+        .andExpect(jsonPath("$.message.['address.city']").exists())
+        .andExpect(jsonPath("$.message.['address.state']").exists());
     }
 
     @Rollback

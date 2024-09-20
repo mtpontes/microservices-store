@@ -105,8 +105,8 @@ class SignInControllerIntegrationTest {
         // assert
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.token").doesNotExist())
-        .andExpect(jsonPath("$.fields.username").exists())
-        .andExpect(jsonPath("$.fields.password").exists());
+        .andExpect(jsonPath("$.message.username").exists())
+        .andExpect(jsonPath("$.message.password").exists());
     }
 
     @Test

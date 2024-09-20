@@ -84,9 +84,9 @@ class AdminAccountControllerIntegrationTest {
         )
         // assert
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.fields.username").exists())
-        .andExpect(jsonPath("$.fields.password").exists())
-        .andExpect(jsonPath("$.fields.name").exists());
+        .andExpect(jsonPath("$.message.username").exists())
+        .andExpect(jsonPath("$.message.password").exists())
+        .andExpect(jsonPath("$.message.name").exists());
     }
 
     @Rollback
@@ -141,9 +141,9 @@ class AdminAccountControllerIntegrationTest {
         )
         // assert
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.fields.username").exists())
-        .andExpect(jsonPath("$.fields.password").exists())
-        .andExpect(jsonPath("$.fields.name").exists());
+        .andExpect(jsonPath("$.message.username").exists())
+        .andExpect(jsonPath("$.message.password").exists())
+        .andExpect(jsonPath("$.message.name").exists());
     }
 
     @Rollback
