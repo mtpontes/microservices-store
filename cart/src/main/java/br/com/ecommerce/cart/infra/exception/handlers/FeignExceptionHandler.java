@@ -58,5 +58,5 @@ public class FeignExceptionHandler {
         }
 
         return responseBody;
-    }  
+    }
 }

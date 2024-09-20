@@ -31,8 +31,7 @@ public class TokenService {
             return token;
             
         } catch (JWTCreationException exception) {
-            throw new FailedCredentialsException(
-                "Error while generating token", exception);
+            throw new FailedCredentialsException("Error while generating token", exception);
         }
     }
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.ecommerce.auth.exception.UserNotFoundException;
+import br.com.ecommerce.auth.exception.exceptions.UserNotFoundException;
 import br.com.ecommerce.auth.service.TokenService;
 
 
