@@ -28,16 +28,8 @@ The project is still under development, is currently using development settings.
 - [ ] Create docker-compose
 - [ ] Create detailed documentation with Postman (currently there are only requests in the Postman collection)
 
-## 📋 Prerequisites
-
-Before you begin, make sure you've met the following requirements:
-
-- Java 17
-- Server RabbitMQ 3.7
-- Database MySQL 8.0
-- MongoDB 8
-
-## 🖥️ System
+## ⚙️ System overview
+![application-schema](readme/application.svg)
 
 ### 1. Eureka
 - This is the discovery service. It acts as a hub where all microservices connect, allowing them to know each other.
@@ -70,28 +62,6 @@ Before you begin, make sure you've met the following requirements:
 ### 9. Payments
 - Manages order payments.
 
-
-## 🛠️ Tecnologies
-
-- [Docker](https://www.docker.com/)
-- [TestContainers](https://testcontainers.com/)
-- [RabbitMQ](https://www.rabbitmq.com/)
-- [MySQL](https://dev.mysql.com/downloads/connector/j/)
-- [MongoDB](https://www.mongodb.com)
-- [H2](https://www.h2database.com/html/main.html)
-- [JWT](https://github.com/auth0/java-jwt)
-- [Spring Cloud Netflix](https://cloud.spring.io/spring-cloud-netflix/reference/html/)
-- [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
-- [Spring Cloud OpenFeign](https://spring.io/projects/spring-cloud-openfeign)
-- [Spring Security](https://spring.io/projects/spring-security)
-- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
-- [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb)
-- [Spring Web]()
-- [Java Bean Validation](https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html)
-
-## ⚙️ System overview
-![application-schema](readme/application.svg)
-
 ## 🔑 Authentication and Authorization Flow
 
 ### 1. Token Interception by the API Gateway:
@@ -119,9 +89,35 @@ Before you begin, make sure you've met the following requirements:
     - The internal headers and the Auth microservice will be removed.
     - The JWT decoding will be done directly in each microservice, eliminating the need for centralized validation in Auth.
 
-## 📦 Endpoints 
+## 🛠️ Tecnologies
 
-#### To log in as an ADMIN use username `root` and password `root@123` or create the environment variables `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
+- [Docker](https://www.docker.com/)
+- [TestContainers](https://testcontainers.com/)
+- [RabbitMQ](https://www.rabbitmq.com/)
+- [MySQL](https://dev.mysql.com/downloads/connector/j/)
+- [MongoDB](https://www.mongodb.com)
+- [H2](https://www.h2database.com/html/main.html)
+- [JWT](https://github.com/auth0/java-jwt)
+- [Spring Cloud Netflix](https://cloud.spring.io/spring-cloud-netflix/reference/html/)
+- [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
+- [Spring Cloud OpenFeign](https://spring.io/projects/spring-cloud-openfeign)
+- [Spring Security](https://spring.io/projects/spring-security)
+- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+- [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb)
+- [Spring Web]()
+- [Java Bean Validation](https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html)
+
+## 📋 Prerequisites
+
+Before you begin, make sure you've met the following requirements:
+
+- Java 17
+- Server RabbitMQ 3.7
+- Database MySQL 8.0
+- MongoDB 8
+
+## 📦 Endpoints 
+Set the **ADMIN_USERNAME** and **ADMIN_PASSWORD** environment variables to log in as an administrator.
 
 [<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/31232249-c57739c1-b80d-463e-be53-c848cdbf703e?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D31232249-c57739c1-b80d-463e-be53-c848cdbf703e%26entityType%3Dcollection%26workspaceId%3Deac3d0ef-d921-4389-8597-a53480212132)
 
