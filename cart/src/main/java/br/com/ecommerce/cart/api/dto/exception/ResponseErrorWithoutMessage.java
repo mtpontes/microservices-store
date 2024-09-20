@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseErrorWithouMessage {
+public class ResponseErrorWithoutMessage {
     
     private int status;
     private String error;

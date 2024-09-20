@@ -37,7 +37,7 @@ import br.com.ecommerce.orders.api.mapper.ProductMapper;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
-import br.com.ecommerce.orders.infra.exception.OutOfStockException;
+import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 

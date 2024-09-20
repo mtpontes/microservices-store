@@ -1,4 +1,4 @@
-package br.com.ecommerce.payment.exception;
+package br.com.ecommerce.auth.exception.handlers;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,19 +14,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import jakarta.persistence.EntityNotFoundException;
+import br.com.ecommerce.auth.exception.exceptions.InvalidTokenException;
+import br.com.ecommerce.auth.exception.exceptions.UserNotFoundException;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-	private final String ENTITY_NOT_FOUND_EXCEPTION = "Payment not found";
-	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
 	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
-	private final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
+	private final HttpStatus internalServerError= HttpStatus.INTERNAL_SERVER_ERROR;
 
 
 	@ExceptionHandler(NoResourceFoundException.class)
@@ -38,14 +37,24 @@ public class GlobalExceptionHandler {
 				notFound.getReasonPhrase()));
 	}
 
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError401(EntityNotFoundException ex) {
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError404(UserNotFoundException ex) {
+		return ResponseEntity
+			.status(notFound.value())
+			.body(new ResponseError(
+				notFound.value(), 
+				notFound.getReasonPhrase(), 
+				ex.getMessage()));
+	}
+
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<ResponseError> handlerError401(InvalidTokenException ex) {
 		return ResponseEntity
 			.status(unauthorized.value())
 			.body(new ResponseError(
 				unauthorized.value(),
 				unauthorized.getReasonPhrase(),
-				ENTITY_NOT_FOUND_EXCEPTION));
+				ex.getMessage()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -84,18 +93,19 @@ public class GlobalExceptionHandler {
 			.body(new ResponseError(
 				badRequest.value(),
 				badRequest.getReasonPhrase(),
-				HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
+				"Malformed or unexpected json format"));
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<ResponseError> handlerErro415(HttpMediaTypeNotSupportedException ex) {
 		String unsupported = Optional.ofNullable(ex.getContentType())
-			.map(m -> m.getType() +"/"+ m.getSubtype())
+			.map(e -> e.getType() + "/" + e.getSubtype())
 			.orElse("unknown");
 
 		String supported = ex.getSupportedMediaTypes().stream()
 			.map(mediaType -> mediaType.getType() + "/" + mediaType.getSubtype())
 			.collect(Collectors.joining(", "));
+			
 		String message = 
 			String.format("Unsupported media type '%s'. Supported media types are: %s", unsupported, supported);
 
@@ -103,12 +113,12 @@ public class GlobalExceptionHandler {
 			.status(unsupportedMediaType.value())
 			.body(new ResponseError(
 				unsupportedMediaType.value(),
-				unsupportedMediaType.getReasonPhrase(),
+				unsupportedMediaType.getReasonPhrase(), 
 				message));
 	}
 
 	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
+    public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
 		MissingRequestHeaderException ex
 	) {
 		String headerName = ex.getHeaderName();
@@ -119,12 +129,14 @@ public class GlobalExceptionHandler {
 					unauthorized.value(), 
 					unauthorized.getReasonPhrase()));
 
-		return this.handleError500(ex);
-	}
+        return this.handleError500(ex);
+    }
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError500(Exception ex) {
-		return ResponseEntity.internalServerError()
+		ex.printStackTrace();
+		return ResponseEntity
+			.internalServerError()
 			.body(new ResponseErrorWithoutMessage(
 				internalServerError.value(),
 				internalServerError.getReasonPhrase()));

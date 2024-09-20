@@ -15,7 +15,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import br.com.ecommerce.cart.api.dto.exception.ResponseError;
-import br.com.ecommerce.cart.api.dto.exception.ResponseErrorWithouMessage;
+import br.com.ecommerce.cart.api.dto.exception.ResponseErrorWithoutMessage;
 import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
 import br.com.ecommerce.cart.infra.exception.exceptions.EmptyCartException;
 import lombok.AllArgsConstructor;
@@ -26,29 +26,32 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	private final String INPUT_VALIDATION_ERROR = "Input validation error";
 	private final String INTERNAL_SERVER_ERROR_MESSAGE = "An internal error occurred";
+	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError= HttpStatus.INTERNAL_SERVER_ERROR;
 
 
 	@ExceptionHandler(NoResourceFoundException.class)
-	public ResponseEntity<ResponseErrorWithouMessage> handleError404(NoResourceFoundException ex) {
-		return ResponseEntity.status(notFound.value())
-			.body(new ResponseErrorWithouMessage(
+	public ResponseEntity<ResponseErrorWithoutMessage> handleError404(NoResourceFoundException ex) {
+		return ResponseEntity
+			.status(notFound.value())
+			.body(new ResponseErrorWithoutMessage(
 				notFound.value(),
 				notFound.getReasonPhrase()));
 	}
 
 	@ExceptionHandler(CartNotFoundException.class)
-	public ResponseEntity<ResponseErrorWithouMessage> handlerError404(CartNotFoundException ex) {
-		return ResponseEntity.status(notFound.value())
-		.body(new ResponseErrorWithouMessage(
-			notFound.value(),
-			notFound.getReasonPhrase()));
+	public ResponseEntity<ResponseErrorWithoutMessage> handlerError404(CartNotFoundException ex) {
+		return ResponseEntity
+			.status(notFound.value())
+			.body(new ResponseErrorWithoutMessage(
+				notFound.value(),
+				notFound.getReasonPhrase()));
 	}
 
 	@ExceptionHandler(EmptyCartException.class)
@@ -72,13 +75,12 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(HandlerMethodValidationException.class)
-	public ResponseEntity<ResponseError> handlerErro400(HandlerMethodValidationException ex) {
+	public ResponseEntity<ResponseErrorWithoutMessage> handleError400(HandlerMethodValidationException ex) {
 		return ResponseEntity
-			.badRequest()
-			.body(new ResponseError(
-				badRequest.value(), 
-				badRequest.getReasonPhrase(),
-				INPUT_VALIDATION_ERROR));
+			.status(badRequest.value())
+			.body(new ResponseErrorWithoutMessage(
+				badRequest.value(),
+				badRequest.getReasonPhrase()));
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
@@ -96,23 +98,7 @@ public class GlobalExceptionHandler {
 			.body(new ResponseError(
 				badRequest.value(), 
 				badRequest.getReasonPhrase(),
-				"Malformed or unexpected json format"));
-	}
-
-	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<ResponseError> handleError400(MissingRequestHeaderException ex) {
-		String message = ex.getMessage();
-		if (message.contains("X-anon-cart-id")) 
-			return ResponseEntity.badRequest()
-				.body(new ResponseError(
-					badRequest.value(), 
-					badRequest.getReasonPhrase(),
-					ex.getMessage()));
-		return ResponseEntity.internalServerError()
-			.body(new ResponseError(
-				internalServerError.value(),
-				internalServerError.getReasonPhrase(),
-				"Missing header"));
+				HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -125,11 +111,32 @@ public class GlobalExceptionHandler {
 			.map(mediaType -> mediaType.getType() + "/" + mediaType.getSubtype())
 			.collect(Collectors.joining(", "));
 		String message = String.format("Unsupported media type '%s'. Supported media types are: %s", unsupported, supported);
-		return ResponseEntity.status(unsupportedMediaType.value())
+		return ResponseEntity
+			.status(unsupportedMediaType.value())
 			.body(new ResponseError(
 				unsupportedMediaType.value(),
 				unsupportedMediaType.getReasonPhrase(), 
 				message));
+	}
+
+	@ExceptionHandler(MissingRequestHeaderException.class)
+	public ResponseEntity<?> handlerMissingRequestHeaderException(MissingRequestHeaderException ex) {
+		String headerName = ex.getHeaderName();
+		if (headerName.contains("X-anon-cart-id")) 
+			return ResponseEntity.badRequest()
+				.body(new ResponseError(
+					badRequest.value(), 
+					badRequest.getReasonPhrase(),
+					ex.getMessage()));
+
+		if (headerName.equalsIgnoreCase("X-auth-user-id"))
+			return ResponseEntity
+				.status(unauthorized.value())
+				.body(new ResponseErrorWithoutMessage(
+					unauthorized.value(), 
+					unauthorized.getReasonPhrase()));
+
+		return this.handleError500(ex);
 	}
 
 	@ExceptionHandler(Exception.class)

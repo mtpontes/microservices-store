@@ -1,4 +1,4 @@
-package br.com.ecommerce.orders.infra.exception;
+package br.com.ecommerce.orders.infra.exception.exceptions;
 
 import java.util.Set;
 

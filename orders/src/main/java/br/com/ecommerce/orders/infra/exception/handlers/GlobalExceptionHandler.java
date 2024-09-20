@@ -1,5 +1,6 @@
-package br.com.ecommerce.payment.exception;
+package br.com.ecommerce.orders.infra.exception.handlers;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,12 +15,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	private final String ENTITY_NOT_FOUND_EXCEPTION = "Payment not found";
+	private final String ENTITY_NOT_FOUND_EXCEPTION = "Order not found";
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
@@ -48,10 +50,20 @@ public class GlobalExceptionHandler {
 				ENTITY_NOT_FOUND_EXCEPTION));
 	}
 
+	@ExceptionHandler(OutOfStockException.class)
+	public ResponseEntity<ResponseError> handlerError400(OutOfStockException ex) {
+		return ResponseEntity.badRequest()
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				Map.of(ex.getMessage(), ex.getProducts())));
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ResponseError> handleError400(MethodArgumentNotValidException ex) {
 		var fields = ex.getFieldErrors().stream()
-			.collect(Collectors.toMap(f -> f.getField().toString(), f -> f.getDefaultMessage()));
+			.collect(Collectors.toMap(
+				f -> f.getField().toString(), f -> f.getDefaultMessage()));
 		
 		return ResponseEntity.badRequest()
 			.body(new ResponseError(
@@ -90,14 +102,17 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<ResponseError> handlerErro415(HttpMediaTypeNotSupportedException ex) {
 		String unsupported = Optional.ofNullable(ex.getContentType())
-			.map(m -> m.getType() +"/"+ m.getSubtype())
+			.map(media -> media.getType() + "/" + media.getSubtype())
 			.orElse("unknown");
 
 		String supported = ex.getSupportedMediaTypes().stream()
 			.map(mediaType -> mediaType.getType() + "/" + mediaType.getSubtype())
 			.collect(Collectors.joining(", "));
-		String message = 
-			String.format("Unsupported media type '%s'. Supported media types are: %s", unsupported, supported);
+
+		String message = String.format(
+			"Unsupported media type '%s'. Supported media types are: %s", 
+			unsupported, 
+			supported);
 
 		return ResponseEntity
 			.status(unsupportedMediaType.value())
@@ -108,7 +123,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
+    public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
 		MissingRequestHeaderException ex
 	) {
 		String headerName = ex.getHeaderName();
@@ -119,11 +134,12 @@ public class GlobalExceptionHandler {
 					unauthorized.value(), 
 					unauthorized.getReasonPhrase()));
 
-		return this.handleError500(ex);
-	}
+        return this.handleError500(ex);
+    }
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError500(Exception ex) {
+		ex.printStackTrace();
 		return ResponseEntity.internalServerError()
 			.body(new ResponseErrorWithoutMessage(
 				internalServerError.value(),

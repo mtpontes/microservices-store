@@ -7,7 +7,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
-import br.com.ecommerce.auth.exception.InvalidTokenException;
+import br.com.ecommerce.auth.exception.exceptions.InvalidTokenException;
 
 @Service
 public class TokenService {

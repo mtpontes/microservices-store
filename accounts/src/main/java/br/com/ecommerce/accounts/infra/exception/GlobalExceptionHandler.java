@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -18,70 +19,85 @@ import jakarta.persistence.EntityNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	
-	private final String CREDENTIALS_ERROR_MESSAGE = "Bad credentials";
 	private final String ENTITY_NOT_FOUND_EXCEPTION = "User not found";
-	private final String METHOD_ARGUMENT_NOT_VALID_MESSAGE = "Input validation error";
-	private final String INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error";
+	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
+
+	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
+	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+	private final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
 	
 	
 	@ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Void> handleError404(
-		NoResourceFoundException ex
-	) {
-    	return ResponseEntity.notFound().build();
+    public ResponseEntity<ResponseErrorWithoutMessage> handleError404(NoResourceFoundException ex) {
+		return ResponseEntity
+			.status(notFound.value())
+			.body(new ResponseErrorWithoutMessage(
+				notFound.value(), 
+				notFound.getReasonPhrase()));
     }
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ErrorMessage> handleError401(
-		EntityNotFoundException ex
-	) {
+	public ResponseEntity<ResponseError> handleError401(EntityNotFoundException ex) {
 		return ResponseEntity
-			.status(HttpStatus.UNAUTHORIZED)
-			.body(new ErrorMessage(
-				HttpStatus.UNAUTHORIZED.value(),
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
 				ENTITY_NOT_FOUND_EXCEPTION));
 	}
 
 	@ExceptionHandler(FailedCredentialsException.class)
-	public ResponseEntity<ErrorMessage> handleError401(
-		FailedCredentialsException ex
-	) {
+	public ResponseEntity<ResponseErrorWithoutMessage> handleError401(FailedCredentialsException ex) {
 		return ResponseEntity
-			.status(HttpStatus.UNAUTHORIZED)
-			.body(new ErrorMessage(
-				HttpStatus.UNAUTHORIZED.value(), 
-				CREDENTIALS_ERROR_MESSAGE));
+			.status(unauthorized.value())
+			.body(new ResponseErrorWithoutMessage(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorMessageWithFields> handleError400(MethodArgumentNotValidException ex) {
+	public ResponseEntity<ResponseError> handleError400(MethodArgumentNotValidException ex) {
 		var fields = ex.getFieldErrors().stream()
-			.collect(Collectors.toMap(
-				f -> f.getField().toString(), f -> f.getDefaultMessage()));
+			.collect(Collectors.toMap(f -> f.getField().toString(), f -> f.getDefaultMessage()));
 
 		return ResponseEntity.badRequest()
-			.body(new ErrorMessageWithFields(
-				HttpStatus.BAD_REQUEST.value(),
-				METHOD_ARGUMENT_NOT_VALID_MESSAGE,
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
 				fields));
+	}
+
+	@ExceptionHandler(HandlerMethodValidationException.class)
+	public ResponseEntity<ResponseErrorWithoutMessage> handleError400(HandlerMethodValidationException ex) {
+		return ResponseEntity
+			.status(badRequest.value())
+			.body(new ResponseErrorWithoutMessage(
+				badRequest.value(),
+				badRequest.getReasonPhrase()));
 	}
 	
 	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<ErrorMessage> handlerErro400IllegalArgumentException(IllegalArgumentException ex) {
+	public ResponseEntity<ResponseError> handlerErro400IllegalArgumentException(IllegalArgumentException ex) {
 		return ResponseEntity.badRequest()
-			.body(new ErrorMessage(
-				HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+			.body(new ResponseError(
+				badRequest.value(), 
+				badRequest.getReasonPhrase(),
+				ex.getMessage()));
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorMessage> handleError400HttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    public ResponseEntity<ResponseError> handleError400HttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest()
-			.body(new ErrorMessage(
-				HttpStatus.BAD_REQUEST.value(), "Malformed or unexpected json format"));
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
     }
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorMessage> handlerErro415(HttpMediaTypeNotSupportedException ex) {
+    public ResponseEntity<ResponseError> handlerErro415(HttpMediaTypeNotSupportedException ex) {
 		String unsupported = Optional.ofNullable(ex.getContentType())
 			.map(media -> media.getType() + "/" + media.getSubtype())
 			.orElse("unknown");
@@ -95,32 +111,39 @@ public class GlobalExceptionHandler {
 			unsupported, 
 			supported);
 
-        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
-			.body(new ErrorMessage(
-				HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), message));
+        return ResponseEntity
+			.status(unsupportedMediaType.value())
+			.body(new ResponseError(
+				unsupportedMediaType.value(),
+				unsupportedMediaType.getReasonPhrase(),
+				message));
     }
 
 	@ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ErrorMessage> handlerMissingRequestHeaderException(MissingRequestHeaderException ex) {
+    public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
+		MissingRequestHeaderException ex
+	) {
 		String headerName = ex.getHeaderName();
-
 		if (headerName.equalsIgnoreCase("X-auth-user-id"))
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body(new ErrorMessage(401, headerName));
+			return ResponseEntity
+				.status(unauthorized.value())
+				.body(new ResponseErrorWithoutMessage(
+					unauthorized.value(), 
+					unauthorized.getReasonPhrase()));
 
         return this.handleError500(ex);
     }
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorMessage> handleError500(Exception ex) {
+	public ResponseEntity<ResponseErrorWithoutMessage> handleError500(Exception ex) {
 		ex.printStackTrace();
 		return ResponseEntity
 			.internalServerError()
-			.body(new ErrorMessage(
-				HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				INTERNAL_SERVER_ERROR_MESSAGE));
+			.body(new ResponseErrorWithoutMessage(
+				internalServerError.value(),
+				internalServerError.getReasonPhrase()));
 	}
 	
-	private record ErrorMessage(int status, Object error) {}
-	private record ErrorMessageWithFields(int status, String error, Object fields) {}
+	private record ResponseError(int status, String error, Object message) {}
+	private record ResponseErrorWithoutMessage(int status, Object error) {}
 }
