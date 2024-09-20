@@ -124,10 +124,10 @@ class AdminDepartmentControllerIntegrationTest {
         // assert
         actForNameNull
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.message.name").exists());
         actForNameBlank
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.message.name").exists());
     }
 
     @Rollback
@@ -229,12 +229,12 @@ class AdminDepartmentControllerIntegrationTest {
         // assert
         actForNameNull
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.departmentId").exists())
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.message.departmentId").exists())
+            .andExpect(jsonPath("$.message.name").exists());
         actForNameBlank
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.departmentId").exists())
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.message.departmentId").exists())
+            .andExpect(jsonPath("$.message.name").exists());
     }
 
     @Rollback

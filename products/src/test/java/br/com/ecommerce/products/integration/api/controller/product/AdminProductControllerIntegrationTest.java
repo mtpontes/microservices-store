@@ -385,7 +385,7 @@ class AdminProductControllerIntegrationTest {
         // assert
         act
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.unit").exists());
+            .andExpect(jsonPath("$.message.unit").exists());
     }
 
     @Rollback

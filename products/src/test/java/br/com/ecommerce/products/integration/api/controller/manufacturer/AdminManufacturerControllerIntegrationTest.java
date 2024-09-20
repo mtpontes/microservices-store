@@ -166,10 +166,10 @@ class AdminManufacturerControllerIntegrationTest {
         // assert
         actForNameNull
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.message.name").exists());
         actForNameBlank
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.message.name").exists());
     }
 
     @Rollback
