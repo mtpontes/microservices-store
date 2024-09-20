@@ -28,7 +28,7 @@ public class GlobalFilterImpl implements GlobalFilter {
             .stream().peek(token -> log.debug("TOKEN VALUE: " + token)).findFirst()
             .map(userKey -> webClienBuilder.build()
                 .get()
-                .uri("http://auth-ms/auth")
+                .uri("lb://auth-ms/auth")
                 .header("Authorization", userKey)
                 .retrieve()
                 .bodyToMono(UserDTO.class)
