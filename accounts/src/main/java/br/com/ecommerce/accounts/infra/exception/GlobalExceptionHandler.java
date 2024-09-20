@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 	
 	
 	@ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ResponseErrorWithoutMessage> handleError404(NoResourceFoundException ex) {
+	public ResponseEntity<ResponseErrorWithoutMessage> handleError404(NoResourceFoundException ex) {
 		return ResponseEntity
 			.status(notFound.value())
 			.body(new ResponseErrorWithoutMessage(
@@ -88,7 +88,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ResponseError> handleError400HttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+	public ResponseEntity<ResponseError> handleError400HttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest()
 			.body(new ResponseError(
 				badRequest.value(),
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     }
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ResponseError> handlerErro415(HttpMediaTypeNotSupportedException ex) {
+	public ResponseEntity<ResponseError> handlerErro415(HttpMediaTypeNotSupportedException ex) {
 		String unsupported = Optional.ofNullable(ex.getContentType())
 			.map(media -> media.getType() + "/" + media.getSubtype())
 			.orElse("unknown");
@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
     }
 
 	@ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
+	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
 		MissingRequestHeaderException ex
 	) {
 		String headerName = ex.getHeaderName();

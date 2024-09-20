@@ -118,7 +118,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
+	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
 		MissingRequestHeaderException ex
 	) {
 		String headerName = ex.getHeaderName();
