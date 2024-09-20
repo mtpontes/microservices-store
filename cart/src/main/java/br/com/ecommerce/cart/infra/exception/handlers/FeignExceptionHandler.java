@@ -1,4 +1,4 @@
-package br.com.ecommerce.cart.infra.exception;
+package br.com.ecommerce.cart.infra.exception.handlers;
 
 import java.io.IOException;
 import java.util.HashMap;

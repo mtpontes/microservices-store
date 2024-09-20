@@ -1,4 +1,4 @@
-package br.com.ecommerce.cart.infra.exception;
+package br.com.ecommerce.cart.infra.exception.handlers;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +16,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import br.com.ecommerce.cart.api.dto.exception.ResponseError;
 import br.com.ecommerce.cart.api.dto.exception.ResponseErrorWithouMessage;
+import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
+import br.com.ecommerce.cart.infra.exception.exceptions.EmptyCartException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

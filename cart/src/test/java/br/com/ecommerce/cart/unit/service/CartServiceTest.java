@@ -36,7 +36,7 @@ import br.com.ecommerce.cart.infra.entity.Cart;
 import br.com.ecommerce.cart.infra.entity.Product;
 import br.com.ecommerce.cart.infra.entity.factory.CartFactory;
 import br.com.ecommerce.cart.infra.entity.factory.ProductFactory;
-import br.com.ecommerce.cart.infra.exception.CartNotFoundException;
+import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
 import br.com.ecommerce.cart.infra.repository.CartRepository;
 import br.com.ecommerce.cart.service.CartService;
 

@@ -41,7 +41,7 @@ import br.com.ecommerce.common.annotations.TestWithRoles;
 @Import(MongoDBTestContainer.class)
 @AutoConfigureJsonTesters
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class CartOrderController {
+class CartToOrderControllerTest {
 
     final String basePath = "/cart-to-order";
     static Cart userCartPersisted = null;
@@ -207,5 +207,15 @@ class CartOrderController {
 
         // assert
         act.andExpect(status().isBadRequest());
+    }
+
+    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    void createTest06_withUnauthorizedRoles() throws Exception {
+        // act
+        ResultActions act = mvc.perform(post(basePath)
+            .contentType(MediaType.APPLICATION_JSON));
+
+        // assert
+        act.andExpect(status().isForbidden());
     }
 }
