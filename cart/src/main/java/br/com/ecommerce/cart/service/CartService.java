@@ -74,7 +74,7 @@ public class CartService {
                 .map(product -> {
                     boolean isZero = (product.getUnit() + update.getUnit()) <= 0;
                     if (isZero) cart.removeProduct(product);
-                    if (!isZero) product.addUnit(product.getUnit());
+                    if (!isZero) product.addUnit(update.getUnit());
                     return cartRespository.save(cart);
                 })
                 .orElseGet(() -> {
