@@ -6,13 +6,21 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>br.com.ecommerce</groupId>
 	<artifactId>common-security</artifactId>
 	<version>1.0.0</version>
+	<packaging>jar</packaging>
 	<name>common-security</name>
 	<description>This is a security library, which shares the security implementations common to all microservices.</description>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>Ecommerce Common Security Resources</name>
+			<url>https://maven.pkg.github.com/mtpontes/microservices-store</url>
+		</repository>
+	</distributionManagement>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
