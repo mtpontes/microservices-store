@@ -24,10 +24,10 @@ import br.com.ecommerce.products.api.mapper.CategoryMapper;
 import br.com.ecommerce.products.business.service.CategoryService;
 import br.com.ecommerce.products.business.validator.UniqueNameCategoryValidator;
 import br.com.ecommerce.products.infra.entity.category.Category;
+import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
 import br.com.ecommerce.products.utils.builder.CategoryTestBuilder;
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceUnitTest {
@@ -56,7 +56,7 @@ class CategoryServiceUnitTest {
     @DisplayName("Unit - getOne - Should throw an exception when not finding Category")
     void getOneTest() {
         // act and assert
-        assertThrows(EntityNotFoundException.class, () -> service.getOne(1L));
+        assertThrows(CategoryNotFoundException.class, () -> service.getOne(1L));
     }
 
     @Test
@@ -95,6 +95,6 @@ class CategoryServiceUnitTest {
     @DisplayName("Unit - update - Should throw exception when not finding Category")
     void updateTest02() {
         // act and assert
-        assertThrows(EntityNotFoundException.class, () -> service.update(1L, new UpdateCategoryDTO()));
+        assertThrows(CategoryNotFoundException.class, () -> service.update(1L, new UpdateCategoryDTO()));
     }
 }

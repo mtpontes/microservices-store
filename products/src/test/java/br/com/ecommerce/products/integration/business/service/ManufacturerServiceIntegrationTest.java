@@ -23,12 +23,12 @@ import br.com.ecommerce.products.business.service.ManufacturerService;
 import br.com.ecommerce.products.infra.entity.manufacturer.Address;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.manufacturer.Phone;
+import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.utils.util.AddressUtils;
 import br.com.ecommerce.products.utils.util.ManufacturerUtils;
 import br.com.ecommerce.products.utils.util.PhoneUtils;
 import br.com.ecommerce.products.utils.util.RandomUtils;
-import jakarta.persistence.EntityNotFoundException;
 
 @ServiceIntegrationTest
 class ManufacturerServiceIntegrationTest {
@@ -150,7 +150,7 @@ class ManufacturerServiceIntegrationTest {
     void updateManufacturerDataTest03() {
         Long unexistentId = 100000L;
         assertThrows(
-            EntityNotFoundException.class, 
+            ManufacturerNotFoundException.class, 
             () -> service.updateManufacturer(unexistentId, new UpdateManufacturerDTO()));
     }
 }

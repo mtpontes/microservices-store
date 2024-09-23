@@ -14,8 +14,8 @@ import br.com.ecommerce.products.api.mapper.CategoryMapper;
 import br.com.ecommerce.products.api.mapper.DepartmentMapper;
 import br.com.ecommerce.products.business.validator.UniqueNameDepartmentValidator;
 import br.com.ecommerce.products.infra.entity.department.Department;
+import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -42,7 +42,7 @@ public class DepartmentService {
                 .collect(Collectors.collectingAndThen(
                     Collectors.toList(), 
                     categories -> departmentMapper.toDataDepartmentDTO(department, categories))))
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(DepartmentNotFoundException::new);
     }
 
     @Transactional
@@ -62,7 +62,7 @@ public class DepartmentService {
                 return departmentRepository.save(department);
             })
             .map(departmentMapper::toSimpleDataDepartmentDTO)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(DepartmentNotFoundException::new);
     }
 
     @Transactional

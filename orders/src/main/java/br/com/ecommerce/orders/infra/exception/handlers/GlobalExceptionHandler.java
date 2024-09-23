@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(OrderNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError401(OrderNotFoundException ex) {
+	public ResponseEntity<ResponseError> handlerError400(OrderNotFoundException ex) {
 		return ResponseEntity
 			.status(badRequest.value())
 			.body(new ResponseError(

@@ -1,6 +1,6 @@
 package br.com.ecommerce.products.infra.security;
 
-import java.util.Set;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 public class SecurityConfigs {
 
-    @Value("${api.security.ips.allowed}") 
-    private Set<String> alloweInternaldIps;
+    @Value("${api.security.gateway.name}") 
+    private String gatewayName;
 
 
     @Bean
@@ -46,11 +46,13 @@ public class SecurityConfigs {
                 .requestMatchers("/products/**").permitAll()
                 .requestMatchers("/admin/products/**").hasAnyRole("ADMIN", "EMPLOYEE")
                 .requestMatchers("/internal/**").access((authentication, requestContext) -> {
-                    String remote = requestContext.getRequest().getRemoteAddr();
-                    boolean isMatch = alloweInternaldIps.stream()
-                        .peek(ip -> log.debug("Allowed IP: {} | Client IP: {}", ip, remote))
-                        .anyMatch(ip -> ip.equalsIgnoreCase(remote));
-                    return new AuthorizationDecision(isMatch);
+                    log.debug("GATEWAY NAME: {}", gatewayName);
+                    boolean isGatewayOrigin = Optional.ofNullable(requestContext.getRequest().getHeader("X-Forwarded-by"))
+                        .map(header -> header.equalsIgnoreCase(gatewayName))
+                        .orElse(false);
+                    
+                    log.debug("IS GATEWAY ORIGIN: {}", isGatewayOrigin);
+                    return new AuthorizationDecision(!isGatewayOrigin);
                 })
 
                 .anyRequest().authenticated()

@@ -1,0 +1,228 @@
+
+networks:
+  microservices-network:
+    driver: bridge
+    
+services:
+
+  mysql:
+    image: mysql:8.0.36
+    env_file: 
+      - ./env/mysql.env
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+      - ./databases:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      start_period: 30s
+      interval: 15s
+      timeout: 5s
+      retries: 10
+  
+  mongodb:
+    image: mongo:7.0-rc
+    restart: unless-stopped
+    env_file: ./env/mongodb.env
+    volumes:
+      - ./mongo-data:/data/db
+      - ./databases:/docker-entrypoint-initdb.d
+    networks:
+      - microservices-network
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "127.0.0.1/test", "--eval", "'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"]
+      start_period: 30s
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    env_file: ./env/rabbitmq.env
+    volumes:
+      - ./rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - microservices-network
+    ports:
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      start_period: 30s
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  eureka-service:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    image: eureka-service
+    environment:
+      EUREKA_HOST: eureka-service
+    networks:
+      - microservices-network
+    ports:
+      - "9091:9091"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/actuator/health"]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 3
+  
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: gateway-service
+    environment:
+      EUREKA_HOST: eureka-service
+      GATEWAY_NAME: gateway
+    networks:
+      - microservices-network
+    ports:
+      - "9092:9092"
+    depends_on:
+      eureka-service:
+        condition: service_healthy
+
+  accounts-service:
+    build:
+      context: ./accounts
+      dockerfile: Dockerfile
+    image: accounts-service
+    env_file: 
+      - ./env/persistence-mysql.env
+      - ./env/secret.env
+      - ./env/user-admin.env
+    environment:
+      DB_HOST: mysql
+      EUREKA_HOST: eureka-service
+    networks:
+      - microservices-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+
+  auth-service:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    image: auth-service
+    env_file: 
+      - ./env/persistence-mysql.env
+      - ./env/secret.env
+    environment:
+      DB_HOST: mysql
+      EUREKA_HOST: eureka-service
+    networks:
+      - microservices-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+
+  products-service:
+    build:
+      context: ./products
+      dockerfile: Dockerfile
+    image: products-service
+    env_file: 
+      - ./env/persistence-mysql.env
+      - ./env/secret.env
+      - ./env/rabbitmq.env
+      - ./env/app-rabbitmq.env
+    environment:
+      DB_HOST: mysql
+      RABBIT_HOST: rabbitmq
+      EUREKA_HOST: eureka-service
+      GATEWAY_NAME: gateway
+    networks:
+      - microservices-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+
+  cart-service:
+    build:
+      context: ./cart
+      dockerfile: Dockerfile
+    image: cart-service
+    env_file: 
+      - ./env/persistence-mongo.env
+      - ./env/secret.env
+      - ./env/rabbitmq.env
+    environment:
+      DB_HOST: mongodb
+      RABBIT_HOST: rabbitmq
+      EUREKA_HOST: eureka-service
+    networks:
+      - microservices-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+
+  orders-service:
+    build:
+      context: ./orders
+      dockerfile: Dockerfile
+    image: orders-service
+    env_file: 
+      - ./env/persistence-mongo.env
+      - ./env/secret.env
+      - ./env/rabbitmq.env
+      - ./env/app-rabbitmq.env
+    environment:
+      DB_HOST: mongodb
+      RABBIT_HOST: rabbitmq
+      EUREKA_HOST: eureka-service
+      GATEWAY_NAME: gateway
+    networks:
+      - microservices-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+
+  payments-service:
+    build:
+      context: ./payments
+      dockerfile: Dockerfile
+    image: payments-service
+    env_file: 
+      - ./env/persistence-mysql.env
+      - ./env/secret.env
+      - ./env/rabbitmq.env
+      - ./env/app-rabbitmq.env
+    environment:
+      DB_HOST: mysql
+      RABBIT_HOST: rabbitmq
+      EUREKA_HOST: eureka-service
+    networks:
+      - microservices-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy

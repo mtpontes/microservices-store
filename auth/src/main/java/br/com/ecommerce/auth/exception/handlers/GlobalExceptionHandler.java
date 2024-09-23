@@ -38,12 +38,12 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError404(UserNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError401(UserNotFoundException ex) {
 		return ResponseEntity
 			.status(notFound.value())
 			.body(new ResponseError(
-				notFound.value(), 
-				notFound.getReasonPhrase(), 
+				unauthorized.value(), 
+				unauthorized.getReasonPhrase(), 
 				ex.getMessage()));
 	}
 

@@ -42,11 +42,11 @@ import br.com.ecommerce.products.business.validator.UniqueNameProductValidator;
 import br.com.ecommerce.products.infra.entity.product.Price;
 import br.com.ecommerce.products.infra.entity.product.Product;
 import br.com.ecommerce.products.infra.entity.product.Stock;
+import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.infra.repository.ProductRepository;
 import br.com.ecommerce.products.utils.builder.ProductTestBuilder;
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceUnitTest {
@@ -88,7 +88,7 @@ class ProductServiceUnitTest {
     @Test
     @DisplayName("Unit - getProduct - Must not return product details by non-existent ID")
     void getProductTest() {
-        assertThrows(EntityNotFoundException.class, () -> service.getProduct(10L));
+        assertThrows(ProductNotFoundException.class, () -> service.getProduct(10L));
     }
 
     @Test
@@ -130,7 +130,7 @@ class ProductServiceUnitTest {
         // arrange
         UpdateProductDTO requestBody = new UpdateProductDTO(null, null, null);
         assertThrows(
-            EntityNotFoundException.class, 
+            ProductNotFoundException.class, 
             () -> service.updateProductData(1L, requestBody));
 
         verify(uniqueNameValidator)

@@ -25,9 +25,9 @@ import br.com.ecommerce.products.api.mapper.DepartmentMapper;
 import br.com.ecommerce.products.business.service.DepartmentService;
 import br.com.ecommerce.products.business.validator.UniqueNameDepartmentValidator;
 import br.com.ecommerce.products.infra.entity.department.Department;
+import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
 import br.com.ecommerce.products.utils.builder.DepartmentTestBuilder;
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceUnitTest {
@@ -56,7 +56,7 @@ class DepartmentServiceUnitTest {
     @DisplayName("Unit - getOneDepartment - Should throw an exception when not finding Department")
     void getOneDepartmentTest() {
         // act and assert
-        assertThrows(EntityNotFoundException.class, () -> service.getOneDepartment(1L));
+        assertThrows(DepartmentNotFoundException.class, () -> service.getOneDepartment(1L));
     }
 
     @Test
@@ -96,7 +96,7 @@ class DepartmentServiceUnitTest {
     void updateDepartmentTest02() {
         // act and assert
         assertThrows(
-            EntityNotFoundException.class,
+            DepartmentNotFoundException.class,
             () -> service.updateDepartment(1L, new UpdateDepartmentoDTO()));
     }
 }

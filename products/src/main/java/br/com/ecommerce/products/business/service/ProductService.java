@@ -36,10 +36,10 @@ import br.com.ecommerce.products.infra.entity.category.Category;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.product.Price;
 import br.com.ecommerce.products.infra.entity.product.Product;
+import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.infra.repository.ProductRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,13 +67,13 @@ public class ProductService {
 	public DataProductDTO getProduct(Long id) {
 		return productRepository.findById(id)
 			.map(this::createDataProductDTO)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	public InternalProductDataDTO getProductPriceInternal(Long id) {
 		return productRepository.findById(id)
 			.map(productMapper::toInternalProductDataDTO)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	public Page<DataProductDTO> getAllProductWithParams(
@@ -120,7 +120,7 @@ public class ProductService {
 				return productRepository.save(p);
 			})
 			.map(productMapper::toProductUpdateResponseDTO)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	@Transactional
@@ -132,7 +132,7 @@ public class ProductService {
 				return productRepository.save(p);
 			})
 			.map(this::createUpdateProductPriceResponseDTO)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	@Transactional
@@ -146,7 +146,7 @@ public class ProductService {
 				.peek(product -> scheduler.removeRedundantSchedulePromotion(product.getId()))
 				.findFirst()
 			.map(this::createUpdateProductPriceResponseDTO)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	@Transactional
@@ -160,7 +160,7 @@ public class ProductService {
 				.peek(p -> scheduler.createScheduleForEndOfPromotion(productId, endOfPromotion))
 				.findFirst()
 			.map(this::createUpdateProductPriceResponseDTO)
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	@Transactional

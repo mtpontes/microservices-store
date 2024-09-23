@@ -39,12 +39,12 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError401(EntityNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError400(EntityNotFoundException ex) {
 		return ResponseEntity
 			.status(unauthorized.value())
 			.body(new ResponseError(
-				unauthorized.value(),
-				unauthorized.getReasonPhrase(),
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
 				ENTITY_NOT_FOUND_EXCEPTION));
 	}
 
