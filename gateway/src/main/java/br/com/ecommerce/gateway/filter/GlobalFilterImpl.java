@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebExchange;
 
 import lombok.AllArgsConstructor;
@@ -42,6 +44,14 @@ public class GlobalFilterImpl implements GlobalFilter {
                             .build())
                         .build();
                     return chain.filter(newEchange);
+                })
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    log.error("Authentication error: " + ex.getResponseBodyAsString(), ex);
+                    
+                    exchange.getResponse().setStatusCode(ex.getStatusCode());
+                    DataBuffer buffer = exchange.getResponse().bufferFactory()
+                        .wrap(ex.getResponseBodyAsString().getBytes());
+                    return exchange.getResponse().writeWith(Mono.just(buffer));
                 }))
             .orElse(chain.filter(exchange));
     }
