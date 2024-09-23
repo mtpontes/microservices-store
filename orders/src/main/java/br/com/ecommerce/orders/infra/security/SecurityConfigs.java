@@ -1,6 +1,6 @@
 package br.com.ecommerce.orders.infra.security;
 
-import java.util.Set;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,19 +15,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import br.com.ecommerce.common.app.SecurityFilter;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
 public class SecurityConfigs {
 
-    @Value("${api.security.ips.allowed}") 
-    private Set<String> alloweInternaldIps;
+    @Value("${api.security.gateway.name}") 
+    private String gatewayName;
 
-
+    
     @Bean
     public OncePerRequestFilter securityFilter() {
         return new SecurityFilter();
@@ -41,12 +39,14 @@ public class SecurityConfigs {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/admin/orders/**").hasRole("ADMIN")
                 .requestMatchers("/orders/**").hasRole("CLIENT")
-                .requestMatchers("/internal/orders").access((authentication, requestContext) -> {
-                    String remote = requestContext.getRequest().getRemoteAddr();
-                    boolean isMatch = alloweInternaldIps.stream()
-                        .peek(ip -> log.debug("Allowed IP: {} | Client IP: {}", ip, remote))
-                        .anyMatch(ip -> ip.equalsIgnoreCase(remote));
-                    return new AuthorizationDecision(isMatch);
+                .requestMatchers("/internal/**").access((authentication, requestContext) -> {
+                    log.debug("GATEWAY NAME: {}", gatewayName);
+                    boolean isGatewayOrigin = Optional.ofNullable(requestContext.getRequest().getHeader("X-Forwarded-by"))
+                        .map(header -> header.equalsIgnoreCase(gatewayName))
+                        .orElse(false);
+                    
+                    log.debug("IS GATEWAY ORIGIN: {}", isGatewayOrigin);
+                    return new AuthorizationDecision(!isGatewayOrigin);
                 })
             )
             .addFilterBefore(this.securityFilter(), UsernamePasswordAuthenticationFilter.class)
