@@ -10,9 +10,10 @@ import br.com.ecommerce.products.api.dto.category.UpdateCategoryDTO;
 import br.com.ecommerce.products.api.mapper.CategoryMapper;
 import br.com.ecommerce.products.business.validator.UniqueNameCategoryValidator;
 import br.com.ecommerce.products.infra.entity.category.Category;
+import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -40,7 +41,7 @@ public class CategoryService {
                 return category;
             })
             .map(categoryMapper::toSimpleDataCategoryDTO)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(DepartmentNotFoundException::new);
     }
 
     public Page<SimpleDataCategoryDTO> getAllByParams(
@@ -54,7 +55,7 @@ public class CategoryService {
     public SimpleDataCategoryDTO getOne(Long id) {
         return categoryRepository.findById(id)
             .map(categoryMapper::toSimpleDataCategoryDTO)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(CategoryNotFoundException::new);
     }
 
     @Transactional
@@ -66,6 +67,6 @@ public class CategoryService {
                 return categoryRepository.save(category);
             })
             .map(categoryMapper::toSimpleDataCategoryDTO)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(CategoryNotFoundException::new);
     }
 }

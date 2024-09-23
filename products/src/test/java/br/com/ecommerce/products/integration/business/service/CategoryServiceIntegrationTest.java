@@ -21,11 +21,12 @@ import br.com.ecommerce.products.api.dto.category.UpdateCategoryDTO;
 import br.com.ecommerce.products.business.service.CategoryService;
 import br.com.ecommerce.products.infra.entity.category.Category;
 import br.com.ecommerce.products.infra.entity.department.Department;
+import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
 import br.com.ecommerce.products.utils.util.CategoryUtils;
 import br.com.ecommerce.products.utils.util.DepartmentUtils;
-import jakarta.persistence.EntityNotFoundException;
 
 @ServiceIntegrationTest
 class CategoryServiceIntegrationTest {
@@ -102,7 +103,7 @@ class CategoryServiceIntegrationTest {
 
         // act and assert
         assertThrows(
-            EntityNotFoundException.class, 
+            DepartmentNotFoundException.class, 
             () -> service.create(input));
     }
 
@@ -155,7 +156,7 @@ class CategoryServiceIntegrationTest {
         // act and assert
         Long unexistentManufacturerId = 1000000L;
         assertThrows(
-            EntityNotFoundException.class,
+            CategoryNotFoundException.class,
             () -> service.update(unexistentManufacturerId, new UpdateCategoryDTO("not blank")));
     }
 }

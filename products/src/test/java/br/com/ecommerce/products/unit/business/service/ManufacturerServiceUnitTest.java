@@ -26,9 +26,9 @@ import br.com.ecommerce.products.business.service.ManufacturerService;
 import br.com.ecommerce.products.business.validator.UniqueNameManufacturerValidator;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.tools.factory.PhoneFactory;
+import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.utils.builder.ManufacturerTestBuilder;
-import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ManufacturerServiceUnitTest {
@@ -59,7 +59,7 @@ class ManufacturerServiceUnitTest {
     @DisplayName("Unit - getManufacturer - Must throw exception")
     void getManufacturerTest() {
         // act and assert
-        assertThrows(EntityNotFoundException.class, () -> service.getManufacturer(1L));
+        assertThrows(ManufacturerNotFoundException.class, () -> service.getManufacturer(1L));
     }
 
     @Test
@@ -106,7 +106,7 @@ class ManufacturerServiceUnitTest {
     void updateManufacturerTest02() {
         // act and assert
         assertThrows(
-            EntityNotFoundException.class,
+            ManufacturerNotFoundException.class,
             () -> service.updateManufacturer(1L, new UpdateManufacturerDTO()));
     }
 }

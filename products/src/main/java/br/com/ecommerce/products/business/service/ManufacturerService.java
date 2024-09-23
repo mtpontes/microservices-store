@@ -18,8 +18,8 @@ import br.com.ecommerce.products.infra.entity.manufacturer.Address;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.manufacturer.Phone;
 import br.com.ecommerce.products.infra.entity.tools.factory.PhoneFactory;
+import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -70,7 +70,7 @@ public class ManufacturerService {
 				DataAddressDTO address = addressMapper.toDataAddressDTO(manufacturer.getAddress());
 				return manufacturerMapper.toDataManufacturerDTO(manufacturer, address);
 			})
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ManufacturerNotFoundException::new);
 	}
 
 	@Transactional
@@ -107,6 +107,6 @@ public class ManufacturerService {
 				DataAddressDTO address = addressMapper.toDataAddressDTO(manufacturer.getAddress());
 				return manufacturerMapper.toDataManufacturerDTO(manufacturer, address);
 			})
-			.orElseThrow(EntityNotFoundException::new);
+			.orElseThrow(ManufacturerNotFoundException::new);
 	}
 }

@@ -1,4 +1,4 @@
-package br.com.ecommerce.products.infra.exception;
+package br.com.ecommerce.products.infra.exception.handlers;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	private final String ENTITY_NOT_FOUND_EXCEPTION = "Order not found";
+	private final String ENTITY_NOT_FOUND_EXCEPTION = "Not found";
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
@@ -39,13 +43,53 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError401(EntityNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError400(EntityNotFoundException ex) {
+		return ResponseEntity
+			.status(badRequest.value())
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				ENTITY_NOT_FOUND_EXCEPTION));
+	}
+
+	@ExceptionHandler(DepartmentNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError400(DepartmentNotFoundException ex) {
 		return ResponseEntity
 			.status(unauthorized.value())
 			.body(new ResponseError(
-				unauthorized.value(),
-				unauthorized.getReasonPhrase(),
-				ENTITY_NOT_FOUND_EXCEPTION));
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				ex.getMessage()));
+	}
+
+	@ExceptionHandler(CategoryNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError400(CategoryNotFoundException ex) {
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				ex.getMessage()));
+	}
+
+	@ExceptionHandler(ManufacturerNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError400(ManufacturerNotFoundException ex) {
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				ex.getMessage()));
+	}
+
+	@ExceptionHandler(ProductNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError400(ProductNotFoundException ex) {
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				badRequest.value(),
+				badRequest.getReasonPhrase(),
+				ex.getMessage()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
