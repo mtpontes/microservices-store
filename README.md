@@ -139,7 +139,7 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
   - At this stage, it is not possible to adjust the quantity of the products, you must adjust the quantities in the cart
 
 <details>
-  <summary><span>Exemplos</span></summary>
+  <summary><span>Examples</span></summary>
 
 #### **CREATE ANONYMOUS CART**
 POST: /anonymous/carts
