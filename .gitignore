@@ -39,3 +39,8 @@ build/
 /log
 *.log*
 .dio
+
+### docker ###
+rabbitmq-data/*
+mongo-data/*
+mysql-data/*
