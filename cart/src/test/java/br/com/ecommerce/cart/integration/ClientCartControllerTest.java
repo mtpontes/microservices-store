@@ -48,7 +48,7 @@ import br.com.ecommerce.common.annotations.TestWithRoles;
 @Import(MongoDBTestContainer.class)
 @AutoConfigureJsonTesters
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class CartControllerTest {
+class ClientCartControllerTest {
 
     final String basePath = "/carts";
     static Cart userCartPersisted = null;
