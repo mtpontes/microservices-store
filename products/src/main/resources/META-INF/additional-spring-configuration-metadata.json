@@ -8,5 +8,10 @@
     "name": "api.security.token.secret",
     "type": "java.lang.String",
     "description": "A description for 'api.security.token.secret'"
+  },
+  {
+    "name": "api.security.gateway.name",
+    "type": "java.lang.String",
+    "description": "A description for 'api.security.gateway.name'"
   }
 ]}
