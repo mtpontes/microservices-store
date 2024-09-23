@@ -45,37 +45,6 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 
 
 <details>
-  <summary><h2>🔑 Authentication and Authorization Flow</h2></summary>
-
-### 1. Token Interception by the API Gateway:
-- The API Gateway checks the "Authorization" header in each request.
-- If the header is absent, the request goes directly to the destination microservice.
-
-### 2. Token Validation:
-- The Gateway collects the token and sends a request to the Auth microservice.
-- The Auth microservice validates the token and returns the user's data (ID, username, roles).
-
-### 3. Passing User Data:
-- The Gateway adds the user's data in internal headers (e.g., "X-auth-user-id").
-- It then forwards the request to the destination microservice with these headers.
-
-### 4. Interception by the Destination Microservice:
-- A security filter in the microservice captures the headers created by the Gateway.
-- The filter maps the data from the headers into a user representation (UserDetails).
-
-### 5. Integration with Spring Security:
-- The mapped user is persisted in the Spring Security context.
-- Spring Security then manages the user's permissions for the microservice routes.
-
-### Future Adjustments:
-- New Flow:
-    - The internal headers and the Auth microservice will be removed.
-    - The JWT decoding will be done directly in each microservice, eliminating the need for centralized validation in Auth.
-
-</details>
-
-
-<details>
   <summary><h2>🛠️ Tecnologies</h2></summary>
 
 - [Docker](https://www.docker.com/)
@@ -97,53 +66,77 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 </details>
 
 
-Before you begin, make sure you've met the following requirements:
-
-- Java 17
-- Server RabbitMQ 3.7
-- Database MySQL 8.0
-- MongoDB 8
-
-
 <details>
   <summary><h2>📦 Documentation</h2></summary>
 
-#### * _Atente-se ao detalhe de que os controllers com prefixo "Admin" exigem que esteja logado como um usuário com permissão ADMIN ou EMPLOYEE_
-#### * _Os controllers som sufixo "Client" só funcionam com usuários com permissão CLIENT_
-#### * _Endpoints com prefixo "internal" não aceitam chamadas externas_
+#### * _Please note that controllers with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission_
+#### * _Controllers with the suffix "Client" only work with users with CLIENT permission_
+#### * _Endpoints with "internal" prefix do not accept external calls_
 #### * _Set the **ADMIN_USERNAME** and **ADMIN_PASSWORD** environment variables to log in as an administrator_
 
 ---
 
+<details>
+  <summary><h3> Authentication and Authorization Flow</h3></summary>
+
+#### 1. Token Interception by the API Gateway:
+- The API Gateway checks the "Authorization" header in each request.
+- If the header is absent, the request goes directly to the destination microservice.
+
+#### 2. Token Validation:
+- The Gateway collects the token and sends a request to the Auth microservice.
+- The Auth microservice validates the token and returns the user's data (ID, username, roles).
+
+#### 3. Passing User Data:
+- The Gateway adds the user's data in internal headers (e.g., "X-auth-user-id").
+- It then forwards the request to the destination microservice with these headers.
+
+#### 4. Interception by the Destination Microservice:
+- A security filter in the microservice captures the headers created by the Gateway.
+- The filter maps the data from the headers into a user representation (UserDetails).
+
+#### 5. Integration with Spring Security:
+- The mapped user is persisted in the Spring Security context.
+- Spring Security then manages the user's permissions for the microservice routes.
+
+#### Future Adjustments:
+  - The internal headers and the Auth microservice will be removed.
+  - The JWT decoding will be done directly in each microservice, eliminating the need for centralized validation in Auth.
+
+</details>
+
+
+---
+
 ### Users
-- Você pode criar três tipos de usuário: ADMIN, EMPLOYEE e CLIENT
-- Cada usuário terá diferentes permissões de acesso
+- You can create three types of users: ADMIN, EMPLOYEE and CLIENT
+- Each user will have different access permissions
 
 ---
 
 ### Products
-- Permite criar departments, categories, manufacturers e products
-- Para criar uma category é necessário criar um department
-- Para criar um product é necessário fornecer uma categoria e um manufacturer
-  - Products são criados sem preço, sendo necessário precifica-los posteriormente
+- Allows you to create departments, categories, manufacturers and products
+- To create a category, you must create a department
+- To create a product, you must provide a category and a manufacturer
+  - Products are created without a price, and you must price them later
 
 ---
 
 ### Cart
-- Você pode criar um carrinho anônimo, que não é vinculado a um usuário de fato. Neste caso, você passa um body com os dados do produto desejado, a API irá gerar um car, um ID para esse cart e irá te retornar os dados dele:
+- You can create an anonymous cart, which is not linked to a real user. In this case, you pass a body with the desired product data, the API will generate a cart, an ID for that cart and will return its data to you.
 
-- É possível mesclar carrinhos anônimos com o carrinho de um usuário autenticado. Para isso, é necessário estar autenticado.
-  - A mesclagem reune os produtos mas não soma suas quantidades
-  - O carrinho anônimo é excluído no fim do processo
+- In the case of authenticated users (CLIENT), it is not necessary to send a body when creating the cart
+  - First you create your cart, then add the products
 
-- No caso de usuários autenticados (CLIENT), não é necessário enviar um body
-  - Primeiramente você cria o seu carrinho, depois adiciona os produtos
+- It is possible to merge anonymous carts with the cart of an authenticated user. To do this, you must be authenticated.
+  - The merge brings together the products but does not add their quantities
+  - The anonymous cart is deleted at the end of the process
 
-- O ID do seu carrinho é o mesmo ID do seu usuário
+- Your cart ID is the same as your user ID
 
-- Os orders são criados à partir deste serviço.
-  - Informe o ID dos produtos no seu carrinho que você deseja gerar um pedido
-  - Nesta etapa não é possível ajustar a quantidade dos produtos, você deve ajustar as quantidades no carrinho
+- Orders are created from this service.
+  - Enter the ID of the products in your cart that you want to generate an order for
+  - At this stage, it is not possible to adjust the quantity of the products, you must adjust the quantities in the cart
 
 <details>
   <summary><span>Exemplos</span></summary>
@@ -202,10 +195,10 @@ Content-Type: application/json
 
 ### Orders
 
-- Na criação de pedidos, não aceita chamadas externas. A criação de um order deve ser feita via conexão síncrona entre Cart e Orders
-- Serve dados dos pedidos para os CLIENT e ADMIN
-- Um usuário CLIENT pode cancelar seu próprio pedido
-- Um usuário ADMIN pode cancelar qualquer pedido
+- When creating orders, it does not accept external calls. The creation of an order must be done via a synchronous connection between Cart and Orders
+- Serves order data to CLIENT and ADMIN
+- A CLIENT user can cancel his own order
+- An ADMIN user can cancel any order
 
 ---
 
