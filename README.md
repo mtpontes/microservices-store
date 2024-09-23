@@ -4,7 +4,8 @@
 
 E-CommerceApp is a REST API for an e-commerce store, based on microservices architecture, it has both operations performed for the customer and operations performed by employees and administrators.
 
-## 🔧 Adjustments and improvements
+<details>
+  <summary><h2>🔧 Adjustments and improvements</h2></summary>
 
 The project is still under development, is currently using development settings. The next updates will focus on the following tasks:
 
@@ -27,6 +28,9 @@ The project is still under development, is currently using development settings.
 - [ ] Configure load balancing rules
 - [ ] Create docker-compose
 - [ ] Create detailed documentation with Postman (currently there are only requests in the Postman collection)
+  
+</details>
+
 
 ## ⚙️ System overview
 ![application-schema](readme/application.svg)
