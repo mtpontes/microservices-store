@@ -34,6 +34,7 @@ public class CartService {
 
     @Transactional
     public CartDTO createCart(String userId) {
+        if (cartRespository.existsById(userId)) throw new IllegalArgumentException("Existent cart");
         Cart mapped = this.cartFactory.createUserCart(userId);
         this.cartRespository.save(mapped);
         return cartMapper.toCartDTO(mapped, Collections.emptyList(), BigDecimal.ZERO);

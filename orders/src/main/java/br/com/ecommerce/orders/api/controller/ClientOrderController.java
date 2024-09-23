@@ -19,7 +19,7 @@ import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/client/orders")
 public class ClientOrderController {
 
 	@Autowired

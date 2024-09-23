@@ -38,7 +38,7 @@ public class SecurityConfigs {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/admin/orders/**").hasRole("ADMIN")
-                .requestMatchers("/orders/**").hasRole("CLIENT")
+                .requestMatchers("/client/orders/**").hasRole("CLIENT")
                 .requestMatchers("/internal/**").access((authentication, requestContext) -> {
                     log.debug("GATEWAY NAME: {}", gatewayName);
                     boolean isGatewayOrigin = Optional.ofNullable(requestContext.getRequest().getHeader("X-Forwarded-by"))
