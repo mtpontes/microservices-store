@@ -10,20 +10,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
 import br.com.ecommerce.payment.model.Payment;
 import br.com.ecommerce.payment.model.PaymentStatus;
 import br.com.ecommerce.payment.repository.PaymentRepository;
-import br.com.ecommerce.payment.testcontainers.MySQLTestContainerConfig;
 
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-@Import(MySQLTestContainerConfig.class)
+@AutoConfigureTestDatabase
 class PaymentRepositoryIntegrationTest {
 
     @Autowired

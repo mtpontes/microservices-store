@@ -17,7 +17,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
 import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -126,6 +128,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
 		MissingRequestHeaderException ex
 	) {
+		log.debug("EXCEPTION MESSAGE: " + ex.getMessage());		
 		String headerName = ex.getHeaderName();
 		if (headerName.equalsIgnoreCase("X-auth-user-id"))
 			return ResponseEntity

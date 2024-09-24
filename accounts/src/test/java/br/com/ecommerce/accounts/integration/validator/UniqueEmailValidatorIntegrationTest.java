@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import br.com.ecommerce.accounts.business.validator.UniqueEmailValidator;
@@ -19,6 +20,7 @@ import br.com.ecommerce.accounts.model.valueobjects.Email;
 import br.com.ecommerce.accounts.utils.UserBuilderTestUtils;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public class UniqueEmailValidatorIntegrationTest {

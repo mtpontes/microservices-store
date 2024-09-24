@@ -41,9 +41,9 @@ import br.com.ecommerce.orders.tools.utils.RandomUtils;
 @AutoConfigureJsonTesters
 @Import({TestConfigBeans.class, MongoDBTestContainer.class})
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class OrderControllerIntegrationTest {
+class ClientOrderControllerIntegrationTest {
 
-    private final String basePath = "/orders";
+    private final String basePath = "/client/orders";
     private Order orderPersisted = null;
 
     @MockBean

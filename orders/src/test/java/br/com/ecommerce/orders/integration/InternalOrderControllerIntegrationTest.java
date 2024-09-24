@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -157,14 +158,13 @@ class InternalOrderControllerIntegrationTest {
         .andExpect(status().isBadRequest());
     }
 
-    @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE", "CLIENT"})
+    @Test
     void createOrderTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(
             post(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
-                .remoteAddress("192.168.1.1")
+                .header("X-Forwarded-By", "gateway")
         )
         // assert
         .andExpect(status().isForbidden());
