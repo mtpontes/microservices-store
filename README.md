@@ -22,6 +22,8 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 
 ### 4. Common
 - An internal library that all microservices use to implement security features.
+- Most services rely on it to implement Spring Security logic without code repetition.
+- In addition to having it locally in the project, its package is also distributed via Github Packages, so even if it is not present locally, services will still be able to access the package.
 
 ### 5. Accounts
 - Manages user accounts and authentication.
