@@ -13,6 +13,7 @@ import br.com.ecommerce.products.api.dto.product.DataProductPriceDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
 import br.com.ecommerce.products.api.dto.product.SimplePriceDataDTO;
+import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
 import br.com.ecommerce.products.infra.entity.category.Category;
@@ -39,7 +40,10 @@ public class ProductMapper {
     }
 
     public InternalProductDataDTO toInternalProductDataDTO(Product data) {
-        return new InternalProductDataDTO(data.getName(), data.getPrice().getCurrentPrice());
+        return new InternalProductDataDTO(
+            data.getName(), 
+            data.getPrice().getCurrentPrice(), 
+            data.getImages().getMainImage());
     }
 
     public DataProductDTO toDataProductDTO(
@@ -56,6 +60,7 @@ public class ProductMapper {
                 data.getSpecs(),
                 priceData,
                 stockData,
+                data.getImages(),
                 categoryData,
                 manufacturerData))
             .orElse(null);
@@ -78,6 +83,16 @@ public class ProductMapper {
                 data.getId(),
                 data.getName(),
                 priceData
+            ))
+            .orElse(null);
+    }
+
+    public UpdateProductImagesResponseDTO toUpdateProductImagesResponseDTO(Product data) {
+        return Optional.ofNullable(data)
+            .map(p -> new UpdateProductImagesResponseDTO(
+                data.getId(),
+                data.getName(),
+                data.getImages()
             ))
             .orElse(null);
     }

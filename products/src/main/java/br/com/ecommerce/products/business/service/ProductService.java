@@ -24,6 +24,7 @@ import br.com.ecommerce.products.api.dto.product.SimplePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.StockWriteOffDTO;
 import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
+import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
 import br.com.ecommerce.products.api.mapper.CategoryMapper;
@@ -204,9 +205,38 @@ public class ProductService {
 		return productRepository.findAllById(productsIds).stream()
 			.collect(Collectors.toMap(
 				product -> String.valueOf(product.getId()), 
-				product -> productMapper.toInternalProductDataDTO(product)));
+				productMapper::toInternalProductDataDTO));
 	}
 
+	public UpdateProductImagesResponseDTO addMainImage(Long productId, String imageLink) {
+		return productRepository.findById(productId)
+			.stream()
+			.peek(product -> product.getImages().setMainImage(imageLink))
+			.map(productRepository::save)
+			.map(productMapper::toUpdateProductImagesResponseDTO)
+			.findFirst()
+			.orElseThrow(ProductNotFoundException::new);
+    }
+
+	public UpdateProductImagesResponseDTO addImages(Long productId, Set<String> newImages) {
+		return productRepository.findById(productId)
+			.stream()
+			.peek(product -> product.getImages().addAdditionalImages(newImages))
+			.map(productRepository::save)
+			.map(productMapper::toUpdateProductImagesResponseDTO)
+			.findFirst()
+			.orElseThrow(ProductNotFoundException::new);
+    }
+
+	public UpdateProductImagesResponseDTO removeImages(Long productId, Set<String> newImages) {
+		return productRepository.findById(productId)
+			.stream()
+			.peek(product -> product.getImages().remove(newImages))
+			.map(productRepository::save)
+			.map(productMapper::toUpdateProductImagesResponseDTO)
+			.findFirst()
+			.orElseThrow(ProductNotFoundException::new);
+    }
 
 	private DataProductDTO createDataProductDTO(Product product) {
 		SimplePriceDataDTO priceData = priceMapper.toSimplePriceDataDTO(product.getPrice());

@@ -2,6 +2,7 @@ package br.com.ecommerce.products.api.dto.product;
 
 import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
+import br.com.ecommerce.products.infra.entity.product.Images;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class DataProductDTO {
 	private String specs;
 	private SimplePriceDataDTO price;
 	private DataStockDTO stock;
+	private Images images;
 	private SimpleDataCategoryDTO category;
 	private SimpleDataManufacturerDTO manufacturer;
 }

@@ -13,4 +13,5 @@ public class InternalProductDataDTO {
 
     private String name;
     private BigDecimal price;
+    private String imageLink;
 }

@@ -33,13 +33,18 @@ public class Product {
 
 	@Column(unique = true, nullable = false, length = 100)
 	private String name;
+
 	@Column(length = 255)
 	private String description;
+
 	@Column(length = 255)
 	private String specs;
 
 	@Embedded
 	private Price price;
+
+	@Embedded
+	private Images images;
 
 	@Embedded
 	private Stock stock;
@@ -55,8 +60,10 @@ public class Product {
 	@Column(updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdAt;
+
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
+
 	private boolean isActive;
 
 	public Product(String name, String description, String specs, Category category, Manufacturer manufacturer) {
@@ -72,6 +79,7 @@ public class Product {
 		this.category = this.notNull(category, "category");
 		this.manufacturer = this.notNull(manufacturer, "manufacturer");
 		this.stock = new Stock();
+		this.isActive = true;
 	}
 
 	public void update(String name, String description, String specs) {

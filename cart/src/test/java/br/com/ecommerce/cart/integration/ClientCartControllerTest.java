@@ -278,11 +278,10 @@ class ClientCartControllerTest {
     }
 
     private void mockProductClientReturn(Set<Product> products) {
-        System.out.println("PRODUTOS: " + products);
         Map<String, InternalProductDataDTO> mockProductResponse = products.stream()
             .collect(Collectors.toMap(
                 Product::getId, 
-                product -> new InternalProductDataDTO("Random Name", BigDecimal.TEN)));
+                product -> new InternalProductDataDTO("Random Name", BigDecimal.TEN, "imageLink")));
 
         Set<String> productClientEntry = products.stream()
             .map(Product::getId)
