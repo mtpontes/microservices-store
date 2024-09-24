@@ -104,8 +104,8 @@ public class AdminProductController {
 
 	@DeleteMapping("/{productId}/images")
 	public ResponseEntity<UpdateProductImagesResponseDTO> removeImages(
-    	@PathVariable Long productId, @RequestBody Set<String> imagesToRemove
+		@PathVariable Long productId, @RequestBody Set<String> imagesToRemove
 	) {
-    return ResponseEntity.ok(service.removeImages(productId, imagesToRemove));
-}
+		return ResponseEntity.ok(service.removeImages(productId, imagesToRemove));
+	}
 }

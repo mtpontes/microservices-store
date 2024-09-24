@@ -105,7 +105,7 @@ public class ProductService {
 			.toList();
 		
 		return productRepository.findAllById(listOfProductIds).stream()
-			.filter(p -> p != null && p.getStock().getUnit() < unitiesRequested.get(p.getId())) 
+			.filter(product -> product != null && product.getStock().getUnit() < unitiesRequested.get(product.getId())) 
 			.collect(Collectors.toList());
 	}
 
@@ -113,12 +113,9 @@ public class ProductService {
 	public UpdateProductResponseDTO updateProductData(Long id, UpdateProductDTO dto) {
 		uniqueNameValidator.validate(dto.getName());
 		return productRepository.findById(id)
-			.map(p -> {
-				p.update(
-					dto.getName(), 
-					dto.getDescription(), 
-					dto.getSpecs());
-				return productRepository.save(p);
+			.map(product -> {
+				product.update(dto.getName(), dto.getDescription(), dto.getSpecs());
+				return productRepository.save(product);
 			})
 			.map(productMapper::toProductUpdateResponseDTO)
 			.orElseThrow(ProductNotFoundException::new);
@@ -208,6 +205,7 @@ public class ProductService {
 				productMapper::toInternalProductDataDTO));
 	}
 
+	@Transactional
 	public UpdateProductImagesResponseDTO addMainImage(Long productId, String imageLink) {
 		return productRepository.findById(productId)
 			.stream()
@@ -218,6 +216,7 @@ public class ProductService {
 			.orElseThrow(ProductNotFoundException::new);
     }
 
+	@Transactional
 	public UpdateProductImagesResponseDTO addImages(Long productId, Set<String> newImages) {
 		return productRepository.findById(productId)
 			.stream()
@@ -228,6 +227,7 @@ public class ProductService {
 			.orElseThrow(ProductNotFoundException::new);
     }
 
+	@Transactional
 	public UpdateProductImagesResponseDTO removeImages(Long productId, Set<String> newImages) {
 		return productRepository.findById(productId)
 			.stream()
