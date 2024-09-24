@@ -121,6 +121,11 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 - To create a category, you must create a department
 - To create a product, you must provide a category and a manufacturer
   - Products are created without a price, and you must price them later
+- Allows you to create product promotions
+  - When the application starts, it checks all products whose promotions have already expired and restores them to their default state.
+  - Promotions use a scheduler to schedule the end of promotions.
+  - Every time the application starts, it checks all products whose promotions expire within 1 hour, defining a scheduler that triggers the change of the promotional price to the original price.
+  - At every zero hour, it also checks all products whose promotions expire within 1 hour and defines a scheduler for each one.
 
 ---
 
@@ -260,4 +265,4 @@ The project is still under development, is currently using development settings.
 
 # 🤝 Credits
 
-- Special thanks to [@AlexandreMadeira](https://github.com/MadeiraAlexandre) for helping me with several suggestions, such as creating the concept of system services, and with the relationships of some entities.
+Special thanks to [@AlexandreMadeira](https://github.com/MadeiraAlexandre) for helping me with several suggestions, such as creating the concept of system services, and with the relationships of some entities.
