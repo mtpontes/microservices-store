@@ -22,15 +22,6 @@ public class OrderListener {
 	}
 	
 //	/* 
-//	 * Cart service create a Order
-//	 */
-//	@RabbitListener(queues = "orders.status-logistic")
-//	@Transactional
-//	public void recebeFilaMsgCartMock(@Payload OrderDTO dto) {
-//		service.saveOrder(dto);
-//	}
-	
-//	/* 
 //	 * Mock a logistics mock service
 //	 */
 //	@RabbitListener(queues = "orders.status-logistic")
