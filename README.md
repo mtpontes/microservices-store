@@ -72,9 +72,9 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
   <summary><h2>📦 Documentation</h2></summary>
 
 #### * _Please note that controllers with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission_
-#### * _Controllers with the suffix "Client" only work with users with CLIENT permission_
-#### * _Endpoints with "internal" prefix do not accept external calls_
-#### * _Set the **ADMIN_USERNAME** and **ADMIN_PASSWORD** environment variables to log in as an administrator_
+#### * _Controllers with the prefix "Client" only work with users with CLIENT permission_
+#### * _Endpoints with "Internal" prefix do not accept external calls_
+#### * _The Accounts service is responsible for always creating a default administrator user, using the ADMIN_USERNAME and ADMIN_PASSWORD environment variables._
 
 ---
 
@@ -204,6 +204,14 @@ Content-Type: application/json
 
 ---
 
+### Payments
+
+- Serves only other services, communicating mainly through messages.
+- Allows some GET queries for system administrators.
+- Receives feedback from the payment API, causing the order status to change.
+
+---
+
 #### Confira a coleção Postman do projeto:
 [<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/31232249-c57739c1-b80d-463e-be53-c848cdbf703e?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D31232249-c57739c1-b80d-463e-be53-c848cdbf703e%26entityType%3Dcollection%26workspaceId%3Deac3d0ef-d921-4389-8597-a53480212132)
 
@@ -235,17 +243,17 @@ The project is still under development, is currently using development settings.
 - [x] Add a promotional price scheduler, so that when you set a promotional price, you also set a deadline for the promotional
 - [x] Implement Spring Security
 - [x] Create a Cart service
-- [ ] Create evaluation service
-- [ ] Create discount coupon system
+- [x] Create docker-compose
+- [x] Create fallbacks for failures between services
 - [ ] Allow users to have multiple addresses
 - [ ] Each microservice will have the ability to decode JWT token, killing the need for Auth microservice
 - [ ] Improvements in authentication, such as sending tokens by Email and authentication via third parties
 - [ ] Sending emails regarding orders
-- [ ] Create fallbacks for failures between services
 - [ ] Create and handle dead letter exchanges
 - [ ] Configure messaging rules
 - [ ] Configure load balancing rules
-- [ ] Create docker-compose
+- [ ] Create evaluation service
+- [ ] Create discount coupon system
 - [ ] Create detailed documentation with Postman (currently there are only requests in the Postman collection)
 
 </details>
