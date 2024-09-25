@@ -35,7 +35,7 @@ class TokenServiceUnitTest {
     @Test
     void generateTokenTest() {
         // act
-        var result = tokenService.generateToken(user);
+        var result = tokenService.generateToken(user.getUsername());
 
         // assert
         assertTrue(TokenFormatValidatorUtils.isValidTokenFormat(result));

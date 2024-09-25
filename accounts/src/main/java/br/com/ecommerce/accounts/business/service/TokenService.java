@@ -12,7 +12,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 
 import br.com.ecommerce.accounts.infra.exception.FailedCredentialsException;
-import br.com.ecommerce.accounts.model.User;
 
 @Service
 public class TokenService {
@@ -20,12 +19,13 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateToken(User user){
+    
+    public String generateToken(String subject){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
                 .withIssuer("ecommerce")
-                .withSubject(user.getUsername())
+                .withSubject(subject)
                 .withExpiresAt(genExpirationDate())
                 .sign(algorithm);
             return token;

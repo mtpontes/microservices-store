@@ -22,6 +22,7 @@ public class UserAdminCreation {
 	@Autowired
 	private UserFactory factory;
 	
+	
 	@PostConstruct
 	public void createUserAdmin() {
 		if(!rp.existsByLoginUsername(username)) {

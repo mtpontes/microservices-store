@@ -2,22 +2,18 @@ package br.com.ecommerce.accounts.business.service;
 
 import java.util.Optional;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.ecommerce.accounts.api.dto.CreateUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.CreateUserEmployeeDTO;
 import br.com.ecommerce.accounts.api.dto.DataUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.DataUserDTO;
-import br.com.ecommerce.accounts.api.dto.SignInDTO;
-import br.com.ecommerce.accounts.api.dto.TokenDTO;
 import br.com.ecommerce.accounts.api.dto.UpdateUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.UserEmployeeCreatedDTO;
 import br.com.ecommerce.accounts.api.factory.EmailFactory;
 import br.com.ecommerce.accounts.api.factory.PhoneNumberFactory;
 import br.com.ecommerce.accounts.api.factory.UserFactory;
 import br.com.ecommerce.accounts.api.mapper.AddressMapper;
-import br.com.ecommerce.accounts.infra.exception.FailedCredentialsException;
 import br.com.ecommerce.accounts.infra.repository.UserRepository;
 import br.com.ecommerce.accounts.model.User;
 import br.com.ecommerce.accounts.model.UserClient;
@@ -33,23 +29,11 @@ import lombok.AllArgsConstructor;
 public class UserService {
 
 	private UserRepository repository;
-	private TokenService tokenService;
-	private PasswordEncoder encoder;
 	private AddressMapper addressMapper;
 	private UserFactory factory;
     private PhoneNumberFactory phoneNumberFactory;
     private EmailFactory emailFactory;;
 
-
-	public TokenDTO signIn(SignInDTO dto) {
-		User user = repository.findByLoginUsername(dto.getUsername())
-			.orElseThrow(EntityNotFoundException::new);
-
-		if (!this.encoder.matches(dto.getPassword(), user.getPassword()))
-			throw new FailedCredentialsException("Bad credentials");
-		
-		return new TokenDTO(tokenService.generateToken(user));
-	}
 
 	@Transactional
 	public DataUserClientDTO saveClientUser(CreateUserClientDTO dto) {
