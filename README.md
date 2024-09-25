@@ -10,37 +10,37 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 <details>
   <summary><h2>📋 Details</h2></summary>
 
-### 1. Eureka
+### Eureka
 - This is the discovery service. It acts as a hub where all microservices connect, allowing them to know each other.
 
-### 2. Gateway
+### Gateway
 - Main entry point of the application and load balancer.
 
-### 3. Auth
+### Auth
 - Responsible for validating tokens and retrieving user authentication data.
 - Serves directly to the Gateway.
 
-### 4. Common
+### Common
 - An internal library that all microservices use to implement security features.
 - Most services rely on it to implement Spring Security logic without code repetition.
 - In addition to having it locally in the project, its package is also distributed via Github Packages, so even if it is not present locally, services will still be able to access the package.
 
-### 5. Accounts
+### Accounts
 - Manages user accounts and authentication.
 
-### 6. Products
+### Products
 - Manages products.
 - Provides reliable product data to other microservices.
 
-### 7. Cart
+### Cart
 - Manages customers' shopping carts.
 - Allows the creation of carts for unauthenticated users, featuring the merging of the local cart with the authenticated user's cart.
 
-### 8. Orders
+### Orders
 - Manages customer orders.
 - Requests the generation and cancellation of payments.
 
-### 9. Payments
+### Payments
 - Manages order payments.
 
 </details>
@@ -228,7 +228,7 @@ Content-Type: application/json
 ### Deploy with Docker
 Clone this repository:
 
-    git clone https://github.com/mtpontes/blog-san-api.git
+    git clone https://github.com/mtpontes/microservices-store.git
 
 Raise the containers:
 
