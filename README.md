@@ -71,12 +71,12 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 <details>
   <summary><h2>📦 Documentation</h2></summary>
 
-#### * _Please note that controllers with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission_
-#### * _Controllers with the prefix "Client" only work with users with CLIENT permission_
-#### * _Endpoints with "Internal" prefix do not accept external calls_
-#### * _The Accounts service is responsible for always creating a default administrator user, using the ADMIN_USERNAME and ADMIN_PASSWORD environment variables._
-
----
+> **Notes:**
+>
+> - Endpoints with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission
+> - Endpoints with the prefix "Client" only work with users with CLIENT permission
+> - Endpoints with "Internal" prefix do not accept external calls
+> - The Accounts service is responsible for always creating a default administrator user, using the ADMINUSERNAME and ADMINPASSWORD environment variables.
 
 <details>
   <summary><h3> Authentication and Authorization Flow</h3></summary>
