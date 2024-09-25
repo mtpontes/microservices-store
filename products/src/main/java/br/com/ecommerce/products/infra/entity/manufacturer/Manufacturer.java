@@ -58,8 +58,10 @@ public class Manufacturer {
 	@Column(updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdAt;
+
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
+	
 	private boolean isActive;
 
 	public Manufacturer(String name, Phone phone, String email, String contactPerson, Address address) {

@@ -26,9 +26,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import br.com.ecommerce.accounts.api.dto.SignInDTO;
 import br.com.ecommerce.accounts.infra.repository.UserRepository;
 import br.com.ecommerce.accounts.model.User;
+import br.com.ecommerce.accounts.model.enums.UserRole;
 import br.com.ecommerce.accounts.utils.TokenFormatValidatorUtils;
 import br.com.ecommerce.accounts.utils.UserBuilderTestUtils;
+import jakarta.transaction.Transactional;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureWebMvc
 @AutoConfigureMockMvc
@@ -60,6 +63,7 @@ class SignInControllerIntegrationTest {
         User user = new UserBuilderTestUtils()
             .username(USERNAME)
             .password(encoder.encode(PASSWORD))
+            .role(UserRole.ADMIN)
             .buildUser();
         repository.save(user);
 
@@ -110,7 +114,7 @@ class SignInControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration - signIn - Should return status 400 when user is not found")
+    @DisplayName("Integration - signIn - Should return status 401 when user is not found")
     void signInTest03() throws IOException, Exception {
         // arrange
         String USERNAME = "test";
@@ -118,6 +122,7 @@ class SignInControllerIntegrationTest {
         User user = new UserBuilderTestUtils()
             .username(USERNAME)
             .password(encoder.encode(PASSWORD))
+            .role(UserRole.ADMIN)
             .buildUser();
         repository.save(user);
         
@@ -144,6 +149,7 @@ class SignInControllerIntegrationTest {
         User user = new UserBuilderTestUtils()
             .username(USERNAME)
             .password(encoder.encode(PASSWORD))
+            .role(UserRole.ADMIN)
             .buildUser();
         repository.save(user);
         

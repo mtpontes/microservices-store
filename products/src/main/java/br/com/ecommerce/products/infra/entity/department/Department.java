@@ -39,8 +39,10 @@ public class Department {
 	@Column(updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdAt;
+
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
+
 	private boolean isActive;
 
 	public Department(String name) {

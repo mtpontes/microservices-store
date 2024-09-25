@@ -46,8 +46,10 @@ public class Category {
 	@Column(updatable = false)
 	@CreationTimestamp
 	private LocalDateTime createdAt;
+
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
+	
 	private boolean isActive;
 
 	public Category(String name, Department department) {

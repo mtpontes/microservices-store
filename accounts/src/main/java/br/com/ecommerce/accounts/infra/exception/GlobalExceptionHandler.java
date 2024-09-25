@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -40,6 +42,26 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ResponseEntity<ResponseError> handleError401(EntityNotFoundException ex) {
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
+				ENTITY_NOT_FOUND_EXCEPTION));
+	}
+	
+	@ExceptionHandler(InternalAuthenticationServiceException.class)
+	public ResponseEntity<ResponseError> handleError401(InternalAuthenticationServiceException ex) {
+		return ResponseEntity
+		.status(unauthorized.value())
+		.body(new ResponseError(
+			unauthorized.value(),
+			unauthorized.getReasonPhrase(),
+			ENTITY_NOT_FOUND_EXCEPTION));
+		}
+		
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ResponseError> handleError401(BadCredentialsException ex) {
 		return ResponseEntity
 			.status(unauthorized.value())
 			.body(new ResponseError(
