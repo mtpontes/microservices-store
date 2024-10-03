@@ -15,6 +15,6 @@ import lombok.AllArgsConstructor;
 public class CartMapper {
 
     public CartDTO toCartDTO(Cart cart, List<ProductDTO> products, BigDecimal total) {
-        return new CartDTO(cart.getUserId(), products, total, cart.isAnon(), cart.getCreatedAt(), cart.getModifiedAt());
+        return new CartDTO(cart.getId(), products, total, cart.isAnon(), cart.getCreatedAt(), cart.getModifiedAt());
     }
 }

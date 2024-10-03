@@ -15,4 +15,5 @@ public class ProductDTO {
     private String name;
     private Integer unit;
     private BigDecimal price;
+    private String imageLink;
 }
