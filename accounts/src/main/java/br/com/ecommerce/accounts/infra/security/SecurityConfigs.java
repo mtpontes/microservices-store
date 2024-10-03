@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import br.com.ecommerce.common.filter.SecurityFilter;
-import br.com.ecommerce.common.jwt.TokenService;
+import br.com.ecommerce.common.jwt.TokenDecoderService;
 
 @Configuration
 @EnableWebSecurity
@@ -24,8 +24,8 @@ public class SecurityConfigs {
 
 
     @Bean
-    public TokenService tokenService() {
-        return new TokenService(secret);
+    public TokenDecoderService tokenService() {
+        return new TokenDecoderService(secret);
     }
 
     @Bean
