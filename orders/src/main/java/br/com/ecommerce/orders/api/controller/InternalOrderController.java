@@ -13,13 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.ecommerce.orders.api.dto.order.OrderDTO;
 import br.com.ecommerce.orders.api.dto.payment.PaymentDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductAndUnitDTO;
-import br.com.ecommerce.orders.api.dto.product.ProductDTO;
 import br.com.ecommerce.orders.api.dto.product.StockWriteOffDTO;
-import br.com.ecommerce.orders.api.mapper.OrderMapper;
-import br.com.ecommerce.orders.api.mapper.ProductMapper;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.Order;
 import jakarta.validation.Valid;
@@ -33,14 +29,10 @@ public class InternalOrderController {
 	private OrderService service;
 	@Autowired
 	private RabbitTemplate template;
-	@Autowired
-	private OrderMapper orderMapper;
-	@Autowired
-	private ProductMapper productMapper;
 
 
 	@PostMapping
-	public ResponseEntity<OrderDTO> createOrder(
+	public ResponseEntity<Order> createOrder(
 		@RequestHeader("X-auth-user-id") String userId,
 		@RequestBody @Valid @NotEmpty(message = "Product list is empty") Set<ProductAndUnitDTO> data, 
 		UriComponentsBuilder uriBuilder
@@ -52,17 +44,13 @@ public class InternalOrderController {
 			.map(o -> new StockWriteOffDTO(o.getId(), Math.negateExact(o.getUnit())))
 			.toList();
 
-		List<ProductDTO> productsData = order.getProducts().stream()
-			.map(productMapper::toProductDTO)
-			.toList();
-		OrderDTO responseBody = orderMapper.toOrderDTO(order, productsData);
 		var uri = uriBuilder
-			.path("/orders/{orderId}")
-			.buildAndExpand(responseBody.getId())
+			.path("/client/orders/{orderId}")
+			.buildAndExpand(order.getId())
 			.toUri();
 
 		template.convertAndSend("orders.create.ex", "payment", paymentCreateRabbit);
 		template.convertAndSend("orders.create.ex", "stock", stockUpdateRabbit);
-		return ResponseEntity.created(uri).body(responseBody);
+		return ResponseEntity.created(uri).body(order);
 	}
 }
