@@ -1,7 +1,6 @@
 package br.com.ecommerce.payment.unit;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,7 +46,7 @@ class PaymentControllerUnitTest {
 	@Test
 	void getAllTest01() throws IOException, Exception {
 		// arrange
-		Page<PaymentDTO> mockValueReturned = new PageImpl<>(List.of(new PaymentDTO(1L, 1L, BigDecimal.TEN)));
+		Page<PaymentDTO> mockValueReturned = new PageImpl<>(List.of(new PaymentDTO("1", "1", BigDecimal.TEN)));
 		when(service.getAllByParams(any(), any(), any(), any(), any(), any())).thenReturn(mockValueReturned);
 
 		var EXPECTED_ORDER_ID = mockValueReturned.getContent().get(0).orderId();
@@ -72,8 +71,8 @@ class PaymentControllerUnitTest {
 	@Test
 	void confirmPaymentTest01() throws IOException, Exception {
 		// arrange
-		Payment mockValueReturned = new Payment(1l, 1L, BigDecimal.TEN);
-		when(service.confirmPayment(anyLong())).thenReturn(mockValueReturned);
+		Payment mockValueReturned = new Payment("1", "1", BigDecimal.TEN);
+		when(service.confirmPayment(anyString())).thenReturn(mockValueReturned);
 
 		// act
 		mvc.perform(
@@ -83,7 +82,7 @@ class PaymentControllerUnitTest {
 		// assert
 		.andExpect(status().isNoContent());
 
-		verify(service).confirmPayment(anyLong());
+		verify(service).confirmPayment(anyString());
 		verify(template).convertAndSend(anyString(), anyString(), any(PaymentConfirmDTO.class));
 	}
 }

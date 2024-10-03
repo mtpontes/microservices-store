@@ -16,31 +16,31 @@ class PaymentUnitTest {
     @Test
     @DisplayName("Unit - createPayment - With valid values should not throw exception")
     void createPaymentTest01() {
-        assertDoesNotThrow(() -> new Payment(1L, 1L, BigDecimal.TEN));
+        assertDoesNotThrow(() -> new Payment("1", "1", BigDecimal.TEN));
     }
     @Test
     @DisplayName("Unit - createPayment - With negative amount should throw IllegalArgumentException")
     void createPaymentTest02() {
         // act and assert
         assertThrows(IllegalArgumentException.class, 
-            () -> new Payment(1L, 1L, new BigDecimal("-10")));
+            () -> new Payment("1", "1", new BigDecimal("-10")));
     }
     @Test
     @DisplayName("Unit - createPayment - With null values should throw IllegalArgumentException")
     void createPaymentTest03() {
-        assertThrows(IllegalArgumentException.class, () -> new Payment(null, 1L, new BigDecimal("1")));
-        assertThrows(IllegalArgumentException.class, () -> new Payment(1L, null, new BigDecimal("1")));
-        assertThrows(IllegalArgumentException.class, () -> new Payment(1L, 1L, null));
+        assertThrows(IllegalArgumentException.class, () -> new Payment(null, "1", new BigDecimal("1")));
+        assertThrows(IllegalArgumentException.class, () -> new Payment("1", null, new BigDecimal("1")));
+        assertThrows(IllegalArgumentException.class, () -> new Payment("1", "1", null));
         assertThrows(IllegalArgumentException.class, () -> new Payment(null, null, null));
-        assertDoesNotThrow(() -> new Payment(1L, 1L, BigDecimal.TEN));
+        assertDoesNotThrow(() -> new Payment("1", "1", BigDecimal.TEN));
     }
 
     @Test
     @DisplayName("Unit - updatePaymentStatus - Cannot update from Canceled state")
     void updatePaymentStatusTest01() {
         Payment payment = Payment.builder()
-            .orderId(1L)
-            .userId(1L)
+            .orderId("1")
+            .userId("1")
             .status(PaymentStatus.CANCELED)
             .paymentAmount(BigDecimal.TEN)
             .build();
@@ -53,8 +53,8 @@ class PaymentUnitTest {
     @DisplayName("Unit - updatePaymentStatus - Allowed update from Awaiting state")
     void updatePaymentStatusTest02() {
         Payment payment = Payment.builder()
-            .orderId(1L)
-            .userId(1L)
+            .orderId("1")
+            .userId("1")
             .status(PaymentStatus.AWAITING)
             .paymentAmount(BigDecimal.TEN)
             .build();

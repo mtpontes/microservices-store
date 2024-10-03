@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 
 public record PaymentDTO(
 		
-	Long orderId,
-	Long userId,
+	String orderId,
+	String userId,
 	BigDecimal paymentAmount) {
 
 	public PaymentDTO(Payment p) {
-		this(p.getOrderId(), p.getUserId(), p.getPaymentAmount());
+		this(String.valueOf(p.getOrderId()), String.valueOf(p.getUserId()), p.getPaymentAmount());
 	}
 }

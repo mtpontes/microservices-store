@@ -14,12 +14,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	private final String ENTITY_NOT_FOUND_EXCEPTION = "Payment not found";
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
@@ -38,14 +35,14 @@ public class GlobalExceptionHandler {
 				notFound.getReasonPhrase()));
 	}
 
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError400(EntityNotFoundException ex) {
+	@ExceptionHandler(PaymentNotFoundException.class)
+	public ResponseEntity<ResponseError> handleError400(PaymentNotFoundException ex) {
 		return ResponseEntity
 			.status(unauthorized.value())
 			.body(new ResponseError(
 				badRequest.value(),
 				badRequest.getReasonPhrase(),
-				ENTITY_NOT_FOUND_EXCEPTION));
+				ex.getMessage()));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

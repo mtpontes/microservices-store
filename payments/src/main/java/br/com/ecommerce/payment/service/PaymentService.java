@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.ecommerce.payment.exception.PaymentNotFoundException;
 import br.com.ecommerce.payment.model.Payment;
 import br.com.ecommerce.payment.model.PaymentDTO;
 import br.com.ecommerce.payment.model.PaymentStatus;
@@ -28,17 +29,15 @@ public class PaymentService {
 		repository.save(payment);
 	}
 
-	public Payment confirmPayment(Long id) {
-		var payment = repository.getReferenceById(id);
+	public Payment confirmPayment(String id) {
+		var payment = repository.findByOrderId(id).orElseThrow(PaymentNotFoundException::new);
 		payment.updatePaymentStatus(PaymentStatus.CONFIRMED);
-		
 		return payment;
 	}
 
-	public Payment cancelPayment(Long id) {
-		var payment = repository.getReferenceById(id);
+	public Payment cancelPayment(String id) {
+		var payment = repository.findByOrderId(id).orElseThrow(PaymentNotFoundException::new);
 		payment.updatePaymentStatus(PaymentStatus.CANCELED);
-		
 		return payment;
 	}
 
