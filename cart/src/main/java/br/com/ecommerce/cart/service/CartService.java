@@ -92,28 +92,13 @@ public class CartService {
         return cart;
     }
 
-    public Set<Product> chosenProducts(Cart cart, Set<String> chosen) {
-        boolean isBlankSet = chosen.stream().filter(string -> !string.isBlank()).count() <= 0;
-        if (isBlankSet) throw new IllegalArgumentException("List of selected products is empty");
-        return cart.getProducts().stream()
-            .filter(product -> chosen.stream().anyMatch(choice -> choice.equalsIgnoreCase(product.getId())))
-            .collect(Collectors.toSet());
-    }
-
     @Transactional
-    public void removeSelectedProducts(Cart cart, Set<Product> chosenProducts) {
-        chosenProducts.forEach(selected -> cart.removeProduct(selected));
-        cartRespository.save(cart);
-    }
-
-    @Transactional
-    public Set<Product> cartToOrder(String userId, Set<String> productIds) {
+    public Set<Product> selectProductsFromCart(Cart cart, Set<String> productIds) {
         // validate list of ids
         boolean isBlankSet = productIds.stream().filter(string -> !string.isBlank()).count() <= 0L;
         if (isBlankSet) throw new IllegalArgumentException("List of selected products is empty");
         
         // recover and validate cart
-        Cart cart = this.getCart(userId);
         if (cart.isAnon()) throw new CartNotFoundException();
         if (cart.getProducts().isEmpty()) throw new EmptyCartException();
 
@@ -121,11 +106,12 @@ public class CartService {
         Set<Product> chosenProducts = cart.getProducts().stream()
             .filter(product -> productIds.stream().anyMatch(choice -> choice.equalsIgnoreCase(product.getId())))
             .collect(Collectors.toSet());
+        return chosenProducts;
+    }
 
-        // delete selected products from cart
+    @Transactional
+    public void removeSelectedProducts(Cart cart, Set<Product> chosenProducts) {
         chosenProducts.forEach(selected -> cart.removeProduct(selected));
         cartRespository.save(cart);
-
-        return chosenProducts;
     }
 }
