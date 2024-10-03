@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
 import br.com.ecommerce.products.annotations.ControllerIntegrationTest;
 import br.com.ecommerce.products.api.dto.product.CreateProductDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
@@ -115,7 +115,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createProductTest01_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -147,7 +147,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createProductTest03_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -179,7 +179,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createProductTest04_withExistentName() throws Exception {
         // arrange
         String path = basePath;
@@ -206,7 +206,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void createProductTest06_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -221,7 +221,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateTest01_withValidData() throws Exception {
         // arrange
         Long productId = 1L;
@@ -248,7 +248,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateTest02_withNullValues() throws Exception {
         // arrange
         Long productId = 1L;
@@ -275,7 +275,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateTest03_withExistentName() throws Exception {
         // arrange
         Long productId = 1L;
@@ -299,7 +299,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updateTest04_withUnauthorizedRoles() throws Exception {
         // arrange
         Long productId = 1L;
@@ -315,7 +315,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateStockTest01_addUnits() throws Exception {
         // arrange
         Long productId = 1L;
@@ -340,7 +340,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateStockTest02_subtractUnits() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);
@@ -367,7 +367,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateStockTest03_withInvalidValue() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);
@@ -389,7 +389,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updateStockTest03_withUnauthorizedRoles() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);
@@ -406,7 +406,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updatePriceTest01_withValidValues() throws Exception {
         // arrange
         Long productId = 1L;
@@ -433,7 +433,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updatePriceTest02_withInvalidValues() throws Exception {
         // arrange
         Long productId = 1L;
@@ -454,7 +454,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updatePriceTest03_withBothValuesEqual() throws Exception {
         // arrange
         Long productId = 1L;
@@ -475,7 +475,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updatePriceTest04_withOriginalPriceLowerThanPromotionalPrice01() throws Exception {
         // arrange
         Long productId = 1L;
@@ -496,7 +496,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updatePriceTest05_withOriginalPriceLowerThanPromotionalPrice() throws Exception {
         // arrange
         Long productId = 1L;
@@ -512,7 +512,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updatePriceTest06_withUnauthorizedRoles() throws Exception {
         // arrange
         Long productId = 1L;
@@ -528,7 +528,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void switchCurrentPriceToOriginalTest01() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);
@@ -556,7 +556,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void switchCurrentPriceToOriginalTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);
@@ -573,7 +573,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void switchCurrentPriceToPromotionalPriceTest01() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);
@@ -604,7 +604,7 @@ class AdminProductControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void switchCurrentPriceToPromotionalPriceTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Product product = productsPersisted.get(0);

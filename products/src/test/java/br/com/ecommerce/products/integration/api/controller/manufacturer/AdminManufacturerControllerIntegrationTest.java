@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
 import br.com.ecommerce.products.annotations.ControllerIntegrationTest;
 import br.com.ecommerce.products.api.dto.manufacturer.CreateManufacturerDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.DataAddressDTO;
@@ -72,7 +72,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createTest01_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -103,7 +103,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createTest02_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -134,7 +134,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createTest03_withInvalidNameInput() throws Exception {
         // arrange
         String path = basePath;
@@ -173,7 +173,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void createTest01_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -187,7 +187,7 @@ class AdminManufacturerControllerIntegrationTest {
         act.andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getOneTest() throws Exception {
         // arrange
         Long manufacturerId = manufacturersPersisted.get(0).getId();
@@ -209,7 +209,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.address").isNotEmpty());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void getOneTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Long manufacturerId = manufacturersPersisted.get(0).getId();
@@ -224,7 +224,7 @@ class AdminManufacturerControllerIntegrationTest {
         act.andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest01_withoutParams() throws Exception {
         // arrange
         String path = basePath;
@@ -245,7 +245,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content[0].address").exists());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest02_withNameParam() throws Exception {
         // arrange
         String path = basePath;
@@ -264,7 +264,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest03_withPhoneParam() throws Exception {
         // arrange
         String path = basePath;
@@ -283,7 +283,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest04_withEmailParam() throws Exception {
         // arrange
         String path = basePath;
@@ -302,7 +302,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest05_withContactPersonParam() throws Exception {
         // arrange
         String path = basePath;
@@ -321,7 +321,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllWithDiverseParamsTest06_withAllParams() throws Exception {
         // arrange
         String path = basePath;
@@ -346,7 +346,7 @@ class AdminManufacturerControllerIntegrationTest {
             .andExpect(jsonPath("$.content", hasSize(expectedResultSize)));
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void getAllWithDiverseParamsTest07_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -361,7 +361,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateTest01_withValidData() throws Exception {
         // arrange
         Long manufacturerId = 1L;
@@ -392,7 +392,7 @@ class AdminManufacturerControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updateTest02_withInvalidData() throws Exception {
         // arrange
         Long manufacturerId = 1L;

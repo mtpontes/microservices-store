@@ -33,6 +33,8 @@ import br.com.ecommerce.products.infra.entity.manufacturer.Phone;
 import br.com.ecommerce.products.infra.entity.product.Price;
 import br.com.ecommerce.products.infra.entity.product.Product;
 import br.com.ecommerce.products.infra.entity.product.Stock;
+import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
@@ -45,7 +47,6 @@ import br.com.ecommerce.products.utils.util.PhoneUtils;
 import br.com.ecommerce.products.utils.util.PriceUtils;
 import br.com.ecommerce.products.utils.util.ProductUtils;
 import br.com.ecommerce.products.utils.util.StockUtils;
-import jakarta.persistence.EntityNotFoundException;
 
 @ServiceIntegrationTest
 class ProductServiceIntegrationTest {
@@ -344,7 +345,7 @@ class ProductServiceIntegrationTest {
         );
 
         assertThrows(
-            EntityNotFoundException.class, 
+            CategoryNotFoundException.class, 
             () -> service.createProduct(input));
     }
 
@@ -363,7 +364,7 @@ class ProductServiceIntegrationTest {
         );
 
         assertThrows(
-            EntityNotFoundException.class, 
+            ManufacturerNotFoundException.class, 
             () -> service.createProduct(input));
     }
 }
