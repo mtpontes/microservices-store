@@ -28,8 +28,7 @@ public class DepartmentController {
 
 	@GetMapping("/{departmentId}")
 	public ResponseEntity<DataDepartmentDTO> getDepartment(@PathVariable Long departmentId) {
-		return ResponseEntity.ok(
-			departmentService.getOneDepartment(departmentId));
+		return ResponseEntity.ok(departmentService.getOneDepartment(departmentId));
 	}
 
 	@GetMapping
@@ -37,8 +36,7 @@ public class DepartmentController {
 		@RequestParam(required = false) String name,
 		Pageable pageable
 	) {
-		return ResponseEntity.ok(
-			departmentService.getAllDepartments(name, pageable));
+		return ResponseEntity.ok(departmentService.getAllDepartments(name, pageable));
 	}
 
 	@GetMapping("/categories/{categoryId}")
@@ -51,7 +49,6 @@ public class DepartmentController {
 		@RequestParam(required = false) String name,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
-		return ResponseEntity.ok(
-			categoryService.getAllByParams(name, pageable));
+		return ResponseEntity.ok(categoryService.getAllByParams(name, pageable));
 	}
 }

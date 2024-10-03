@@ -34,8 +34,7 @@ public class AdminDepartmentController {
 		@RequestBody @Valid CreateDepartmentDTO dto, 
 		UriComponentsBuilder uriBuilder
 	) {
-		SimpleDataDepartmentDTO responseBody = 
-			departmentService.createDepartment(dto);
+		SimpleDataDepartmentDTO responseBody = departmentService.createDepartment(dto);
 		var uri = uriBuilder
 			.path("/departments/{departmentId}")
 			.buildAndExpand(responseBody.getId())
@@ -48,8 +47,7 @@ public class AdminDepartmentController {
 		@PathVariable Long departmentId, 
 		@RequestBody UpdateDepartmentoDTO dto
 	) {
-		return ResponseEntity.ok(
-			departmentService.updateDepartment(departmentId, dto));
+		return ResponseEntity.ok(departmentService.updateDepartment(departmentId, dto));
 	}
 
 	@PostMapping("/categories")

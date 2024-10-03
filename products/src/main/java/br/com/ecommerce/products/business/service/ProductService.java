@@ -37,6 +37,8 @@ import br.com.ecommerce.products.infra.entity.category.Category;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.product.Price;
 import br.com.ecommerce.products.infra.entity.product.Product;
+import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
+import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundException;
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
@@ -184,8 +186,10 @@ public class ProductService {
 	public DataProductDTO createProduct(CreateProductDTO dto) {
 		uniqueNameValidator.validate(dto.getName());
 
-		Category category = categoryRepository.getReferenceById(dto.getCategoryId());
-		Manufacturer manufacturer = manufacturerRepository.getReferenceById(dto.getManufacturerId());
+		Category category = categoryRepository.findById(dto.getCategoryId())
+			.orElseThrow(CategoryNotFoundException::new);
+		Manufacturer manufacturer = manufacturerRepository.findById(dto.getManufacturerId())
+			.orElseThrow(ManufacturerNotFoundException::new);
 		Product product = productMapper.toProduct(dto, category, manufacturer);
 
 		category.addProduct(product);
