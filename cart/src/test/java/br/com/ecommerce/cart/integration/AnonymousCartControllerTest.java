@@ -122,7 +122,7 @@ class AnonymousCartControllerTest {
     @Test
     void getTest01() throws Exception {
         // arrange
-        String userId = userCartPersisted.getUserId();
+        String userId = userCartPersisted.getId();
         this.mockProductClientReturn(userCartPersisted.getProducts());
 
         // act
@@ -162,7 +162,7 @@ class AnonymousCartControllerTest {
     @Test
     void updateUnitTest01_addingUnit() throws Exception {
         // arrange
-        String header = userCartPersisted.getUserId();
+        String header = userCartPersisted.getId();
         Product existentProduct = userCartPersisted.getProducts().iterator().next();
         String productId = existentProduct.getId();
         int productUnit = existentProduct.getUnit();
@@ -189,7 +189,7 @@ class AnonymousCartControllerTest {
             .andExpect(jsonPath("$.createdAt").hasJsonPath())
             .andExpect(jsonPath("$.modifiedAt").hasJsonPath())
             .andExpect(jsonPath("$.anon").hasJsonPath());
-        Product product = repository.findById(userCartPersisted.getUserId())
+        Product product = repository.findById(userCartPersisted.getId())
             .get().getProducts().stream()
             .filter(p -> p.getId().equalsIgnoreCase(productId))
             .findFirst().get();

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +26,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,8 +42,12 @@ import br.com.ecommerce.cart.config.MongoDBTestContainer;
 import br.com.ecommerce.cart.infra.entity.Cart;
 import br.com.ecommerce.cart.infra.entity.Product;
 import br.com.ecommerce.cart.infra.repository.CartRepository;
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.IdRolePair;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
+import br.com.ecommerce.common.utils.MockUserUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -88,19 +94,15 @@ class ClientCartControllerTest {
     }
 
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(idRolePair = @IdRolePair(id = "createTest", role = "CLIENT"))
     void createTest01() throws Exception {
-        // arrange
-        String entry = "validId";
-
         // act
         ResultActions act = mvc.perform(post(basePath)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", entry));
+            .contentType(MediaType.APPLICATION_JSON));
 
         // assert
         act.andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").hasJsonPath())
+            .andExpect(jsonPath("$.id").value("createTest"))
             .andExpect(jsonPath("$.products").hasJsonPath())
             .andExpect(jsonPath("$.totalPrice").hasJsonPath())
             .andExpect(jsonPath("$.createdAt").hasJsonPath())
@@ -108,7 +110,7 @@ class ClientCartControllerTest {
             .andExpect(jsonPath("$.anon").hasJsonPath());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createTest02_withUnauthorizedRoles() throws Exception {
         // act
         ResultActions act = mvc.perform(post(basePath)
@@ -118,16 +120,18 @@ class ClientCartControllerTest {
         act.andExpect(status().isForbidden());
     }
     
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = "CLIENT")
     void getTest01() throws Exception {
         // arrange
-        String userId = userCartPersisted.getUserId();
+        String userId = userCartPersisted.getId();
+        MockUserUtils.mockUser(userId);
+
         this.mockProductClientReturn(userCartPersisted.getProducts());
 
         // act
         ResultActions act = mvc.perform(get(basePath)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", userId));
+            .contentType(MediaType.APPLICATION_JSON));
 
         // assert
         act.andExpect(status().isOk())
@@ -143,7 +147,8 @@ class ClientCartControllerTest {
             .andExpect(jsonPath("$.anon").hasJsonPath());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @Test
+    @WithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getTest02_withUnauthorizedRoles() throws Exception {
         // act
         ResultActions act = mvc.perform(get(basePath)
@@ -153,10 +158,13 @@ class ClientCartControllerTest {
         act.andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = {"CLIENT"})
     void updateUnitTest01() throws Exception {
         // arrange
-        String header = userCartPersisted.getUserId();
+        String userId = userCartPersisted.getId();
+        MockUserUtils.mockUser(userId);
+
         Product existentProduct = userCartPersisted.getProducts().iterator().next();
         String productId = existentProduct.getId();
         int productUnit = existentProduct.getUnit();
@@ -169,7 +177,6 @@ class ClientCartControllerTest {
         // act
         ResultActions act = mvc.perform(put(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", header)
             .content(updateCartProductDTOJson.write(requestBody).getJson()));
 
         // assert
@@ -184,14 +191,15 @@ class ClientCartControllerTest {
             .andExpect(jsonPath("$.createdAt").hasJsonPath())
             .andExpect(jsonPath("$.modifiedAt").hasJsonPath())
             .andExpect(jsonPath("$.anon").hasJsonPath());
-        Product product = repository.findById(userCartPersisted.getUserId())
+        Product product = repository.findById(userCartPersisted.getId())
             .get().getProducts().stream()
             .filter(p -> p.getId().equalsIgnoreCase(productId))
             .findFirst().get();
         assertEquals(expectedUnit, product.getUnit());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = {"CLIENT"})
     void updateUnitTest02_withInvalidData() throws Exception {
         // arrange
         UpdateCartProductDTO requestBody = new UpdateCartProductDTO();
@@ -199,14 +207,14 @@ class ClientCartControllerTest {
         // act
         ResultActions act = mvc.perform(put(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", "any")
             .content(updateCartProductDTOJson.write(requestBody).getJson()));
 
         // assert
         act.andExpect(status().isBadRequest());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @Test
+    @WithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateUnitTest03_withUnauthorizedRoles() throws Exception {
         // act
         ResultActions act = mvc.perform(put(basePath)
@@ -216,11 +224,14 @@ class ClientCartControllerTest {
         act.andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = {"CLIENT"})
     void mergeCartsTest01() throws Exception {
         // arrange
-        String userId = userCartPersisted.getUserId();
-        AnonCartRefereceDTO requestBody = new AnonCartRefereceDTO(anonCartPersisted.getUserId());
+        String userId = userCartPersisted.getId();
+        MockUserUtils.mockUser(userId);
+
+        AnonCartRefereceDTO requestBody = new AnonCartRefereceDTO(anonCartPersisted.getId());
 
         Set<Product> copiedSet = new HashSet<>();
         copiedSet.addAll(userCartPersisted.getProducts());
@@ -247,12 +258,13 @@ class ClientCartControllerTest {
             .andExpect(jsonPath("$.createdAt").hasJsonPath())
             .andExpect(jsonPath("$.modifiedAt").hasJsonPath())
             .andExpect(jsonPath("$.anon").hasJsonPath());
-        int userCartproductSetSize = repository.findById(userCartPersisted.getUserId()).get().getProducts().size();
+        int userCartproductSetSize = repository.findById(userCartPersisted.getId()).get().getProducts().size();
         assertEquals(expectedUserCartProductSetSize, userCartproductSetSize);
-        assertFalse(repository.existsById(anonCartPersisted.getUserId()));
+        assertFalse(repository.existsById(anonCartPersisted.getId()));
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = {"CLIENT"})
     void mergeCartsTest02_withInvalidData() throws Exception {
         // arrange
         UpdateCartProductDTO requestBody = new UpdateCartProductDTO();
@@ -260,14 +272,14 @@ class ClientCartControllerTest {
         // act
         ResultActions act = mvc.perform(put(basePath + "/merge")
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", "any")
             .content(updateCartProductDTOJson.write(requestBody).getJson()));
 
         // assert
         act.andExpect(status().isBadRequest());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @Test
+    @WithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void mergeCartsTest03_withUnauthorizedRoles() throws Exception {
         // act
         ResultActions act = mvc.perform(put(basePath + "/merge")
