@@ -27,15 +27,15 @@ public class Payment {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long orderId;
-	private Long userId;
+	private String orderId;
+	private String userId;
 	private BigDecimal paymentAmount;
 
 	@Enumerated(EnumType.STRING)
 	private PaymentStatus status;
 
 
-	public Payment(Long orderId, Long userId, BigDecimal paymentAmount) {
+	public Payment(String orderId, String userId, BigDecimal paymentAmount) {
 		this.checkNotNull(orderId, "orderId");
 		this.checkNotNull(userId, "userId");
 		this.checkPaymentAmount(paymentAmount);

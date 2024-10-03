@@ -64,7 +64,10 @@ public class CartServiceTest {
     @BeforeEach
     void setup() {
         service = new CartService(
-            cartRepository, new CartFactory(), new ProductMapper(productFactory), new CartMapper());
+            cartRepository, 
+            new CartFactory(), 
+            new ProductMapper(productFactory), 
+            new CartMapper());
     }
 
 
@@ -99,7 +102,7 @@ public class CartServiceTest {
         Cart result = cartCaptor.getValue();
 
         // assert
-        assertNotNull(result.getUserId());
+        assertNotNull(result.getId());
         assertEquals(expectedProductsSetSize, result.getProducts().size());
         assertTrue(result.isAnon());
         assertNotNull(result.getCreatedAt());
@@ -241,7 +244,7 @@ public class CartServiceTest {
     }
 
     @Test
-    void chosenProductsTest() {
+    void selectProductsFromCartTest() {
         // arrange
         Cart cart = new Cart("any id");
         cart.addProducts(this.createProductSet());
@@ -249,10 +252,11 @@ public class CartServiceTest {
         int expectedProductSetSize = 1;
 
         // act
-        Set<Product> products = service.chosenProducts(cart, Set.of(chosenProduct));
+        Set<Product> products = service.selectProductsFromCart(cart, Set.of(chosenProduct));
 
         // assert
         assertEquals(expectedProductSetSize, products.size());
+        assertEquals(products.iterator().next().getUnit(), cart.getProducts().iterator().next().getUnit());
     }
 
     private Set<Product> createProductSet() {

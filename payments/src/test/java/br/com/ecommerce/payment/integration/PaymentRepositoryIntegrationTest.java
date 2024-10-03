@@ -29,30 +29,30 @@ class PaymentRepositoryIntegrationTest {
     static void setup(@Autowired PaymentRepository repository) {
         repository.saveAll(
             List.of(
-                Payment.builder().orderId(300L).userId(300L).paymentAmount(new BigDecimal("5000")).status(PaymentStatus.CONFIRMED).build(),
-
-                Payment.builder().orderId(1L).build(),
-                Payment.builder().orderId(1L).build(),
-                Payment.builder().orderId(2L).build(),
-
-                Payment.builder().userId(1L).build(),
-                Payment.builder().userId(1L).build(),
-                Payment.builder().userId(2L).build(),
-
+                Payment.builder().orderId("300").userId("300").paymentAmount(new BigDecimal("5000")).status(PaymentStatus.CONFIRMED).build(),
+            
+                Payment.builder().orderId("1").build(),
+                Payment.builder().orderId("1").build(),
+                Payment.builder().orderId("2").build(),
+            
+                Payment.builder().userId("1").build(),
+                Payment.builder().userId("1").build(),
+                Payment.builder().userId("2").build(),
+            
                 Payment.builder().paymentAmount(new BigDecimal("1")).build(),
                 Payment.builder().paymentAmount(new BigDecimal("1")).build(),
                 Payment.builder().paymentAmount(new BigDecimal("2")).build(),
                 
                 Payment.builder().status(PaymentStatus.AWAITING).build(),
                 Payment.builder().status(PaymentStatus.AWAITING).build(),
-
-                Payment.builder().userId(100L).paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CANCELED).build(),
-                Payment.builder().userId(100L).paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CANCELED).build(),
-                Payment.builder().userId(100L).paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CONFIRMED).build(),
-                Payment.builder().userId(100L).paymentAmount(new BigDecimal("2000")).status(PaymentStatus.CANCELED).build(),
-
-                Payment.builder().userId(200L).paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CANCELED).build(),
-                Payment.builder().userId(300L).paymentAmount(new BigDecimal("3000")).status(PaymentStatus.CANCELED).build()
+            
+                Payment.builder().userId("100").paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CANCELED).build(),
+                Payment.builder().userId("100").paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CANCELED).build(),
+                Payment.builder().userId("100").paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CONFIRMED).build(),
+                Payment.builder().userId("100").paymentAmount(new BigDecimal("2000")).status(PaymentStatus.CANCELED).build(),
+            
+                Payment.builder().userId("200").paymentAmount(new BigDecimal("1000")).status(PaymentStatus.CANCELED).build(),
+                Payment.builder().userId("300").paymentAmount(new BigDecimal("3000")).status(PaymentStatus.CANCELED).build()
             )
         );
     }
@@ -67,8 +67,8 @@ class PaymentRepositoryIntegrationTest {
         assertEquals(1, result.size());
         assertEquals(new BigDecimal("5000.00"), payment.getPaymentAmount());
         assertEquals(PaymentStatus.CONFIRMED, payment.getStatus());
-        assertEquals(300L, payment.getUserId());
-        assertEquals(300L, payment.getOrderId());
+        assertEquals("300", payment.getUserId());
+        assertEquals("300", payment.getOrderId());
     }
 
     @Test

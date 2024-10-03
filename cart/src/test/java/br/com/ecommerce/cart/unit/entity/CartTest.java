@@ -38,14 +38,14 @@ public class CartTest {
     @Test
     void userIdTest() {
         Cart cart = new Cart(validUserId);
-        assertEquals(validUserId, cart.getUserId());
+        assertEquals(validUserId, cart.getId());
     }
 
     @Test
     void anonymousUserIdTest() {
         int expectedPiecesOfId = 5;
         Cart cart = new Cart(new Product());
-        assertEquals(expectedPiecesOfId, cart.getUserId().split("-").length);
+        assertEquals(expectedPiecesOfId, cart.getId().split("-").length);
     }
 
     @Test

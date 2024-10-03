@@ -19,7 +19,7 @@ import br.com.ecommerce.accounts.api.dto.CreateUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.CreateUserEmployeeDTO;
 import br.com.ecommerce.accounts.api.factory.UserFactory;
 import br.com.ecommerce.accounts.api.mapper.AddressMapper;
-import br.com.ecommerce.accounts.business.service.TokenService;
+import br.com.ecommerce.accounts.business.service.TokenProducer;
 import br.com.ecommerce.accounts.business.service.UserService;
 import br.com.ecommerce.accounts.infra.repository.UserRepository;
 import br.com.ecommerce.accounts.model.User;
@@ -40,7 +40,7 @@ class UserServiceUnitTest {
     @Mock
     private AddressMapper addressMapper;
     @Mock
-    private TokenService tokenService;
+    private TokenProducer tokenService;
 	@InjectMocks
 	private UserService service;
 

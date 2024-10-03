@@ -40,18 +40,17 @@ public class PaymentController {
 		@RequestParam(required = false) Long userId, 
 		@RequestParam(required = false) BigDecimal paymentAmount, 
 		@RequestParam(required = false) PaymentStatus status
-		) {
-		
+	) {
 		Page<PaymentDTO> payments = service.getAllByParams(pageable, paymentId, orderId, userId, paymentAmount, status);
 		return ResponseEntity.ok(payments);
 	}
 
 	/* 
-		* Mock a payment confirmation of a payment provider service
-		*/
+	 * Mock a payment confirmation of a payment provider service
+	 */
 	@PatchMapping("/{paymentId}")
 	@Transactional
-	public ResponseEntity<?> confirmPayment(@PathVariable Long paymentId) {
+	public ResponseEntity<?> confirmPayment(@PathVariable String paymentId) {
 		Payment p = service.confirmPayment(paymentId);
 		PaymentConfirmDTO dto = new PaymentConfirmDTO(p.getOrderId(), PaymentStatus.CONFIRMED);
 		

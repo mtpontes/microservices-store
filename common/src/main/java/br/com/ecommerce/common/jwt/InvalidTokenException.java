@@ -1,4 +1,4 @@
-package br.com.ecommerce.auth.exception.exceptions;
+package br.com.ecommerce.common.jwt;
 
 public class InvalidTokenException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

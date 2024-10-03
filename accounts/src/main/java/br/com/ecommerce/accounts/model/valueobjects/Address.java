@@ -59,7 +59,6 @@ public class Address {
     private String validateField(String field, String fieldName) {
         return Optional.ofNullable(field)
             .filter(f -> !f.isBlank())
-            .orElseThrow(() -> 
-                new IllegalArgumentException("Cannot be blank: " + fieldName));
+            .orElseThrow(() -> new IllegalArgumentException("Cannot be blank: " + fieldName));
     }
 }

@@ -15,15 +15,15 @@ public class PaymentListener {
 	@Autowired
 	private PaymentService service;
 
-	@RabbitListener(queues = "payments.details-order")
 	@Transactional
+	@RabbitListener(queues = "payments.details-order")
 	public void receiveQueueMessagesOrder(@Payload PaymentDTO dto) {
 		service.createPayment(dto);
 	}
 
-	@RabbitListener(queues = "payments.cancel-order")
 	@Transactional
-	public void receivePaymentsCancelOrder(@Payload Long orderId) {
+	@RabbitListener(queues = "payments.cancel-order")
+	public void receivePaymentsCancelOrder(@Payload String orderId) {
 		service.cancelPayment(orderId);
 	}
 }

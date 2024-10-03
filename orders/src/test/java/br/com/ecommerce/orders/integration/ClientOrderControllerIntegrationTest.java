@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -19,12 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
+import br.com.ecommerce.common.utils.MockUserUtils;
 import br.com.ecommerce.orders.api.client.ProductClient;
 import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
@@ -34,7 +36,9 @@ import br.com.ecommerce.orders.tools.builder.OrderTestBuilder;
 import br.com.ecommerce.orders.tools.config.TestConfigBeans;
 import br.com.ecommerce.orders.tools.testcontainers.MongoDBTestContainer;
 import br.com.ecommerce.orders.tools.utils.RandomUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -68,17 +72,20 @@ class ClientOrderControllerIntegrationTest {
                         randomUtils.getRandomString(),
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt()),
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString()),
                     new Product(
                         randomUtils.getRandomString(),
                         randomUtils.getRandomString(10), 
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt()),
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString()),
                     new Product(
                         randomUtils.getRandomString(), 
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt())
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString())
                 );
 
                 Order order = new OrderTestBuilder()
@@ -98,18 +105,7 @@ class ClientOrderControllerIntegrationTest {
     }
 
 
-    @TestWithRoles(roles = {"CLIENT"})
-    void getAllBasicsInfoOrdersByUserTest01_missingHeader() throws Exception {
-        mvc.perform(
-            get(basePath)
-                .contentType(MediaType.APPLICATION_JSON)
-                // missing X-auth-user-id header
-        )
-        // assert
-        .andExpect(status().isUnauthorized());
-    }
-
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getAllBasicsInfoOrdersByUserTest02_withUnauthorizedRoles() throws Exception {
         mvc.perform(
             get(basePath)
@@ -120,18 +116,7 @@ class ClientOrderControllerIntegrationTest {
         .andExpect(status().isForbidden());
     }
     
-    @TestWithRoles(roles = {"CLIENT"})
-    void getOrderByIdAndUserIdTest01_missingHeader() throws Exception {
-        mvc.perform(
-            get(basePath + "/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                // missing X-auth-user-id header
-        )
-        // assert
-        .andExpect(status().isUnauthorized());
-    }
-
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getOrderByIdAndUserIdTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         String orderId = orderPersisted.getId();
@@ -145,35 +130,25 @@ class ClientOrderControllerIntegrationTest {
         .andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
-    @DisplayName("Unit - cancelOrder - Should return status 204")
+    @Test
+    @WithMockUser(roles = "CLIENT")
     void cancelOrderTest01() throws IOException, Exception {
         // arrange
         String orderId = orderPersisted.getId();
+        String userId = orderPersisted.getUserId();
+        MockUserUtils.mockUser(userId);
 
         // act
         mvc.perform(
             patch(basePath + "/" + orderId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", "1")
         )
+        
         // assert
         .andExpect(status().isNoContent());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
-    void cancelOrderTest02_missingHeader() throws IOException, Exception {
-        // act
-        mvc.perform(
-            patch(basePath + "/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                // missing X-auth-user-id header
-        )
-        // assert
-        .andExpect(status().isUnauthorized());
-    }
-
-    @TestWithRoles(roles = {"ADMIN", "EMPLYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLYEE"})
     void cancelOrderTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(

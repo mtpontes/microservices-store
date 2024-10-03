@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.ecommerce.accounts.api.dto.CreateUserEmployeeDTO;
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -45,7 +45,7 @@ class AdminAccountControllerIntegrationTest {
 
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN"})
+    @TestCustomWithMockUser(roles = {"ADMIN"})
     @DisplayName("Integration - createAdminUser - must return status 200 and user data")
     void createAdminUserTest01() throws IOException, Exception {
         // arrange
@@ -67,7 +67,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN"})
+    @TestCustomWithMockUser(roles = {"ADMIN"})
     @DisplayName("Integration - createAdminUser - Must return status 400 and fields with error")
     void createAdminUserTest02() throws IOException, Exception {
         // arrange
@@ -90,7 +90,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"EMPLOYEE", "CLIENT"})
+    @TestCustomWithMockUser(roles = {"EMPLOYEE", "CLIENT"})
     void createAdminUserTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(
@@ -102,7 +102,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     @DisplayName("Integration - createEmployeeUser - must return status 200 and user data")
     void createEmployeeUserTest01() throws IOException, Exception {
         // arrange
@@ -124,7 +124,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     @DisplayName("Integration - createEmployeeUser - Must return status 400 and fields with error")
     void createEmployeeUserTest02() throws IOException, Exception {
         // arrange
@@ -147,7 +147,7 @@ class AdminAccountControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void createEmployeeUserTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(

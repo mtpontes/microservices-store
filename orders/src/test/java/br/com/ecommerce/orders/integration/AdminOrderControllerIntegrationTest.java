@@ -26,7 +26,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
 import br.com.ecommerce.orders.api.client.ProductClient;
 import br.com.ecommerce.orders.infra.entity.Order;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
@@ -69,17 +69,20 @@ class AdminOrderControllerIntegrationTest {
                         randomUtils.getRandomString(),
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt()),
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString()),
                     new Product(
                         randomUtils.getRandomString(),
                         randomUtils.getRandomString(10), 
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt()),
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString()),
                     new Product(
                         randomUtils.getRandomString(), 
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt())
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString())
                 );
 
                 Order order = new OrderTestBuilder()
@@ -100,7 +103,7 @@ class AdminOrderControllerIntegrationTest {
     }
     
 
-    @TestWithRoles(roles = {"ADMIN"})
+    @TestCustomWithMockUser(roles = {"ADMIN"})
     void getAllBasicsInfoOrdersByUserTest01() throws Exception {
         // act
         mvc.perform(
@@ -111,7 +114,7 @@ class AdminOrderControllerIntegrationTest {
         .andExpect(status().isOk());
     }
 
-    @TestWithRoles(roles = {"CLIENT", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"CLIENT", "EMPLOYEE"})
     void getAllBasicsInfoOrdersByUserTest02_withUnauthorizedRoles() throws Exception {
         mvc.perform(
             get(basePath)
@@ -121,7 +124,7 @@ class AdminOrderControllerIntegrationTest {
         .andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"ADMIN"})
+    @TestCustomWithMockUser(roles = {"ADMIN"})
     void getOrderByIdAndUserIdTest01() throws Exception {
         String orderId = ordersPersisted.get(0).getId();
         String userId = ordersPersisted.get(0).getUserId();
@@ -134,7 +137,7 @@ class AdminOrderControllerIntegrationTest {
         .andExpect(status().isOk());
     }
 
-    @TestWithRoles(roles = {"CLIENT", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"CLIENT", "EMPLOYEE"})
     void getOrderByIdAndUserIdTest02_withUnauthorizedRoles() throws Exception {
         mvc.perform(
             get(basePath + "/1/1")
@@ -145,7 +148,7 @@ class AdminOrderControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN"})
+    @TestCustomWithMockUser(roles = {"ADMIN"})
     @DisplayName("Unit - cancelOrder - Should return status 204")
     void cancelOrderTest01() throws IOException, Exception {
         // arrange
@@ -162,7 +165,7 @@ class AdminOrderControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"CLIENT", "EMPLOYEE"})
     void cancelOrderTest02_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(

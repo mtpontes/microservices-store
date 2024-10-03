@@ -27,7 +27,6 @@ public class ManufacturerController {
 		@RequestParam(required = false) String contactPerson,
 		@PageableDefault(size = 10) Pageable pageable
 	) {
-		return ResponseEntity.ok(
-			service.getAllSimpleDataManufacturers(name, contactPerson, pageable));
+		return ResponseEntity.ok(service.getAllSimpleDataManufacturers(name, contactPerson, pageable));
 	}
 }

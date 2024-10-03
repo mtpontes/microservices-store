@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,7 +35,7 @@ import br.com.ecommerce.cart.config.MongoDBTestContainer;
 import br.com.ecommerce.cart.infra.entity.Cart;
 import br.com.ecommerce.cart.infra.entity.Product;
 import br.com.ecommerce.cart.infra.repository.CartRepository;
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.utils.MockUserUtils;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -79,9 +81,12 @@ class CartToOrderControllerTest {
     }
 
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = "CLIENT")
     void createTest01() throws Exception {
         // arrange
+        MockUserUtils.mockUser(userCartPersisted.getId());
+
         Set<String> productIds = new HashSet<>(Set.of(userCartPersisted.getProducts().iterator().next().getId()));
         OrderDataDTO responseBody = new OrderDataDTO();
 
@@ -92,7 +97,6 @@ class CartToOrderControllerTest {
         String requestBody = collectionOfIdsJson.write(productIds).getJson();
         ResultActions act = mvc.perform(post(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", userCartPersisted.getUserId())
             .content(requestBody));
 
         // assert
@@ -103,16 +107,19 @@ class CartToOrderControllerTest {
             .andExpect(jsonPath("$.status").hasJsonPath())
             .andExpect(jsonPath("$.createdAt").hasJsonPath());
         
-        Cart cart = cartRepository.findById(userCartPersisted.getUserId()).get();
+        Cart cart = cartRepository.findById(userCartPersisted.getId()).get();
         assertTrue(cart.getProducts().isEmpty());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = "CLIENT")
     void createTest02_withEmptyCart() throws Exception {
         // arrange
+        MockUserUtils.mockUser(emptyUserCart.getId());
+
         Set<String> productIds = new HashSet<>(Set.of(userCartPersisted.getProducts().iterator().next().getId()));
         OrderDataDTO responseBody = new OrderDataDTO();
-        String invalidId = emptyUserCart.getUserId();
+        String invalidId = emptyUserCart.getId();
 
         when(orderClient.createOrder(anyString(), anySet()))
             .thenReturn(responseBody);
@@ -128,12 +135,15 @@ class CartToOrderControllerTest {
         act.andExpect(status().isBadRequest());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
-    void createTest02_withUnexistentCart() throws Exception {
+    @Test
+    @WithMockUser(roles = "CLIENT")
+    void createTest03_withUnexistentCart() throws Exception {
         // arrange
+        String unexistentUserId = "unexistentUserId"; 
+        MockUserUtils.mockUser(unexistentUserId); // the ID of an authenticated user's Cart is the same as the User ID
+
         Set<String> productIds = new HashSet<>(Set.of(userCartPersisted.getProducts().iterator().next().getId()));
         OrderDataDTO responseBody = new OrderDataDTO();
-        String invalidId = "randominvalidid";
         when(orderClient.createOrder(anyString(), anySet()))
             .thenReturn(responseBody);
 
@@ -141,38 +151,21 @@ class CartToOrderControllerTest {
         String requestBody = collectionOfIdsJson.write(productIds).getJson();
         ResultActions act = mvc.perform(post(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", invalidId)
             .content(requestBody));
 
         // assert
         act.andExpect(status().isNotFound());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
-    void createTest03_withAnonymousCart() throws Exception {
+    @Test
+    @WithMockUser(roles = "CLIENT")
+    void createTest04_bodyIsEmptyArray() throws Exception {
         // arrange
-        Set<String> productIds = new HashSet<>(Set.of(anonCartPersisted.getProducts().iterator().next().getId()));
-        OrderDataDTO responseBody = new OrderDataDTO();
-        when(orderClient.createOrder(anyString(), anySet()))
-            .thenReturn(responseBody);
+        MockUserUtils.mockUser(emptyUserCart.getId());
 
-        // act
-        String requestBody = collectionOfIdsJson.write(productIds).getJson();
-        ResultActions act = mvc.perform(post(basePath)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", anonCartPersisted)
-            .content(requestBody));
-
-        // assert
-        act.andExpect(status().isNotFound());
-    }
-
-    @TestWithRoles(roles = {"CLIENT"})
-    void createTest04_bodyIsEmptyList() throws Exception {
-        // arrange
         Set<String> productIds = new HashSet<>(Set.of());
         OrderDataDTO responseBody = new OrderDataDTO();
-        String invalidId = emptyUserCart.getUserId();
+        String invalidId = emptyUserCart.getId();
 
         when(orderClient.createOrder(anyString(), anySet()))
             .thenReturn(responseBody);
@@ -188,12 +181,12 @@ class CartToOrderControllerTest {
         act.andExpect(status().isBadRequest());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
+    @Test
+    @WithMockUser(roles = "CLIENT")
     void createTest05_stringsOfBodyIsBlank() throws Exception {
         // arrange
         Set<String> productIds = new HashSet<>(Set.of(""));
         OrderDataDTO responseBody = new OrderDataDTO();
-        String invalidId = emptyUserCart.getUserId();
 
         when(orderClient.createOrder(anyString(), anySet()))
             .thenReturn(responseBody);
@@ -202,14 +195,14 @@ class CartToOrderControllerTest {
         String requestBody = collectionOfIdsJson.write(productIds).getJson();
         ResultActions act = mvc.perform(post(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", invalidId)
             .content(requestBody));
 
         // assert
         act.andExpect(status().isBadRequest());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @Test
+    @WithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createTest06_withUnauthorizedRoles() throws Exception {
         // act
         ResultActions act = mvc.perform(post(basePath)

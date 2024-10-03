@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(RolesInvocationContextProvider.class)
-public @interface TestWithRoles {
-    String[] roles();
+public @interface TestCustomWithMockUser {
+    String[] roles() default {};
+    String[] userId() default {};
+    IdRolePair[] idRolePair() default {};
 }

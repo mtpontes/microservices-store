@@ -1,21 +1,23 @@
-package br.com.ecommerce.auth.service;
+package br.com.ecommerce.common.jwt;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-
-import br.com.ecommerce.auth.exception.exceptions.InvalidTokenException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Service
-public class TokenService {
+public class TokenDecoderService {
 
-	@Value("${api.security.token.secret}")
-	private String secret;
+	private final String secret;
 
-	public String validateToken(String token) {
+	public TokenDecoderService(String secret) {
+		this.secret = secret;
+	}
+
+	
+	public DecodedJWT validateToken(String token) {
 		token = token.replace("Bearer ", "");
 		
 		try {
@@ -23,8 +25,7 @@ public class TokenService {
 			return JWT.require(algorithm)
 				.withIssuer("ecommerce")
 				.build()
-				.verify(token)
-				.getSubject();
+				.verify(token);
 				
 		} catch (JWTVerificationException exception){
 			throw new InvalidTokenException();

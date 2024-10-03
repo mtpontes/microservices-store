@@ -16,35 +16,36 @@ class ProductUnitTest {
     private final String NAME = "Name";
     private final BigDecimal PRICE = BigDecimal.valueOf(100);
     private final int UNITS = 10;
+    private final String imageLink = "imagelink has no behaviors";
 
 
     @Test
     @DisplayName("Test creating an order with a valid product")
     void createProductTest01() {
-        assertDoesNotThrow(() -> new Product(PRODUCT_ID, NAME, PRICE, UNITS));
+        assertDoesNotThrow(() -> new Product(PRODUCT_ID, NAME, PRICE, UNITS, imageLink));
     }
 
     @Test
     @DisplayName("Test creating product with various invalid inputs")
     void createProductTest02() {
         assertThrows(IllegalArgumentException.class, 
-            () -> new Product(null, NAME,  PRICE, UNITS),
+            () -> new Product(null, NAME,  PRICE, UNITS, imageLink),
             "Creating product with null ID should throw IllegalArgumentException");
         
         assertThrows(IllegalArgumentException.class, 
-            () -> new Product(PRODUCT_ID, NAME, null, UNITS),
+            () -> new Product(PRODUCT_ID, NAME, null, UNITS, imageLink),
             "Creating product with null price should throw IllegalArgumentException");
 
         assertThrows(IllegalArgumentException.class, 
-            () -> new Product(PRODUCT_ID, NAME, BigDecimal.valueOf(-100), UNITS),
+            () -> new Product(PRODUCT_ID, NAME, BigDecimal.valueOf(-100), UNITS, imageLink),
             "Creating product with null price should throw IllegalArgumentException");
         
         assertThrows(IllegalArgumentException.class, 
-            () -> new Product(PRODUCT_ID, NAME, PRICE, null),
+            () -> new Product(PRODUCT_ID, NAME, PRICE, null, imageLink),
             "Creating product with null quantity should throw IllegalArgumentException");
 
         assertThrows(IllegalArgumentException.class, 
-            () -> new Product(PRODUCT_ID, NAME, PRICE, -100),
+            () -> new Product(PRODUCT_ID, NAME, PRICE, -100, imageLink),
             "Creating product with null quantity should throw IllegalArgumentException");
     }
 }

@@ -1,6 +1,7 @@
 package br.com.ecommerce.payment.repository;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +28,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>{
 		Long userId,
 		BigDecimal paymentAmount,
 		PaymentStatus status);
+
+    Optional<Payment> findByOrderId(String id);
 }

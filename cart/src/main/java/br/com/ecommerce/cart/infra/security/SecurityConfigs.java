@@ -1,5 +1,6 @@
 package br.com.ecommerce.cart.infra.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,19 +12,27 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import br.com.ecommerce.common.app.SecurityFilter;
-import lombok.AllArgsConstructor;
+import br.com.ecommerce.common.filter.SecurityFilter;
+import br.com.ecommerce.common.jwt.TokenDecoderService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
 public class SecurityConfigs {
+
+    @Value("${api.security.token.secret}")
+    private String secret;
+
+
+    @Bean
+    public TokenDecoderService tokenService() {
+        return new TokenDecoderService(secret);
+    }
 
     @Bean
     public OncePerRequestFilter securityFilter() {
-        return new SecurityFilter();
+        return new SecurityFilter(this.tokenService());
     }
 
     @Bean

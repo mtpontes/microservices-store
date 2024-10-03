@@ -18,7 +18,9 @@ import br.com.ecommerce.cart.api.mapper.ProductMapper;
 import br.com.ecommerce.cart.infra.entity.Cart;
 import br.com.ecommerce.cart.infra.entity.Product;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class CartViewModel {
@@ -38,12 +40,14 @@ public class CartViewModel {
 
 		Set<String> productIds = products.stream().map(Product::getId).collect(Collectors.toSet());
 		Map<String, InternalProductDataDTO> productMap = this.productClient.getPrices(productIds);
+		log.debug("CART VIEW MODEL: {}", productMap);
 
 		return products.stream()
 			.map(product -> productMapper.toProductDTO(
 				product, 
 				productMap.get(product.getId()).getName(),	
-				productMap.get(product.getId()).getPrice()))
+				productMap.get(product.getId()).getPrice(),
+				productMap.get(product.getId()).getImageLink()))
 			.toList();
 	}
 

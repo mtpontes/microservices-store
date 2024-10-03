@@ -21,7 +21,7 @@ public class ProductMapper {
         return factory.createProduct(data.getId(), data.getUnit());
     }
     
-    public ProductDTO toProductDTO(Product data, String name, BigDecimal price) {
-        return new ProductDTO(data.getId(), name, data.getUnit(), price);
+    public ProductDTO toProductDTO(Product data, String name, BigDecimal price, String imageLink) {
+        return new ProductDTO(data.getId(), name, data.getUnit(), price, imageLink);
     }
 }

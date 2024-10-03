@@ -20,21 +20,21 @@ import lombok.ToString;
 public class Cart {
 
     @Id
-    private String userId;
+    private String id;
     private Set<Product> products = new HashSet<>();
     private boolean isAnon;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public Cart(String userId) {
-        this.userId = this.checkId(userId);
+        this.id = this.checkId(userId);
         this.createdAt = LocalDateTime.now();
         this.updateModifiedAt();
         this.isAnon = false;
     }
 
     public Cart(Product product) {
-        this.userId = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID().toString();
         this.createdAt = LocalDateTime.now();
         this.updateModifiedAt();
         this.isAnon = true;

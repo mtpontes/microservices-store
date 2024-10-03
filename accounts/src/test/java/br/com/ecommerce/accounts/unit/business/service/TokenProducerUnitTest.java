@@ -9,21 +9,23 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import br.com.ecommerce.accounts.business.service.TokenService;
+import br.com.ecommerce.accounts.business.service.TokenProducer;
 import br.com.ecommerce.accounts.model.User;
+import br.com.ecommerce.accounts.model.enums.UserRole;
 import br.com.ecommerce.accounts.utils.TokenFormatValidatorUtils;
 import br.com.ecommerce.accounts.utils.UserBuilderTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class TokenServiceUnitTest {
+class TokenProducerUnitTest {
 	
     @InjectMocks
-    private TokenService tokenService;
+    private TokenProducer tokenService;
 
     private String secret = "testSecret";
     private final User user = new UserBuilderTestUtils()
-        .username("default")
-        .password("default")
+        .id(1L)
+        .username("username")
+        .role(UserRole.ADMIN)
         .buildUser();
 
     @BeforeEach
@@ -35,7 +37,7 @@ class TokenServiceUnitTest {
     @Test
     void generateTokenTest() {
         // act
-        var result = tokenService.generateToken(user.getUsername());
+        var result = tokenService.generateToken(user);
 
         // assert
         assertTrue(TokenFormatValidatorUtils.isValidTokenFormat(result));

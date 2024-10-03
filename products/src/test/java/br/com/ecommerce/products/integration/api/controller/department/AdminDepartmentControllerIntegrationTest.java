@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
 import br.com.ecommerce.products.annotations.ControllerIntegrationTest;
 import br.com.ecommerce.products.api.dto.category.CreateCategoryDTO;
 import br.com.ecommerce.products.api.dto.category.UpdateCategoryDTO;
@@ -84,7 +84,7 @@ class AdminDepartmentControllerIntegrationTest {
 
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createDepartmentTest01_withValidData() throws Exception {
         // arrange
         String path = basePath;
@@ -104,7 +104,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createDepartmentTest02_withNameNull() throws Exception {
         // arrange
         String path = basePath;
@@ -131,7 +131,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void createDepartmentTest03_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = basePath;
@@ -146,7 +146,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateDepartmentTest01() throws Exception {
         // arrange
         System.out.println("AQUI: " + departmentsPersisted);
@@ -170,7 +170,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updateDepartmentTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Long departmentId = 1L;
@@ -186,7 +186,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createCategoryTest01_withValidData() throws Exception {
         // arrange
         String path = baseCategoryPath;
@@ -207,7 +207,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void createCategoryTest02_withInvalidValues() throws Exception {
         // arrange
         String path = baseCategoryPath;
@@ -238,7 +238,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void createCategoryTest03_withUnauthorizedRoles() throws Exception {
         // arrange
         String path = baseCategoryPath;
@@ -253,7 +253,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @TestCustomWithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateCategoryTest01() throws Exception {
         // arrange
         Long manufacturerId = 1L;
@@ -274,7 +274,7 @@ class AdminDepartmentControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     void updateCategoryTest02_withUnauthorizedRoles() throws Exception {
         // arrange
         Long manufacturerId = 1L;

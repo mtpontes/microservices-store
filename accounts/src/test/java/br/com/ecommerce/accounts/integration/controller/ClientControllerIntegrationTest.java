@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.annotation.Rollback;
@@ -31,11 +32,22 @@ import br.com.ecommerce.accounts.api.dto.CreateUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.UpdateUserClientDTO;
 import br.com.ecommerce.accounts.infra.repository.UserRepository;
 import br.com.ecommerce.accounts.model.User;
+import br.com.ecommerce.accounts.model.UserClient;
 import br.com.ecommerce.accounts.model.valueobjects.Address;
 import br.com.ecommerce.accounts.utils.UserBuilderTestUtils;
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.IdRolePair;
+import br.com.ecommerce.common.utils.MockUserUtils;
 import jakarta.transaction.Transactional;
 
+/**
+* Integration test for the {@link UserClient} controller.
+* <p>
+* The API persists a default user with ID {@code 1L} during initialization.
+* The test persists an additional user with ID {@code 2L} in the {@code @BeforeAll} method.
+* In the {@link IdRolePair} annotation, the ID {@code 2L} is used to reference the user
+* persisted during test initialization.
+* </p>
+*/
 @Transactional
 @SpringBootTest
 @AutoConfigureWebMvc
@@ -46,6 +58,7 @@ import jakarta.transaction.Transactional;
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class ClientControllerIntegrationTest {
 
+    private static User clientPersisted = null;
     private final String basePath = "/client/account";
 
     @Autowired
@@ -61,7 +74,7 @@ class ClientControllerIntegrationTest {
         @Autowired PasswordEncoder encoder,
         @Autowired UserRepository userRepository
     ) {
-        User client = new UserBuilderTestUtils()
+        clientPersisted = new UserBuilderTestUtils()
             .username("seed-san")
             .password(encoder.encode("password-seed-san!@123"))
             .name("Client-seed-san")
@@ -77,7 +90,7 @@ class ClientControllerIntegrationTest {
                 "city",
                 "SC"))
             .buildUserClient();
-        userRepository.save(client);
+        userRepository.save(clientPersisted);
     }
 
 
@@ -117,8 +130,8 @@ class ClientControllerIntegrationTest {
         .andExpect(jsonPath("$.cpf").isNotEmpty());
     }
 
-    @Rollback
     @Test
+    @Rollback
     @DisplayName("Integration - create with invalid data - Must return status 400 and fields with error")
     void createTest02() throws IOException, Exception {
         // arrange
@@ -160,11 +173,13 @@ class ClientControllerIntegrationTest {
         .andExpect(jsonPath("$.message.['address.state']").exists());
     }
 
+    @Test
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
-    @DisplayName("Integration - updateCurrentClientData - Must return status 200 and user data")
+    @WithMockUser(roles = "CLIENT")
     void updateCurrentClientDataTest01() throws IOException, Exception {
         // arrange
+        MockUserUtils.mockUser(clientPersisted.getId().toString());
+
         var requestBody = new UpdateUserClientDTO(
             "email@email.com",
             "+55 47 98888-8888",
@@ -183,7 +198,6 @@ class ClientControllerIntegrationTest {
             put(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateUserClientDTOJson.write(requestBody).getJson())
-                .header("X-auth-user-id", "2")
         )
         // assert
         .andExpect(status().isOk())
@@ -199,11 +213,14 @@ class ClientControllerIntegrationTest {
         .andExpect(jsonPath("$.address.state").value(requestBody.getAddress().getState()));
     }
 
+    @Test
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @WithMockUser(roles = "CLIENT")
     @DisplayName("Integration - updateCurrentClientData - Must return status 200 and non-updated user data")
     void updateCurrentClientDataTest02() throws IOException, Exception {
         // arrange
+        MockUserUtils.mockUser(clientPersisted.getId().toString());
+
         var requestBody = new UpdateUserClientDTO(
             "",
             "",
@@ -218,12 +235,10 @@ class ClientControllerIntegrationTest {
             );
 
         // act
-        String currentUserID = "2";
         mvc.perform(
             put(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateUserClientDTOJson.write(requestBody).getJson())
-                .header("X-auth-user-id", currentUserID)
         )
         // assert
         .andExpect(status().isOk())
@@ -239,39 +254,37 @@ class ClientControllerIntegrationTest {
         .andExpect(jsonPath("$.address.state").isNotEmpty());
     }
 
+    @Test
     @Rollback
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @WithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void updateCurrentClientDataTest03_withUnauthorizedRoles() throws IOException, Exception {
         // act
-        String currentUserID = "2";
         mvc.perform(
             put(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", currentUserID)
         )
         // assert
         .andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"CLIENT"})
-    void getCurrentUserClientDataTest01() throws IOException, Exception {
+    @Test
+    void getCurrentUserClientDataTest01_withoutAuthorization() throws IOException, Exception {
         // act
         mvc.perform(
             get(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", "")
         )
         // assert
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isForbidden());
     }
 
-    @TestWithRoles(roles = {"ADMIN", "EMPLOYEE"})
+    @Test
+    @WithMockUser(roles = {"ADMIN", "EMPLOYEE"})
     void getCurrentUserClientDataTest01_withUnauthorizedRoles() throws IOException, Exception {
         // act
         mvc.perform(
             get(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", "")
         )
         // assert
         .andExpect(status().isForbidden());

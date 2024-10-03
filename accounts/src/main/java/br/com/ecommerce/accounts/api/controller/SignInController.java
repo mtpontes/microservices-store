@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.accounts.api.dto.SignInDTO;
 import br.com.ecommerce.accounts.api.dto.TokenDTO;
-import br.com.ecommerce.accounts.business.service.TokenService;
+import br.com.ecommerce.accounts.business.service.TokenProducer;
+import br.com.ecommerce.accounts.model.User;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -20,14 +21,15 @@ import lombok.AllArgsConstructor;
 public class SignInController {
 	
 	private final AuthenticationManager authenticationManager;
-	private final TokenService tokenService;
+	private final TokenProducer tokenService;
 	
 
 	@PostMapping
 	public ResponseEntity<TokenDTO> signIn(@RequestBody @Valid SignInDTO dto) {
 		var usernamePasswordToken = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
-		authenticationManager.authenticate(usernamePasswordToken);
-		String jwt = tokenService.generateToken(dto.getUsername());
+		User user = (User) authenticationManager.authenticate(usernamePasswordToken)
+			.getPrincipal();
+		String jwt = tokenService.generateToken(user);
 		return ResponseEntity.ok(new TokenDTO(jwt));
 	}
 }

@@ -25,7 +25,9 @@ import br.com.ecommerce.orders.infra.entity.Product;
 import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
 import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
 import br.com.ecommerce.orders.infra.repository.OrderRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class OrderService {
 
@@ -50,10 +52,11 @@ public class OrderService {
 		Map<String, InternalProductDataDTO> priceMap = this.productClient.getPrices(ids);
 		List<Product> products = dtos.stream()
 			.map(data -> new Product(
-				data.getId(), 
+				data.getId(),
 				priceMap.get(data.getId()).getName(), 
 				priceMap.get(data.getId()).getPrice(), 
-				data.getUnit()))
+				data.getUnit(),
+				priceMap.get(data.getId()).getImageLink()))
 			.toList();
 
 		Order newOrder = new Order(userId, products);
@@ -74,6 +77,21 @@ public class OrderService {
 	public Page<OrderBasicInfDTO> getAllOrdersByUser(Pageable pageable, String userId) {
 		return this.orderRepository.findAllByUserId(pageable, userId)
 			.map(orderMapper::toOrderBasicInfoDTO);
+	}
+
+	@Transactional
+	public OrderDTO updateOrderStatus(String userId, String orderId, OrderStatus newStatus) {
+		return orderRepository.findByIdAndUserId(orderId, userId)
+			.map(order -> {
+				order.updateOrderStatus(newStatus);
+				return orderRepository.save(order);
+			})
+			.map(order -> order.getProducts().stream()
+				.map(productMapper::toProductDTO)
+				.collect(Collectors.collectingAndThen(
+					Collectors.toList(), 
+					products -> orderMapper.toOrderDTO(order, products))))
+			.orElseThrow(OrderNotFoundException::new);
 	}
 
 	@Transactional

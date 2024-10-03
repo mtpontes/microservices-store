@@ -36,7 +36,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import br.com.ecommerce.common.annotations.TestWithRoles;
+import br.com.ecommerce.common.annotations.TestCustomWithMockUser;
 import br.com.ecommerce.orders.api.client.ProductClient;
 import br.com.ecommerce.orders.api.dto.product.InternalProductDataDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductAndUnitDTO;
@@ -68,6 +68,8 @@ class InternalOrderControllerIntegrationTest {
     private MockMvc mvc;
 
     @Autowired
+    private RandomUtils randomUtils;
+    @Autowired
     private JacksonTester<List<ProductAndUnitDTO>> listOfProductAndUnitDTOJson;
 
     @BeforeAll
@@ -82,17 +84,20 @@ class InternalOrderControllerIntegrationTest {
                         randomUtils.getRandomString(),
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt()),
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString()),
                     new Product(
                         randomUtils.getRandomString(),
                         randomUtils.getRandomString(10), 
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt()),
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString()),
                     new Product(
                         randomUtils.getRandomString(), 
                         randomUtils.getRandomString(10),
                         randomUtils.getRandomBigDecimal(), 
-                        randomUtils.getRandomInt())
+                        randomUtils.getRandomInt(),
+                        randomUtils.getRandomString())
                 );
 
                 Order order = new OrderTestBuilder()
@@ -108,7 +113,7 @@ class InternalOrderControllerIntegrationTest {
     
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     @DisplayName("Unit - createOrder - Should return status 201 and created order details")
     void createOrderTest01() throws IOException, Exception {
         // arrange
@@ -118,7 +123,7 @@ class InternalOrderControllerIntegrationTest {
             .thenReturn(Collections.emptySet());
 
         Set<String> listOfIds = requestBody.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
-        InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE);
+        InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE, randomUtils.getRandomString());
         Map<String, InternalProductDataDTO> priceMap = listOfIds.stream()
             .collect(Collectors.toMap(id -> id, id -> nameAndPrice));
         when(productClient.getPrices(eq(listOfIds)))
@@ -138,7 +143,7 @@ class InternalOrderControllerIntegrationTest {
     }
 
     @Rollback
-    @TestWithRoles(roles = {"CLIENT"})
+    @TestCustomWithMockUser(roles = {"CLIENT"})
     @DisplayName("Unit - createOrder - Should return status 400 when the product list is empty or null")
     void createOrderTest02() throws IOException, Exception {
         // arrange
