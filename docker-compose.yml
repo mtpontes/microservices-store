@@ -113,25 +113,6 @@ services:
       eureka-service:
         condition: service_healthy
 
-  auth-service:
-    build:
-      context: ./auth
-      dockerfile: Dockerfile
-    image: auth-service
-    env_file: 
-      - ./env/persistence-mysql.env
-      - ./env/secret.env
-    environment:
-      DB_HOST: mysql
-      EUREKA_HOST: eureka-service
-    networks:
-      - microservices-network
-    depends_on:
-      mysql:
-        condition: service_healthy
-      eureka-service:
-        condition: service_healthy
-
   products-service:
     build:
       context: ./products
