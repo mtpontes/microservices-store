@@ -23,12 +23,13 @@ class OrderUnitTest {
     private final String NAME = "Name";
     private final BigDecimal PRICE = BigDecimal.valueOf(100);
     private final int UNITS = 1;
+    private final String imageLink = "imagelink has no behaviors";
     
 
     @Test
     @DisplayName("Test creating order with valid data")
     void createOrderTest01() {
-        assertDoesNotThrow(() -> new Order("1", List.of(new Product("1", NAME, BigDecimal.TEN, 1))),
+        assertDoesNotThrow(() -> new Order("1", List.of(new Product("1", NAME, BigDecimal.TEN, 1, imageLink))),
             "Should not throw exception when creating order with valid data");
     }
 
@@ -37,9 +38,9 @@ class OrderUnitTest {
     void createOrderTest02_calculationOfTotal() {
         assertAll(() -> {
             var products = List.of(
-                new Product(PRODUCT_ID, NAME, PRICE, UNITS), 
-                new Product("2", NAME, PRICE, UNITS), 
-                new Product("3", NAME, PRICE, UNITS));
+                new Product(PRODUCT_ID, NAME, PRICE, UNITS, imageLink), 
+                new Product("2", NAME, PRICE, UNITS, imageLink), 
+                new Product("3", NAME, PRICE, UNITS, imageLink));
             var order = new Order(PRODUCT_ID, products);
 
             assertEquals(PRICE.multiply(BigDecimal.valueOf(products.size())), order.getTotal());
@@ -50,7 +51,7 @@ class OrderUnitTest {
     @DisplayName("Test creating order with invalid data")
     void createOrderTest03() {
         assertThrows(IllegalArgumentException.class, 
-            () -> new Order(null, List.of(new Product(PRODUCT_ID, NAME, BigDecimal.TEN, UNITS))),
+            () -> new Order(null, List.of(new Product(PRODUCT_ID, NAME, BigDecimal.TEN, UNITS, imageLink))),
             "Should throw IllegalArgumentException when userId is null");
         
         assertThrows(IllegalArgumentException.class, 
@@ -66,9 +67,9 @@ class OrderUnitTest {
     @DisplayName("Test creating order with valid data")
     void createOrderTest04_validateStatusAndDate() {
         var products = List.of(
-            new Product("1", NAME, PRICE, UNITS), 
-            new Product("2", NAME, PRICE, UNITS), 
-            new Product("3", NAME, PRICE, UNITS));
+            new Product("1", NAME, PRICE, UNITS, imageLink), 
+            new Product("2", NAME, PRICE, UNITS, imageLink), 
+            new Product("3", NAME, PRICE, UNITS, imageLink));
         var order = new Order(PRODUCT_ID, products);
 
         assertEquals(OrderStatus.AWAITING_PAYMENT, order.getStatus());

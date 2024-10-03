@@ -101,7 +101,7 @@ class OrderServiceUnitTest {
 			.thenReturn(responseBodyVerifyStocks);
 
         Set<String> listOfIds = input.stream().map(ProductAndUnitDTO::getId).collect(Collectors.toSet());
-        InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE);
+        InternalProductDataDTO nameAndPrice = new InternalProductDataDTO("any name", BigDecimal.ONE, "imagelink");
         Map<String, InternalProductDataDTO> priceMap = listOfIds.stream()
             .collect(Collectors.toMap(id -> id, id -> nameAndPrice));
         when(productClient.getPrices(eq(listOfIds)))
