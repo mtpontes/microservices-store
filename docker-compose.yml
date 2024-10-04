@@ -8,10 +8,10 @@ services:
   mysql:
     image: mysql:8.0.36
     env_file: 
-      - ./env/mysql.env
+      - ./repo/env/mysql.env
     volumes:
-      - ./mysql-data:/var/lib/mysql
-      - ./databases:/docker-entrypoint-initdb.d
+      - ./repo/mysql-data:/var/lib/mysql
+      - ./repo/databases:/docker-entrypoint-initdb.d
     restart: unless-stopped
     networks:
       - microservices-network
@@ -27,10 +27,10 @@ services:
   mongodb:
     image: mongo:7.0-rc
     restart: unless-stopped
-    env_file: ./env/mongodb.env
+    env_file: ./repo/env/mongodb.env
     volumes:
-      - ./mongo-data:/data/db
-      - ./databases:/docker-entrypoint-initdb.d
+      - ./repo/mongo-data:/data/db
+      - ./repo/databases:/docker-entrypoint-initdb.d
     networks:
       - microservices-network
     ports:
@@ -45,9 +45,9 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     restart: unless-stopped
-    env_file: ./env/rabbitmq.env
+    env_file: ./repo/env/rabbitmq.env
     volumes:
-      - ./rabbitmq-data:/var/lib/rabbitmq
+      - ./repo/rabbitmq-data:/var/lib/rabbitmq
     networks:
       - microservices-network
     ports:
@@ -66,6 +66,8 @@ services:
     image: eureka-service
     environment:
       EUREKA_HOST: eureka-service
+    volumes:
+      - ./repo/logs/eureka:/application/eureka-log
     networks:
       - microservices-network
     ports:
@@ -85,6 +87,8 @@ services:
     environment:
       EUREKA_HOST: eureka-service
       GATEWAY_NAME: gateway
+    volumes:
+      - ./repo/logs/gateway:/application/gateway-log
     networks:
       - microservices-network
     ports:
@@ -99,12 +103,14 @@ services:
       dockerfile: Dockerfile
     image: accounts-service
     env_file: 
-      - ./env/persistence-mysql.env
-      - ./env/secret.env
-      - ./env/user-admin.env
+      - ./repo/env/persistence-mysql.env
+      - ./repo/env/secret.env
+      - ./repo/env/user-admin.env
     environment:
       DB_HOST: mysql
       EUREKA_HOST: eureka-service
+    volumes:
+      - ./repo/logs/accounts:/application/accounts-log
     networks:
       - microservices-network
     depends_on:
@@ -119,15 +125,17 @@ services:
       dockerfile: Dockerfile
     image: products-service
     env_file: 
-      - ./env/persistence-mysql.env
-      - ./env/secret.env
-      - ./env/rabbitmq.env
-      - ./env/app-rabbitmq.env
+      - ./repo/env/persistence-mysql.env
+      - ./repo/env/secret.env
+      - ./repo/env/rabbitmq.env
+      - ./repo/env/app-rabbitmq.env
     environment:
       DB_HOST: mysql
       RABBIT_HOST: rabbitmq
       EUREKA_HOST: eureka-service
       GATEWAY_NAME: gateway
+    volumes:
+      - ./repo/logs/products:/application/products-log
     networks:
       - microservices-network
     depends_on:
@@ -144,13 +152,15 @@ services:
       dockerfile: Dockerfile
     image: cart-service
     env_file: 
-      - ./env/persistence-mongo.env
-      - ./env/secret.env
-      - ./env/rabbitmq.env
+      - ./repo/env/persistence-mongo.env
+      - ./repo/env/secret.env
+      - ./repo/env/rabbitmq.env
     environment:
       DB_HOST: mongodb
       RABBIT_HOST: rabbitmq
       EUREKA_HOST: eureka-service
+    volumes:
+      - ./repo/logs/cart:/application/cart-log
     networks:
       - microservices-network
     depends_on:
@@ -165,15 +175,17 @@ services:
       dockerfile: Dockerfile
     image: orders-service
     env_file: 
-      - ./env/persistence-mongo.env
-      - ./env/secret.env
-      - ./env/rabbitmq.env
-      - ./env/app-rabbitmq.env
+      - ./repo/env/persistence-mongo.env
+      - ./repo/env/secret.env
+      - ./repo/env/rabbitmq.env
+      - ./repo/env/app-rabbitmq.env
     environment:
       DB_HOST: mongodb
       RABBIT_HOST: rabbitmq
       EUREKA_HOST: eureka-service
       GATEWAY_NAME: gateway
+    volumes:
+      - ./repo/logs/orders:/application/orders-log
     networks:
       - microservices-network
     depends_on:
@@ -190,14 +202,16 @@ services:
       dockerfile: Dockerfile
     image: payments-service
     env_file: 
-      - ./env/persistence-mysql.env
-      - ./env/secret.env
-      - ./env/rabbitmq.env
-      - ./env/app-rabbitmq.env
+      - ./repo/env/persistence-mysql.env
+      - ./repo/env/secret.env
+      - ./repo/env/rabbitmq.env
+      - ./repo/env/app-rabbitmq.env
     environment:
       DB_HOST: mysql
       RABBIT_HOST: rabbitmq
       EUREKA_HOST: eureka-service
+    volumes:
+      - ./repo/logs/payments:/application/payments-log
     networks:
       - microservices-network
     depends_on:
