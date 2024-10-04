@@ -81,29 +81,18 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 <details>
   <summary><h3> Authentication and Authorization Flow</h3></summary>
 
-#### 1. Token Interception by the API Gateway:
-- The API Gateway checks the "Authorization" header in each request.
-- If the header is absent, the request goes directly to the destination microservice.
+#### 1. User authenticates to the Accounts service:
+- Logs in.
+- API generates a JWT with user identification data: id, username and roles.
+- User receives the JWT token.
 
 #### 2. Token Validation:
-- The Gateway collects the token and sends a request to the Auth microservice.
-- The Auth microservice validates the token and returns the user's data (ID, username, roles).
+- When calling any service on an endpoint that requires authorization, a security filter intercepts, captures the JWT token and decodes it.
+- With the decoded JWT, the service creates a representation of the user (UserDetailsImpl) in the security context, allowing the system to know who the logged-in user is and what permissions they have.
 
-#### 3. Passing User Data:
-- The Gateway adds the user's data in internal headers (e.g., "X-auth-user-id").
-- It then forwards the request to the destination microservice with these headers.
-
-#### 4. Interception by the Destination Microservice:
-- A security filter in the microservice captures the headers created by the Gateway.
-- The filter maps the data from the headers into a user representation (UserDetails).
-
-#### 5. Integration with Spring Security:
+#### 3. Integration with Spring Security:
 - The mapped user is persisted in the Spring Security context.
 - Spring Security then manages the user's permissions for the microservice routes.
-
-#### Future Adjustments:
-  - The internal headers and the Auth microservice will be removed.
-  - The JWT decoding will be done directly in each microservice, eliminating the need for centralized validation in Auth.
 
 </details>
 
