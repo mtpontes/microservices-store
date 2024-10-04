@@ -40,6 +40,6 @@ build/
 .dio
 
 ### docker ###
-rabbitmq-data/*
-mongo-data/*
-mysql-data/*
+*/rabbitmq-data/*
+*/mongo-data/*
+*/mysql-data/*
