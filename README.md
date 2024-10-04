@@ -250,13 +250,13 @@ The project is still under development, is currently using development settings.
 - [x] Create a Cart service
 - [x] Create docker-compose
 - [x] Create fallbacks for failures between services
+- [x] Each microservice will have the ability to decode JWT token, killing the need for Auth microservice
 - [ ] Allow users to have multiple addresses
-- [ ] Each microservice will have the ability to decode JWT token, killing the need for Auth microservice
-- [ ] Improvements in authentication, such as sending tokens by Email and authentication via third parties
 - [ ] Sending emails regarding orders
 - [ ] Create and handle dead letter exchanges
 - [ ] Configure messaging rules
 - [ ] Configure load balancing rules
+- [ ] Integrate the Payments service with a real payment API, making the service fully functional
 - [ ] Create evaluation service
 - [ ] Create discount coupon system
 - [ ] Create detailed documentation with Postman (currently there are only requests in the Postman collection)
