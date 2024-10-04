@@ -5,7 +5,7 @@
 E-CommerceApp is a REST API for an e-commerce store, based on microservices architecture, it has both operations performed for the customer and operations performed by employees and administrators.
 
 ## ⚙️ System overview
-![application-schema](readme/application.svg)
+![application-schema](/repo/readme/application.svg)
 
 <details>
   <summary><h2>📋 Details</h2></summary>
