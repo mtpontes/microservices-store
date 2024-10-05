@@ -16,10 +16,6 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 ### Gateway
 - Main entry point of the application and load balancer.
 
-### Auth
-- Responsible for validating tokens and retrieving user authentication data.
-- Serves directly to the Gateway.
-
 ### Common
 - An internal library that all microservices use to implement security features.
 - Most services rely on it to implement Spring Security logic without code repetition.
