@@ -245,6 +245,7 @@ The project is still under development, is currently using development settings.
 - [ ] Create evaluation service
 - [ ] Create discount coupon system
 - [ ] Create detailed documentation with Postman (currently there are only requests in the Postman collection)
+- [ ] Implement caching with Redis
 
 </details>
 
