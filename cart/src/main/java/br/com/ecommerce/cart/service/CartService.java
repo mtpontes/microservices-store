@@ -70,7 +70,7 @@ public class CartService {
     public Cart changeProductUnit(String userId, UpdateCartProductDTO update) {
         return cartRespository.findById(userId)
             .map(cart -> cart.getProducts().stream()
-                .filter(product -> product.getId().equals(product.getId()))
+                .filter(product -> product.getId().equals(update.getId()))
                 .findFirst()
                 .map(product -> {
                     boolean isZero = (product.getUnit() + update.getUnit()) <= 0;
