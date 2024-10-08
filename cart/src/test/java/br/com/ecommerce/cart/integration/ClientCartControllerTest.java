@@ -2,6 +2,7 @@ package br.com.ecommerce.cart.integration;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -290,6 +292,9 @@ class ClientCartControllerTest {
     }
 
     private void mockProductClientReturn(Set<Product> products) {
+        when(productClient.existsProduct(anyString()))
+            .thenReturn(ResponseEntity.ok().build());
+
         Map<String, InternalProductDataDTO> mockProductResponse = products.stream()
             .collect(Collectors.toMap(
                 Product::getId, 

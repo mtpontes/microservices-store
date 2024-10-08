@@ -27,8 +27,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import br.com.ecommerce.cart.api.client.ProductClient;
 import br.com.ecommerce.cart.api.dto.cart.UpdateCartProductDTO;
 import br.com.ecommerce.cart.api.mapper.CartMapper;
 import br.com.ecommerce.cart.api.mapper.ProductMapper;
@@ -37,6 +39,7 @@ import br.com.ecommerce.cart.infra.entity.Product;
 import br.com.ecommerce.cart.infra.entity.factory.CartFactory;
 import br.com.ecommerce.cart.infra.entity.factory.ProductFactory;
 import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
+import br.com.ecommerce.cart.infra.exception.exceptions.ProductNotFoundException;
 import br.com.ecommerce.cart.infra.repository.CartRepository;
 import br.com.ecommerce.cart.service.CartService;
 
@@ -51,6 +54,8 @@ public class CartServiceTest {
     private ProductMapper productMapper;
     @Mock
     private CartMapper cartMapper;
+    @Mock
+    private ProductClient productClient;
     
     @InjectMocks
     private CartService service;
@@ -67,7 +72,8 @@ public class CartServiceTest {
             cartRepository, 
             new CartFactory(), 
             new ProductMapper(productFactory), 
-            new CartMapper());
+            new CartMapper(),
+            productClient);
     }
 
 
@@ -95,6 +101,8 @@ public class CartServiceTest {
         // arrange
         UpdateCartProductDTO entry = new UpdateCartProductDTO("1", 10);
         int expectedProductsSetSize = 1;
+        when(productClient.existsProduct(entry.getId()))
+            .thenReturn(ResponseEntity.ok().build());
 
         // act
         service.createAnonCart(entry);
@@ -167,6 +175,8 @@ public class CartServiceTest {
         String userId = "validid";
         Cart cart = new Cart(userId);
 
+        when(productClient.existsProduct(anyString()))
+            .thenReturn(ResponseEntity.ok().build());
         when(cartRepository.findById(eq(userId)))
             .thenReturn(Optional.of(cart));
         when(cartRepository.save(eq(cart)))
@@ -194,6 +204,9 @@ public class CartServiceTest {
         Product product = productFactory.createProduct("id", 100);
         cart.addProduct(product);
 
+        when(productClient.existsProduct(product.getId()))
+            .thenReturn(ResponseEntity.ok().build());
+
         when(cartRepository.findById(eq(userId)))
             .thenReturn(Optional.of(cart));
 
@@ -219,6 +232,9 @@ public class CartServiceTest {
         Product product = productFactory.createProduct("id", 100);
         cart.addProduct(product);
 
+        when(productClient.existsProduct(product.getId()))
+            .thenReturn(ResponseEntity.ok().build());
+
         when(cartRepository.findById(eq(userId)))
             .thenReturn(Optional.of(cart));
 
@@ -237,8 +253,23 @@ public class CartServiceTest {
 
     @Test
     void changeProductUnitTest_whenNotFoundCart() {
+        when(productClient.existsProduct(any()))
+            .thenReturn(ResponseEntity.ok().build());
+
         assertThrows(
             CartNotFoundException.class,
+            () -> service.changeProductUnit("any id", new UpdateCartProductDTO()),
+            "Does not throw exception when found a Cart");
+    }
+
+    @Test
+    void changeProductUnitTest_whenNotFoundProduct() {
+        when(productClient.existsProduct(any()))
+            .thenReturn(ResponseEntity.notFound().build());
+
+            
+        assertThrows(
+            ProductNotFoundException.class,
             () -> service.changeProductUnit("any id", new UpdateCartProductDTO()),
             "Does not throw exception when found a Cart");
     }

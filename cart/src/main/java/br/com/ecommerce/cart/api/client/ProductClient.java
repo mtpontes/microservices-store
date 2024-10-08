@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,4 +23,10 @@ public interface ProductClient {
 		value = "/internal/products/prices/{productId}",
 		headers = {"Content-Type: application/json"})
 	InternalProductDataDTO getPrice(@PathVariable("productId") String productId);
+
+	@GetMapping(
+		value = "/internal/products/exists/{productId}",
+		headers = {"Content-Type: application/json"}
+	)
+	ResponseEntity<Void> existsProduct(@PathVariable("productId") String productId);
 }

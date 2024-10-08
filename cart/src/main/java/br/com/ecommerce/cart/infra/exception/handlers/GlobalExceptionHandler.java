@@ -18,6 +18,7 @@ import br.com.ecommerce.cart.api.dto.exception.ResponseError;
 import br.com.ecommerce.cart.api.dto.exception.ResponseErrorWithoutMessage;
 import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
 import br.com.ecommerce.cart.infra.exception.exceptions.EmptyCartException;
+import br.com.ecommerce.cart.infra.exception.exceptions.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,15 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(CartNotFoundException.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handlerError404(CartNotFoundException ex) {
+		return ResponseEntity
+			.status(notFound.value())
+			.body(new ResponseErrorWithoutMessage(
+				notFound.value(),
+				notFound.getReasonPhrase()));
+	}
+
+	@ExceptionHandler(ProductNotFoundException.class)
+	public ResponseEntity<ResponseErrorWithoutMessage> handlerError404(ProductNotFoundException ex) {
 		return ResponseEntity
 			.status(notFound.value())
 			.body(new ResponseErrorWithoutMessage(

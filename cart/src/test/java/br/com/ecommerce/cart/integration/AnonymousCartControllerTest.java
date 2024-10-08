@@ -24,6 +24,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -89,6 +90,8 @@ class AnonymousCartControllerTest {
         // arrange
         UpdateCartProductDTO requestBody = new UpdateCartProductDTO("newproduct", 1);
         this.mockProductClientReturn(Set.of(new Product(requestBody.getId(), requestBody.getUnit())));
+        when(productClient.existsProduct(requestBody.getId()))
+            .thenReturn(ResponseEntity.ok().build());
 
         // act
         ResultActions act = mvc.perform(post(basePath)
@@ -167,6 +170,8 @@ class AnonymousCartControllerTest {
         String productId = existentProduct.getId();
         int productUnit = existentProduct.getUnit();
         this.mockProductClientReturn(userCartPersisted.getProducts());
+        when(productClient.existsProduct(productId))
+            .thenReturn(ResponseEntity.ok().build());
         
         UpdateCartProductDTO requestBody = new UpdateCartProductDTO(productId, productUnit);
         int expectedUnit = productUnit * 2;

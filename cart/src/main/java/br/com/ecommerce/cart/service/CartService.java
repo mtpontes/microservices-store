@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.ecommerce.cart.api.client.ProductClient;
 import br.com.ecommerce.cart.api.dto.cart.CartDTO;
 import br.com.ecommerce.cart.api.dto.cart.UpdateCartProductDTO;
 import br.com.ecommerce.cart.api.mapper.CartMapper;
@@ -17,7 +19,9 @@ import br.com.ecommerce.cart.infra.entity.Product;
 import br.com.ecommerce.cart.infra.entity.factory.CartFactory;
 import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
 import br.com.ecommerce.cart.infra.exception.exceptions.EmptyCartException;
+import br.com.ecommerce.cart.infra.exception.exceptions.ProductNotFoundException;
 import br.com.ecommerce.cart.infra.repository.CartRepository;
+import feign.FeignException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +34,7 @@ public class CartService {
     private final CartFactory cartFactory;
     private final ProductMapper productMapper;
     private final CartMapper cartMapper;
+    private final ProductClient productClient;
 
 
     @Transactional
@@ -42,6 +47,7 @@ public class CartService {
 
     @Transactional
     public Cart createAnonCart(UpdateCartProductDTO data) {
+        this.existsProduct(data.getId());
         Product product = productMapper.toProduct(data);
         Cart mapped = this.cartFactory.createAnonymousCart(product);
         return this.cartRespository.save(mapped);
@@ -68,6 +74,7 @@ public class CartService {
 
     @Transactional
     public Cart changeProductUnit(String userId, UpdateCartProductDTO update) {
+        this.existsProduct(update.getId());
         return cartRespository.findById(userId)
             .map(cart -> cart.getProducts().stream()
                 .filter(product -> product.getId().equals(update.getId()))
@@ -113,5 +120,16 @@ public class CartService {
     public void removeSelectedProducts(Cart cart, Set<Product> chosenProducts) {
         chosenProducts.forEach(selected -> cart.removeProduct(selected));
         cartRespository.save(cart);
+    }
+
+    public void existsProduct(String productId) {
+        try {
+            productClient.existsProduct(productId); // if the response is not status 400/500, do nothing
+
+        } catch (FeignException e) {
+            var responseStatus = e.status();
+            if (responseStatus == HttpStatus.NOT_FOUND.value()) throw new ProductNotFoundException();
+            if (responseStatus != HttpStatus.OK.value()) throw new RuntimeException("Communication error with product service");
+        }
     }
 }

@@ -256,4 +256,8 @@ public class ProductService {
 		CompletePriceDataDTO priceData = priceMapper.toCompletePriceDataDTO(product.getPrice());
 		return productMapper.toUpdateProductPriceResponseDTO(product, priceData);
 	}
+
+    public boolean existsProduct(Long productId) {
+		return productRepository.existsById(productId);
+    }
 }

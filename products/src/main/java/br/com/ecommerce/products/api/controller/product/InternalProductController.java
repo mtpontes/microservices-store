@@ -61,4 +61,11 @@ public class InternalProductController {
 	public ResponseEntity<InternalProductDataDTO> getPrice(@PathVariable Long productId) {
 		return ResponseEntity.ok(service.getProductPriceInternal(productId));
 	}
+
+	@GetMapping("/exists/{productId}")
+	public ResponseEntity<Void> existsProduct(@PathVariable Long productId) {
+		boolean existsProduct = service.existsProduct(productId);
+		if (existsProduct) return ResponseEntity.ok().build();
+		return ResponseEntity.notFound().build();
+	}
 }
