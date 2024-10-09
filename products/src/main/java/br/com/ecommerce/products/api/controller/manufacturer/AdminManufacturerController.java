@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import br.com.ecommerce.products.api.dto.manufacturer.CreateManufacturerDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.DataManufacturerDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.UpdateManufacturerDTO;
+import br.com.ecommerce.products.api.openapi.IAdminManufacturerController;
 import br.com.ecommerce.products.business.service.ManufacturerService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/admin/manufacturers")
-public class AdminManufacturerController {
+public class AdminManufacturerController implements IAdminManufacturerController {
 
 	private final ManufacturerService service;
 

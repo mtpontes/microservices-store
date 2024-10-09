@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
 import br.com.ecommerce.products.api.dto.department.DataDepartmentDTO;
 import br.com.ecommerce.products.api.dto.department.SimpleDataDepartmentDTO;
+import br.com.ecommerce.products.api.openapi.IDepartmentController;
 import br.com.ecommerce.products.business.service.CategoryService;
 import br.com.ecommerce.products.business.service.DepartmentService;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/departments")
-public class DepartmentController {
+public class DepartmentController implements IDepartmentController{
 
 	private final DepartmentService departmentService;
 	private final CategoryService categoryService;

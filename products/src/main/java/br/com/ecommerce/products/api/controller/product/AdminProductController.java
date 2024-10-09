@@ -24,6 +24,7 @@ import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
+import br.com.ecommerce.products.api.openapi.IAdminProductController;
 import br.com.ecommerce.products.business.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/admin/products")
-public class AdminProductController {
+public class AdminProductController implements IAdminProductController {
 
 	private final ProductService service;
 

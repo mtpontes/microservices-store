@@ -18,12 +18,10 @@ import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundExce
 import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	private final String ENTITY_NOT_FOUND_EXCEPTION = "Not found";
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
@@ -40,16 +38,6 @@ public class GlobalExceptionHandler {
 			.body(new ResponseErrorWithoutMessage(
 				notFound.value(),
 				notFound.getReasonPhrase()));
-	}
-
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError400(EntityNotFoundException ex) {
-		return ResponseEntity
-			.status(badRequest.value())
-			.body(new ResponseError(
-				badRequest.value(),
-				badRequest.getReasonPhrase(),
-				ENTITY_NOT_FOUND_EXCEPTION));
 	}
 
 	@ExceptionHandler(DepartmentNotFoundException.class)

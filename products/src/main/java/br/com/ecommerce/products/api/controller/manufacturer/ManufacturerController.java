@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
+import br.com.ecommerce.products.api.openapi.IManufacturerController;
 import br.com.ecommerce.products.business.service.ManufacturerService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/manufacturers")
-public class ManufacturerController {
+public class ManufacturerController implements IManufacturerController{
 
 	private final ManufacturerService service;
 
