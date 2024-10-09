@@ -41,6 +41,7 @@ public class SecurityConfigs {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui.html/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/cart-to-order/**").hasRole("CLIENT")
                 .requestMatchers(HttpMethod.PATCH, "/carts").hasRole("CLIENT")
                 .requestMatchers("/carts/**").hasRole("CLIENT")

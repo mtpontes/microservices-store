@@ -31,7 +31,6 @@ public class GlobalExceptionHandler {
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
-	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError= HttpStatus.INTERNAL_SERVER_ERROR;
@@ -138,13 +137,6 @@ public class GlobalExceptionHandler {
 					badRequest.value(), 
 					badRequest.getReasonPhrase(),
 					ex.getMessage()));
-
-		if (headerName.equalsIgnoreCase("X-auth-user-id"))
-			return ResponseEntity
-				.status(unauthorized.value())
-				.body(new ResponseErrorWithoutMessage(
-					unauthorized.value(), 
-					unauthorized.getReasonPhrase()));
 
 		return this.handleError500(ex);
 	}

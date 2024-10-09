@@ -22,22 +22,17 @@ import lombok.extern.slf4j.Slf4j;
 public class FeignExceptionHandler {
 
     private final ObjectMapper mapper;
+    private final GlobalExceptionHandler global;
 
-    
+
     @ExceptionHandler(FeignClientException.class)
-    public ResponseEntity<Map<String, Object>> feignClientException(FeignClientException ex) {
+    public ResponseEntity<?> feignClientException(FeignClientException ex) {
+        HttpStatus statusCode = HttpStatus.valueOf(ex.status());
+        if (ex.status() == 500) return global.handleError500(ex);
+
         Map<String, Object> responseBody = this.deserializeClientResponseError(ex.getMessage());
-
-        int statusCode = 500;
-        try {
-            statusCode = (int) responseBody.get("status");
-
-        } catch (NullPointerException e) {
-            ResponseEntity.internalServerError().build();
-        }
-
         return ResponseEntity
-            .status(HttpStatus.valueOf(statusCode))
+            .status(statusCode.value())
             .body(responseBody);
     }
 

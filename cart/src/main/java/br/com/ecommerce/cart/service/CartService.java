@@ -101,10 +101,6 @@ public class CartService {
 
     @Transactional
     public Set<Product> selectProductsFromCart(Cart cart, Set<String> productIds) {
-        // validate list of ids
-        boolean isBlankSet = productIds.stream().filter(string -> !string.isBlank()).count() <= 0L;
-        if (isBlankSet) throw new IllegalArgumentException("List of selected products is empty");
-        
         // recover and validate cart
         if (cart.isAnon()) throw new CartNotFoundException();
         if (cart.getProducts().isEmpty()) throw new EmptyCartException();
@@ -113,6 +109,7 @@ public class CartService {
         Set<Product> chosenProducts = cart.getProducts().stream()
             .filter(product -> productIds.stream().anyMatch(choice -> choice.equalsIgnoreCase(product.getId())))
             .collect(Collectors.toSet());
+        if (chosenProducts.isEmpty()) throw new IllegalArgumentException("Product does not belong to the cart");
         return chosenProducts;
     }
 
@@ -129,7 +126,8 @@ public class CartService {
         } catch (FeignException e) {
             var responseStatus = e.status();
             if (responseStatus == HttpStatus.NOT_FOUND.value()) throw new ProductNotFoundException();
-            if (responseStatus != HttpStatus.OK.value()) throw new RuntimeException("Communication error with product service");
+            if (responseStatus != HttpStatus.OK.value()) 
+                throw new RuntimeException("Communication error with product service");
         }
     }
 }
