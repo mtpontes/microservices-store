@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.ecommerce.accounts.api.dto.CreateUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.DataUserClientDTO;
 import br.com.ecommerce.accounts.api.dto.UpdateUserClientDTO;
+import br.com.ecommerce.accounts.api.openapi.IClientAccountController;
 import br.com.ecommerce.accounts.business.service.UserService;
 import br.com.ecommerce.common.user.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -20,7 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/client/account")
-public class ClientAccountController {
+public class ClientAccountController implements IClientAccountController {
 	
 	private final  UserService service;
 
