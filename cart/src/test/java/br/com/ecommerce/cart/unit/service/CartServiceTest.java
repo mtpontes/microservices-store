@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +43,8 @@ import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
 import br.com.ecommerce.cart.infra.exception.exceptions.ProductNotFoundException;
 import br.com.ecommerce.cart.infra.repository.CartRepository;
 import br.com.ecommerce.cart.service.CartService;
+import feign.FeignException.FeignClientException;
+import feign.Request;
 
 @ExtendWith(MockitoExtension.class)
 public class CartServiceTest {
@@ -252,10 +255,12 @@ public class CartServiceTest {
     }
 
     @Test
-    void changeProductUnitTest_whenNotFoundCart() {
+    void changeProductUnitTest4_whenNotFoundCart() {
+        // arrange
         when(productClient.existsProduct(any()))
             .thenReturn(ResponseEntity.ok().build());
 
+        // act and assert
         assertThrows(
             CartNotFoundException.class,
             () -> service.changeProductUnit("any id", new UpdateCartProductDTO()),
@@ -263,13 +268,29 @@ public class CartServiceTest {
     }
 
     @Test
-    void changeProductUnitTest_whenNotFoundProduct() {
+    void changeProductUnitTest5_whenNotFoundProduct() {
+        // arrange
         when(productClient.existsProduct(any()))
-            .thenReturn(ResponseEntity.notFound().build());
-
-            
+            .thenThrow(new FeignClientException(404, null, mock(Request.class), null, null));
+        
+        // act and assert
         assertThrows(
             ProductNotFoundException.class,
+            () -> service.changeProductUnit("any id", new UpdateCartProductDTO()),
+            "Does not throw exception when found a Cart");
+    }
+
+    @Test
+    void changeProductUnitTest6_whenProductClientResponseIsUnexpected() {
+        // arrange
+        Request requestMock = mock(Request.class);
+        int statusCode = new Random().nextInt(405, 511);
+        when(productClient.existsProduct(any()))
+            .thenThrow(new FeignClientException(statusCode, null, requestMock, null, null));
+        
+        // act and assert
+        assertThrows(
+            RuntimeException.class,
             () -> service.changeProductUnit("any id", new UpdateCartProductDTO()),
             "Does not throw exception when found a Cart");
     }

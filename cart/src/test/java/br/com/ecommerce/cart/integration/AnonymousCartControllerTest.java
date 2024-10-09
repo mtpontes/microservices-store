@@ -99,7 +99,7 @@ class AnonymousCartControllerTest {
             .content(updateCartProductDTOJson.write(requestBody).getJson()));
 
         // assert
-        act.andExpect(status().isOk())
+        act.andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").hasJsonPath())
             .andExpect(jsonPath("$.products").hasJsonPath())
             .andExpect(jsonPath("$.totalPrice").hasJsonPath())

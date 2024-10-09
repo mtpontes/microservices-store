@@ -103,7 +103,7 @@ class ClientCartControllerTest {
             .contentType(MediaType.APPLICATION_JSON));
 
         // assert
-        act.andExpect(status().isOk())
+        act.andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").value("createTest"))
             .andExpect(jsonPath("$.products").hasJsonPath())
             .andExpect(jsonPath("$.totalPrice").hasJsonPath())

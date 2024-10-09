@@ -124,6 +124,7 @@ public class CartService {
             productClient.existsProduct(productId); // if the response is not status 400/500, do nothing
 
         } catch (FeignException e) {
+            log.debug("-- EXISTS PRODUCT CATCH --");
             var responseStatus = e.status();
             if (responseStatus == HttpStatus.NOT_FOUND.value()) throw new ProductNotFoundException();
             if (responseStatus != HttpStatus.OK.value()) 
