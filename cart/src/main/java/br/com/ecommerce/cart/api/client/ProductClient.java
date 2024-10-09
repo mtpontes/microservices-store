@@ -26,7 +26,6 @@ public interface ProductClient {
 
 	@GetMapping(
 		value = "/internal/products/exists/{productId}",
-		headers = {"Content-Type: application/json"}
-	)
+		headers = {"Content-Type: application/json"})
 	ResponseEntity<Void> existsProduct(@PathVariable("productId") String productId);
 }
