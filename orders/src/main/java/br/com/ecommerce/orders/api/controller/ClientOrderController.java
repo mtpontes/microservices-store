@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.ecommerce.common.user.UserDetailsImpl;
 import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
+import br.com.ecommerce.orders.api.openapi.IClientOrderController;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
 
 @RestController
 @RequestMapping("/client/orders")
-public class ClientOrderController {
+public class ClientOrderController implements IClientOrderController {
 
 	@Autowired
 	private OrderService service;

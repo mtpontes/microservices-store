@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
+import br.com.ecommerce.orders.api.openapi.IAdminOrderController;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.OrderStatus;
 
 @RestController
 @RequestMapping("/admin/orders")
-public class AdminOrderController {
+public class AdminOrderController implements IAdminOrderController {
 
 	@Autowired
 	private OrderService service;
@@ -38,8 +39,7 @@ public class AdminOrderController {
 	@GetMapping("/{orderId}/{userId}")
 	public ResponseEntity<OrderDTO> getOrderByIdAndUserId(
 		@PathVariable String orderId,
-		@PathVariable String userId,
-		@PageableDefault(size = 10) Pageable pageable
+		@PathVariable String userId
 	) {
 		return ResponseEntity.ok(service.getOrderById(orderId, userId));
 	}
