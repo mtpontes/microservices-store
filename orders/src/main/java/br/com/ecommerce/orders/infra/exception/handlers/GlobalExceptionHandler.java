@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.orders.api.dto.exception.ResponseError;
+import br.com.ecommerce.orders.api.dto.exception.ResponseErrorWithoutMessage;
 import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
 import br.com.ecommerce.orders.infra.exception.exceptions.OutOfStockException;
 import lombok.extern.slf4j.Slf4j;
@@ -148,7 +150,4 @@ public class GlobalExceptionHandler {
 				internalServerError.value(),
 				internalServerError.getReasonPhrase()));
 	}
-
-	private record ResponseError(int status, String error, Object message) {}
-	private record ResponseErrorWithoutMessage(int status, Object error) {}
 }
