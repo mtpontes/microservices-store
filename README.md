@@ -72,7 +72,13 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 > - Endpoints with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission
 > - Endpoints with the prefix "Client" only work with users with CLIENT permission
 > - Endpoints with "Internal" prefix do not accept external calls
-> - The Accounts service is responsible for always creating a default administrator user, using the ADMINUSERNAME and ADMINPASSWORD environment variables.
+> - The Accounts service is responsible for always creating a default administrator user, using the ADMINUSERNAME and ADMINPASSWORD environment variables
+
+### Swagger UI
+
+To access documentation made with Swagger go to: http://localhost:{servicePort}/swagger-ui/index.html
+
+---
 
 <details>
   <summary><h3> Authentication and Authorization Flow</h3></summary>
@@ -211,7 +217,10 @@ Content-Type: application/json
   <summary><h2>🚀 How to run</h2></summary>
 
 ### Deploy with Docker
+This docker-compose file is for demonstration purposes, facilitating deployment in any environment.
+
 Clone this repository:
+
 
     git clone https://github.com/mtpontes/microservices-store.git
 
@@ -236,6 +245,8 @@ The project is still under development, is currently using development settings.
 - [x] Create docker-compose
 - [x] Create fallbacks for failures between services
 - [x] Each microservice will have the ability to decode JWT token, killing the need for Auth microservice
+- [x] Create detailed API documentation with Swagger
+- [ ] Implement caching with Redis
 - [ ] Allow users to have multiple addresses
 - [ ] Sending emails regarding orders
 - [ ] Create and handle dead letter exchanges
@@ -244,8 +255,6 @@ The project is still under development, is currently using development settings.
 - [ ] Integrate the Payments service with a real payment API, making the service fully functional
 - [ ] Create evaluation service
 - [ ] Create discount coupon system
-- [ ] Create detailed documentation with Postman (currently there are only requests in the Postman collection)
-- [ ] Implement caching with Redis
 
 </details>
 
