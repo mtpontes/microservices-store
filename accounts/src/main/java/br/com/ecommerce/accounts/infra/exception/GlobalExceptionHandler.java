@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.accounts.api.dto.exception.ResponseError;
+import br.com.ecommerce.accounts.api.dto.exception.ResponseErrorWithoutMessage;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
@@ -53,11 +55,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InternalAuthenticationServiceException.class)
 	public ResponseEntity<ResponseError> handleError401(InternalAuthenticationServiceException ex) {
 		return ResponseEntity
-		.status(unauthorized.value())
-		.body(new ResponseError(
-			unauthorized.value(),
-			unauthorized.getReasonPhrase(),
-			ENTITY_NOT_FOUND_EXCEPTION));
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
+				ENTITY_NOT_FOUND_EXCEPTION));
 		}
 		
 	@ExceptionHandler(BadCredentialsException.class)
@@ -165,7 +167,4 @@ public class GlobalExceptionHandler {
 				internalServerError.value(),
 				internalServerError.getReasonPhrase()));
 	}
-	
-	private record ResponseError(int status, String error, Object message) {}
-	private record ResponseErrorWithoutMessage(int status, Object error) {}
 }

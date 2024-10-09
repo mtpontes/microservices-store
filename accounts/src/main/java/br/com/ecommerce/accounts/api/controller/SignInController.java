@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.accounts.api.dto.SignInDTO;
 import br.com.ecommerce.accounts.api.dto.TokenDTO;
+import br.com.ecommerce.accounts.api.openapi.ISignInController;
 import br.com.ecommerce.accounts.business.service.TokenProducer;
 import br.com.ecommerce.accounts.model.User;
 import jakarta.validation.Valid;
@@ -18,7 +19,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/auth")
-public class SignInController {
+public class SignInController implements ISignInController {
 	
 	private final AuthenticationManager authenticationManager;
 	private final TokenProducer tokenService;

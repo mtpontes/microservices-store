@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.accounts.api.dto.DataUserDTO;
+import br.com.ecommerce.accounts.api.openapi.IAccountController;
 import br.com.ecommerce.accounts.business.service.UserService;
 import br.com.ecommerce.common.user.UserDetailsImpl;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/account")
 @AllArgsConstructor
-public class AccountController {
+public class AccountController implements IAccountController {
 	
 	private final UserService service;
 	

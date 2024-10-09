@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.accounts.api.dto.CreateUserEmployeeDTO;
 import br.com.ecommerce.accounts.api.dto.UserEmployeeCreatedDTO;
+import br.com.ecommerce.accounts.api.openapi.IAdminAccountController;
 import br.com.ecommerce.accounts.business.service.UserService;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/admin/account")
-public class AdminAccountController {
+public class AdminAccountController implements IAdminAccountController {
 	
 	@Autowired
 	private UserService service;
