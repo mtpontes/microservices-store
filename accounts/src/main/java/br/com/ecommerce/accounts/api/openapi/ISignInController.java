@@ -20,7 +20,12 @@ public interface ISignInController {
 
     @Operation(
         summary = "Sign in user",
-        description = "Endpoint for authenticating the user and retrieving their data along with an access token.",
+        description = 
+            """
+            Endpoint for authenticating the user and retrieving their data along with an access token.
+            
+            - Validates the user's credentials and provides a token for authenticated access to protected resources.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 

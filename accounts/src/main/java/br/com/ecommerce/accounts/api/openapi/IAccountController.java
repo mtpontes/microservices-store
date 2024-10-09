@@ -14,13 +14,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(
     name = "account-controller",
-    description = "Controller common to all types of users, regardless of roles.")
+    description = "Controller common to all types of users, regardless of roles."
+)
 @SecurityRequirement(name = "bearer-key")
 public interface IAccountController {
 
     @Operation(
         summary = "Get current user data",
-        description = "Endpoint for retrieving the data of the logged-in user.",
+        description = 
+            """
+            Endpoint for retrieving the data of the logged-in user.
+
+            - Retorna informações relevantes do usuário autenticado.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 
@@ -28,11 +34,14 @@ public interface IAccountController {
                 content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = DataUserDTO.class)
-            )), 
+                )
+            ), 
             @ApiResponse(
                 description = "Forbidden", 
                 responseCode = "403",
-                content = @Content())
-        })
+                content = @Content()
+            )
+        }
+    )
     public ResponseEntity<DataUserDTO> getCurrentUser(@AuthenticationPrincipal UserDetailsImpl user);
 }

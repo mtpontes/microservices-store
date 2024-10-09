@@ -27,14 +27,19 @@ import jakarta.validation.constraints.NotNull;
 public interface ICartToOrderController {
 
     @Operation(
+        summary = "Create an order from the cart",
         description = 
-            "Endpoint for creating an anonymous cart \n" +
-            "- All product IDs must be different from null \n" +
-            "- Anonymous carts cannot generate orders \n" +
-            "- It is not possible to generate orders with an empty cart \n" +
-            "- Only the IDs of the products present in the cart must be passed \n" +
-            "- The quantities are not adjustable here; the quantity of the product will be that which is in the cart",
-        summary = "Create anonymous cart",
+            """
+            Endpoint for creating an order based on the contents of an anonymous cart.
+            
+            - **Fixed quantity**: The product quantities are determined by what is registered in the cart at the time the order is created. No quantity adjustments are allowed at this stage.
+            - **User identification**: The order will be linked to the authenticated user, and the cart must contain the products that will be included in the order.
+            - **Product IDs**: The set of product IDs being purchased must be sent in the request body. These IDs correspond to the products previously added to the cart.
+            - **Cart restrictions**: The cart must be complete and valid to create the order. If there are invalid products or the cart is empty, the order cannot be created.
+            - The selected products are removed from the cart at the end of the process.
+            
+            This endpoint is essential for finalizing the purchase process, transforming the cart's contents into a concrete order.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 
@@ -52,5 +57,5 @@ public interface ICartToOrderController {
         })
     ResponseEntity<OrderDataDTO> create(
         @AuthenticationPrincipal @Valid @NotNull UserDetailsImpl user,
-        @RequestBody @Valid @NotEmpty Set<String> requestBody);
+        @RequestBody @Valid @NotEmpty Set<String> productIds);
 }

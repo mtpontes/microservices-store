@@ -28,9 +28,10 @@ public interface IClientAccountController {
 
     @Operation(
         summary = "Create user client",
-        description = """
+        description = 
+            """
             Endpoint to create a UserClient.
-
+    
             - Public route
             """,
         responses = {
@@ -73,10 +74,12 @@ public interface IClientAccountController {
 
     @Operation(
         summary = "Get current user client data",
-        description = """
+        description = 
+            """
             Endpoint to retrieve all data of the logged-in user (UserClient specific properties).
 
             - Only UserClient users with the CLIENT role can access this endpoint.
+            - Returns a detailed object containing the user's specific information.
             """,
         security = { @SecurityRequirement(name = "bearer-key") },
         responses = {
@@ -86,20 +89,27 @@ public interface IClientAccountController {
                 content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = DataUserClientDTO.class)
-            )), 
+                )
+            ), 
             @ApiResponse(
                 description = "Forbidden", 
                 responseCode = "403",
                 content = @Content(
-                ))
-        })
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseError.class)
+                )
+            )
+        }
+    )
     public ResponseEntity<DataUserClientDTO> getCurrentUserClientData(
         @AuthenticationPrincipal UserDetailsImpl currentUser
     );
+    
 
     @Operation(
         summary = "Update current user client data",
-        description = """
+        description = 
+            """
             Endpoint to update the logged-in user's client data.
 
             - Updates only the user's own data.

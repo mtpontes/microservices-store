@@ -27,8 +27,13 @@ import jakarta.validation.Valid;
 public interface IAnonymousCartController {
 
     @Operation(
-        description = "Endpoint for creating an anonymous cart.",
         summary = "Create anonymous cart",
+        description = 
+            """
+            Endpoint for creating an anonymous cart. This endpoint allows users 
+            to create a cart without requiring authentication. The cart can then 
+            be populated with products for later checkout.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 
@@ -58,8 +63,14 @@ public interface IAnonymousCartController {
 
 
     @Operation(
-        description = "Endpoint for retrieving cart data.",
-        summary = "Get cart data",
+        summary = "Get cart",
+        description = 
+            """
+            Endpoint for retrieving cart data using the anonymous cart ID.
+            This endpoint allows clients to fetch the contents of their 
+            anonymous cart, enabling them to view items before 
+            proceeding to checkout.
+            """,
         responses = {
             @ApiResponse(
                 description = "Missing 'X-anon-cart-id' header ", 
@@ -84,14 +95,19 @@ public interface IAnonymousCartController {
             schema = @Schema(type = "string"))
         @RequestHeader(name = "X-anon-cart-id") String anonCartId);
 
-
-    @Operation(
-        summary = "Endpoint for adding, removing, and changing product quantities.",
-        description = 
-            "- Add products \n" + 
-            "- Remove products \n" + 
-            "- Increase quantities: accepts any quantity \n" + 
-            "- Decrease quantity: when the quantity reaches 0, the product is removed from the cart",
+        @Operation(
+            summary = "Manage cart products",
+            description = 
+                """
+                Endpoint for adding, removing, and changing product quantities in an anonymous cart.
+                This endpoint allows clients to manage their shopping cart in a flexible manner:
+                - **Add products**: Clients can specify products to add to the cart along with the desired quantities.
+                - **Remove products**: Clients can specify which products to remove from the cart entirely.
+                - **Increase quantities**: Accepts any positive integer to increase the quantity of existing products in the cart.
+                - **Decrease quantity**: When the quantity of a product reaches 0, it is automatically removed from the cart.
+                
+                The cart is identified by the 'X-anon-cart-id' header, which is mandatory for accessing this endpoint. Ensure that the provided cart ID is valid to avoid errors.
+                """,
         responses = {
             @ApiResponse(
                 description = "Empty fields", responseCode = "400",

@@ -22,11 +22,12 @@ public interface IAdminAccountController {
 
     @Operation(
         summary = "Create admin user",
-        description = """
-                Endpoint to create a user with ADMIN role.
-
-                - Accessible only to authenticated users with ADMIN role.
-                """,
+        description = 
+            """
+            Endpoint to create a user with ADMIN role.
+    
+            - Accessible only to authenticated users with ADMIN role.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 
@@ -64,11 +65,12 @@ public interface IAdminAccountController {
 
     @Operation(
         summary = "Create employee user",
-        description = """
-                Endpoint to create a user with the EMPLOYEE role.
-
-                - Accessible only to users with ADMIN or EMPLOYEE role.
-                """,
+        description = 
+            """
+            Endpoint to create a user with the EMPLOYEE role.
+    
+            - Accessible only to users with ADMIN or EMPLOYEE role.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 

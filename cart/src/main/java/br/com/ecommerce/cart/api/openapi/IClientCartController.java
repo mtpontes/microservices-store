@@ -26,8 +26,16 @@ import jakarta.validation.Valid;
 public interface IClientCartController {
 
     @Operation(
-        description = "Endpoint for creating an anonymous cart.",
-        summary = "Create anonymous cart",
+        summary = "Create cart for authenticated user",
+        description = 
+            """
+            Creates a shopping cart exclusively for the authenticated user, where the **cart ID is the same as the user ID**. 
+            If the user already has an active cart, it will be returned, preventing the creation of multiple carts. 
+            The cart is used to manage products before checkout.
+
+            - **Authenticated user**: The cart is linked to the user currently logged in.
+            - **Product management**: Products can be added, removed, or updated via specific endpoints.
+            """,
         responses = {
             @ApiResponse(
                 description = "Success", 
@@ -56,8 +64,15 @@ public interface IClientCartController {
         UriComponentsBuilder uriBuilder);
 
     @Operation(
-        description = "Endpoint to retrieve cart data.",
-        summary = "Get cart data",
+        summary = "Get cart",
+        description = 
+            """
+            Retrieves the shopping cart associated with the authenticated user. 
+            If the cart does not exist or the authentication header is missing, the request will fail.
+            
+            - **Authentication required**: The cart is retrieved based on the authenticated user's ID.
+            - **Cart not found**: If the associated cart is not located, a 404 response will be returned.
+            """,
         responses = {
             @ApiResponse(
                 description = "Missing 'X-anon-cart-id' header ", 
@@ -77,14 +92,17 @@ public interface IClientCartController {
     ResponseEntity<CartDTO> get(@AuthenticationPrincipal UserDetailsImpl user);
 
     @Operation(
-        summary = "Endpoint to merge an anonymous cart with the authenticated user's cart.",
+        summary = "Merge anonymous cart with authenticated user's cart",
         description = 
-            "Merge the carts when the user authenticates \n" +
-            "- If the user does not yet have a cart linked to their ID, one will be created in the process \n" +
-            "- The anonymous cart is deleted at the end of the process \n" +
-            "- If the product exists in both carts, the quantities will be summed \n" +
-            "- If the product does not exist in the cart, it will be transferred to the authenticated user's cart" +
-            "- It is not possible to merge if the target is not an anonymous cart",
+            """
+            Merges the anonymous cart with the authenticated user's cart after authentication.
+    
+            - If the user does not yet have a cart linked to their ID, one will be created during the process.
+            - The anonymous cart will be deleted at the end of the operation.
+            - If the product exists in both carts, quantities will be summed.
+            - Products not existing in the authenticated user's cart will be transferred from the anonymous cart.
+            - Merging is not possible if the source is not an anonymous cart.
+            """,
         responses = {
             @ApiResponse(
                 description = "Empty fields", 
@@ -107,12 +125,16 @@ public interface IClientCartController {
     );
 
     @Operation(
-        summary = "Endpoint to add, remove, and change quantities of products.",
+        summary = "Manage products in cart",
         description = 
-            "- Add products \n" + 
-            "- Remove products \n" + 
-            "- Increase quantities: accepts any amount \n" + 
-            "- Decrease quantity: when reaching quantity 0, the product is removed from the cart",
+            """
+            Allows adding, removing, and updating product quantities in the cart.
+    
+            - **Add products**: New products are added to the cart.
+            - **Remove products**: Removes products from the cart.
+            - **Increase quantities**: Any specified quantity is accepted.
+            - **Decrease quantities**: If the quantity reaches 0, the product is removed from the cart.
+            """,
         responses = {
             @ApiResponse(
                 description = "Empty fields", 
