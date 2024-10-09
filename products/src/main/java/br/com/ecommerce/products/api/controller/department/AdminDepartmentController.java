@@ -15,6 +15,7 @@ import br.com.ecommerce.products.api.dto.category.UpdateCategoryDTO;
 import br.com.ecommerce.products.api.dto.department.CreateDepartmentDTO;
 import br.com.ecommerce.products.api.dto.department.SimpleDataDepartmentDTO;
 import br.com.ecommerce.products.api.dto.department.UpdateDepartmentoDTO;
+import br.com.ecommerce.products.api.openapi.IAdminDepartmentController;
 import br.com.ecommerce.products.business.service.CategoryService;
 import br.com.ecommerce.products.business.service.DepartmentService;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/admin/departments")
-public class AdminDepartmentController {
+public class AdminDepartmentController implements IAdminDepartmentController {
 
 	private final DepartmentService departmentService;
 	private final CategoryService categoryService;

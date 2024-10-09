@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ecommerce.products.api.dto.product.DataProductDTO;
+import br.com.ecommerce.products.api.openapi.IProductController;
 import br.com.ecommerce.products.business.service.ProductService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/products")
-public class ProductController {
+public class ProductController implements IProductController {
 
 	private final ProductService service;
 
