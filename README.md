@@ -222,10 +222,36 @@ This docker-compose file is for demonstration purposes, facilitating deployment 
 
 Clone this repository:
 
-
     git clone https://github.com/mtpontes/microservices-store.git
 
 Raise the containers:
+
+    docker-compose up --build
+
+### Known Issues
+
+#### Line endings in "mvnw" file causing error on deploy (CRLF vs LF)
+
+If you are running the application on a Linux environment after cloning the repository on a Windows machine, you might encounter issues with the `mvnw` script due to line endings being converted to CRLF (Windows format) instead of LF (Unix format). This can cause the script to fail, especially when running Maven commands like:
+
+    mvn clean install -DskipTests
+
+This error is typically related to the line endings issue.
+
+To fix this:
+
+1. **Check the line endings**:
+   - Open the project folder in a text editor like VSCode.
+   - Check the line ending format of the `mvnw` file (it should be `LF`).
+
+2. **Convert to LF if necessary**:
+   - In VSCode, you can change the line endings by clicking on the bottom right corner where the current line ending format is displayed and selecting `LF` (Unix).
+   - Alternatively, you can run the following command in Git Bash or WSL to convert the line endings:
+     ```bash
+     sed -i 's/\r$//' mvnw
+     ```
+
+Once you've ensured the correct line endings, run the following command to build and start the containers:
 
     docker-compose up --build
 
