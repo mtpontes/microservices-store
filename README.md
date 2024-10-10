@@ -45,6 +45,7 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 <details>
   <summary><h2>🛠️ Tecnologies</h2></summary>
 
+- [Swagger]()
 - [Docker](https://www.docker.com/)
 - [TestContainers](https://testcontainers.com/)
 - [RabbitMQ](https://www.rabbitmq.com/)
