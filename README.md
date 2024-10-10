@@ -287,4 +287,4 @@ The project is still under development, is currently using development settings.
 
 # 🤝 Credits
 
-Special thanks to [@AlexandreMadeira](https://github.com/MadeiraAlexandre) for helping me with several suggestions, such as creating the concept of system services, and with the relationships of some entities.
+Special thanks to [@MadeiraAlexandre](https://github.com/MadeiraAlexandre) for helping me with several suggestions, such as creating the concept of system services, and with the relationships of some entities.
