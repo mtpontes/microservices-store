@@ -13,12 +13,10 @@ public class RabbitMQTestContainerConfig {
 
     @Bean
     @DynamicPropertySource
-    @SuppressWarnings("resource")
     public RabbitMQContainer getRabbitContainer(DynamicPropertyRegistry registry) {
-        try (RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:3.7.25-management-alpine")
-                .withExposedPorts(5672, 15672)) {
+        try (RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:4-management-alpine")) {
+            rabbit.withExposedPorts(5672, 15672);
             registry.add("spring.rabbitmq.port", () -> rabbit.getAmqpPort());
-
             return rabbit;
         }
     }
