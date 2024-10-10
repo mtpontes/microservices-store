@@ -1,0 +1,36 @@
+name: Tests Workflow
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    # Setup repo to actions
+    - uses: actions/checkout@v4
+
+    # Setup enviroment
+    - name: Load environment variables
+      run: |
+        set -o allexport
+        source repo/env/dev.env
+        set +o allexport
+
+    # Setup Java
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    # Run tests
+    - name: Test with Maven
+      run: mvn -B test --file pom.xml
