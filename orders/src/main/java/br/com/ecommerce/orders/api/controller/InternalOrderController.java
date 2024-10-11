@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import br.com.ecommerce.orders.api.dto.payment.PaymentDTO;
 import br.com.ecommerce.orders.api.dto.product.ProductAndUnitDTO;
 import br.com.ecommerce.orders.api.dto.product.StockWriteOffDTO;
+import br.com.ecommerce.orders.api.openapi.IInternalOrderController;
 import br.com.ecommerce.orders.business.service.OrderService;
 import br.com.ecommerce.orders.infra.entity.Order;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 @RestController
 @RequestMapping("/internal/orders")
-public class InternalOrderController {
+public class InternalOrderController implements IInternalOrderController{
 
 	@Autowired
 	private OrderService service;

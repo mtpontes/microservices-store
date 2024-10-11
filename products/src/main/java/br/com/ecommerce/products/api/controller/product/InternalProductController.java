@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.ecommerce.products.api.dto.product.DataProductStockDTO;
 import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
 import br.com.ecommerce.products.api.dto.product.ProductUnitsRequestedDTO;
+import br.com.ecommerce.products.api.openapi.IInternalProductController;
 import br.com.ecommerce.products.business.service.ProductService;
 import br.com.ecommerce.products.infra.entity.product.Product;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/internal/products")
-public class InternalProductController {
+public class InternalProductController implements IInternalProductController {
 
 	private final ProductService service;
 
