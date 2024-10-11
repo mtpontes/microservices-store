@@ -6,7 +6,7 @@ networks:
 services:
 
   mysql:
-    image: mysql:8.0.36
+    image: mysql:8
     env_file: 
       - ./repo/env/mysql.env
     volumes:
@@ -25,7 +25,7 @@ services:
       retries: 10
   
   mongodb:
-    image: mongo:7.0-rc
+    image: mongo:8
     restart: unless-stopped
     env_file: ./repo/env/mongodb.env
     volumes:
@@ -43,7 +43,7 @@ services:
       retries: 10
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:4-management
     restart: unless-stopped
     env_file: ./repo/env/rabbitmq.env
     volumes:
