@@ -11,6 +11,7 @@ import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
 import br.com.ecommerce.products.api.dto.department.DataDepartmentDTO;
 import br.com.ecommerce.products.api.dto.department.SimpleDataDepartmentDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -62,11 +63,25 @@ public interface IDepartmentController {
             
             It is possible to filter the results by department name. The query is paginated, with a 
             default size of 10 items per page.
-            """
+            """,
+        parameters = {
+            @Parameter(
+                name = "sort",
+                description = "Sort the results by specified fields, e.g. 'name,asc' or 'price,desc'."
+            ),
+            @Parameter(
+                name = "page",
+                description = "Page number."
+            ),
+            @Parameter(
+                name = "size",
+                description = "Page size."
+            )
+        }
     )
     public ResponseEntity<Page<SimpleDataDepartmentDTO>> getAllDepartments(
         @RequestParam(required = false) String name,
-        Pageable pageable
+        @Parameter(hidden = true) Pageable pageable
     );
 
     @Operation(
@@ -108,9 +123,24 @@ public interface IDepartmentController {
     
             - It is possible to filter categories by name.
             - Categories are presented in a paginated manner.
-            """)
+            """,
+        parameters = {
+            @Parameter(
+                name = "sort",
+                description = "Sort the results by specified fields, e.g. 'name,asc' or 'name,desc'..."
+            ),
+            @Parameter(
+                name = "page",
+                description = "Page number."
+            ),
+            @Parameter(
+                name = "size",
+                description = "Page size."
+            )
+        }
+    )
     public ResponseEntity<Page<SimpleDataCategoryDTO>> getAllCategories(
         @RequestParam(required = false) String name,
-        @PageableDefault(size = 10) Pageable pageable
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     );
 }
