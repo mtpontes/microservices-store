@@ -68,16 +68,16 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 <details>
   <summary><h2>📦 Documentation</h2></summary>
 
+### Swagger UI
+
+Para acessar a documentação do OpenAPI com o Swagger UI, execute os contêineres e vá para http://localhost:9092/swagger-ui/index.html (Gateway). A documentação pode ser acessada centralmente pelo Gateway usando a URL já mencionada, e também pela própria API (contas, produtos, pedidos, carrinho, pagamentos).
+
 > **Notes:**
 >
 > - Endpoints with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission
 > - Endpoints with the prefix "Client" only work with users with CLIENT permission
 > - Endpoints with "Internal" prefix do not accept external calls
 > - The Accounts service is responsible for always creating a default administrator user, using the ADMIN_USERNAME and ADMIN_PASSWORD environment variables
-
-### Swagger UI
-
-To access documentation made with Swagger go to: http://localhost:{servicePort}/swagger-ui/index.html
 
 ---
 
@@ -273,6 +273,7 @@ The project is still under development, is currently using development settings.
 - [x] Create fallbacks for failures between services
 - [x] Each microservice will have the ability to decode JWT token, killing the need for Auth microservice
 - [x] Create detailed API documentation with Swagger
+- [x] Group all OpenAPI documentation into Gateway
 - [ ] Implement caching with Redis
 - [ ] Allow users to have multiple addresses
 - [ ] Sending emails regarding orders
