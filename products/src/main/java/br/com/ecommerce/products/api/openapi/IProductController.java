@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import br.com.ecommerce.products.api.dto.product.DataProductDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,10 +39,24 @@ public interface IProductController {
     
             ### Note:
             If no parameters are provided, all products will be returned.
-            """
+            """,
+        parameters = {
+            @Parameter(
+                name = "sort",
+                description = "Sort the results by specified fields, e.g. 'name,asc' or 'price,desc'."
+            ),
+            @Parameter(
+                name = "page",
+                description = "Page number."
+            ),
+            @Parameter(
+                name = "size",
+                description = "Page size."
+            )
+        }
     )
     public ResponseEntity<Page<DataProductDTO>> getAll(
-        @PageableDefault(size = 10) Pageable pageable,
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) String category,
         @RequestParam(required = false) BigDecimal minPrice,

@@ -12,6 +12,7 @@ import br.com.ecommerce.orders.api.dto.exception.ResponseError;
 import br.com.ecommerce.orders.api.dto.order.OrderBasicInfDTO;
 import br.com.ecommerce.orders.api.dto.order.OrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,11 +34,25 @@ public interface IClientOrderController {
             
             - The orders are presented in a paginated format to facilitate navigation.
             - Each order includes reduced data to enhance performance and user experience.
-            """
+            """,
+        parameters = {
+            @Parameter(
+                name = "sort",
+                description = "Sort the results by specified fields, such as 'name,asc' or 'name,desc'..."
+            ),
+            @Parameter(
+                name = "page",
+                description = "Page number."
+            ),
+            @Parameter(
+                name = "size",
+                description = "Page size."
+            )
+        }
     )
     public ResponseEntity<Page<OrderBasicInfDTO>> getAllBasicsInfoOrdersByUser(
         @AuthenticationPrincipal UserDetailsImpl user,
-        @PageableDefault(size = 10) Pageable pageable
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     );
 
     @Operation(
@@ -65,12 +80,26 @@ public interface IClientOrderController {
                     schema = @Schema(implementation = ResponseError.class)
                 )
             )
+        },
+        parameters = {
+            @Parameter(
+                name = "sort",
+                description = "Sort the results by specified fields, such as 'name,asc' or 'name,desc'..."
+            ),
+            @Parameter(
+                name = "page",
+                description = "Page number."
+            ),
+            @Parameter(
+                name = "size",
+                description = "Page size."
+            )
         }
     )
     public ResponseEntity<OrderDTO> getOrderByIdAndUserId(
         @PathVariable String orderId,
         @AuthenticationPrincipal UserDetailsImpl user,
-        @PageableDefault(size = 10) Pageable pageable
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     );
 
     @Operation(

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(
@@ -26,11 +27,25 @@ public interface IManufacturerController {
             - `contactPerson`: Filters manufacturers by contact person.
             
             If no parameters are provided, all manufacturers will be returned with a default pagination of 10 items per page.
-            """
+            """,
+        parameters = {
+            @Parameter(
+                name = "sort",
+                description = "Sort the results by specified fields, e.g. 'name,asc' or 'name,desc'..."
+            ),
+            @Parameter(
+                name = "page",
+                description = "Page number."
+            ),
+            @Parameter(
+                name = "size",
+                description = "Page size."
+            )
+        }
     )
     public ResponseEntity<Page<SimpleDataManufacturerDTO>> getAll(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) String contactPerson,
-        @PageableDefault(size = 10) Pageable pageable
+        @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable
     );
 }

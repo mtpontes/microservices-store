@@ -1,5 +1,8 @@
 package br.com.ecommerce.products.infra.config;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,10 +12,18 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 @OpenAPIDefinition
 public class SpringDocConfigs {
+
+    @Value("${server.port}")
+    String port;
+
+    @Value("${container.machine.host}")
+    private String gatewayHost;
+
 
     @Bean
     public OpenAPI openAPI(){
@@ -26,6 +37,9 @@ public class SpringDocConfigs {
                 .title("Product Service")
                 .description("This is the product microservice from the Microservices Store API")
                 .contact(new Contact()
-                    .name("Mateus Pontes")));
+                    .name("Mateus Pontes")))
+
+            .servers(List.of(new Server().url("http://localhost:"+ port).description("Local Server")))
+            .servers(List.of(new Server().url(String.format("http://%s:9092/api/v1/products", gatewayHost)).description("Gateway Server")));
     }
 }
