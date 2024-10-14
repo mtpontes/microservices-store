@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Hidden
 @RestController
 @AllArgsConstructor
-public class APIDocsConfigController {
+public class GroupAPIDocsController {
 
     private static final Set<String> SERVICES = Set.of("gateway", "payment-ms");
     private final DiscoveryClient discoveryClient;
