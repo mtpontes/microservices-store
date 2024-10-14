@@ -2,7 +2,9 @@
 
 ## 🔎 About the project
 
-E-CommerceApp is a REST API for an e-commerce store, based on microservices architecture, it has both operations performed for the customer and operations performed by employees and administrators.
+E-Commerce Store is a REST API for an e-commerce store, based on microservices architecture, with both operations performed by the customer and operations performed by administrators.
+
+This is an old project that I created at the beginning of the year, and this repository is intended for a complete refactoring of the project.
 
 ## ⚙️ System overview
 ![application-schema](/repo/readme/application.svg)
@@ -255,27 +257,35 @@ Once you've ensured the correct line endings, run the following command to build
   <summary><h2>🔧 Adjustments and improvements</h2></summary>
 The project is still under development, is currently using development settings. The next updates will focus on the following tasks:
 
+
+### Priorities
+
 - [x] Add standard price and promotional price
-- [x] Implement a better separation of Users and Clients
-- [x] Add more details to poor entities
 - [x] Add more behaviors to entities, reducing dependence on external services for basic domain rules
-- [x] Add a promotional price scheduler, so that when you set a promotional price, you also set a deadline for the promotional
-- [x] Implement Spring Security
-- [x] Create a Cart service
+- [x] Add a promotional price scheduler, so that when you set a promotional price, you also set an expiration date for the promotion
 - [x] Create docker-compose
 - [x] Create fallbacks for failures between services
-- [x] Each microservice will have the ability to decode JWT token, killing the need for Auth microservice
-- [x] Create detailed API documentation with Swagger
-- [x] Group all OpenAPI documentation into Gateway
+- [x] Create detailed API documentation with OpenAPI and group all documentations into Gateway
+- [x] Create test routine with Github Actions
 - [ ] Implement caching with Redis
-- [ ] Allow users to have multiple addresses
 - [ ] Sending emails regarding orders
+<!-- - [ ] Allow users to have multiple addresses -->
+<!-- - [ ] Integrate the Payments service with a real payment API, making the service fully functional -->
+
+### Security
+- [x] Implement Spring Security
+- [x] Each microservice should be able to decode the JWT token, eliminating the need for the Auth microservice
+- [ ] Implement OAuth2 with 2FA
+
+### New services
+- [x] Cart
+- [ ] Evaluation
+- [ ] DiscountCoupon
+
+<!-- ### Infra
 - [ ] Create and handle dead letter exchanges
 - [ ] Configure messaging rules
-- [ ] Configure load balancing rules
-- [ ] Integrate the Payments service with a real payment API, making the service fully functional
-- [ ] Create evaluation service
-- [ ] Create discount coupon system
+- [ ] Configure load balancing rules -->
 
 </details>
 
