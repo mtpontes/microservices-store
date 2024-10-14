@@ -53,14 +53,7 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 - [MongoDB](https://www.mongodb.com)
 - [H2](https://www.h2database.com/html/main.html)
 - [JWT](https://github.com/auth0/java-jwt)
-- [Spring Cloud Netflix](https://cloud.spring.io/spring-cloud-netflix/reference/html/)
-- [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
-- [Spring Cloud OpenFeign](https://spring.io/projects/spring-cloud-openfeign)
-- [Spring Security](https://spring.io/projects/spring-security)
-- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
-- [Spring Data MongoDB](https://spring.io/projects/spring-data-mongodb)
-- [Spring Web]()
-- [Java Bean Validation](https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html)
+- [Spring Boot]()
 
 </details>
 
@@ -70,7 +63,7 @@ E-CommerceApp is a REST API for an e-commerce store, based on microservices arch
 
 ### Swagger UI
 
-Para acessar a documentação do OpenAPI com o Swagger UI, execute os contêineres e vá para http://localhost:9092/swagger-ui/index.html (Gateway). A documentação pode ser acessada centralmente pelo Gateway usando a URL já mencionada, e também pela própria API (contas, produtos, pedidos, carrinho, pagamentos).
+To access the OpenAPI documentation with Swagger UI, run the containers and go to http://localhost:9092/swagger-ui/index.html (Gateway). The documentation can be accessed centrally via the Gateway using the URL already mentioned, and also via the API itself (accounts, products, orders, carts, payments).
 
 > **Notes:**
 >
