@@ -1,13 +1,11 @@
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM maven:3-eclipse-temurin-17-alpine AS builder
 
 WORKDIR /application
 
-COPY mvnw .
 COPY pom.xml .
-COPY .mvn .mvn
 COPY src src
 
-RUN ./mvnw clean install -DskipTests
+RUN mvn clean install -DskipTests
 RUN cp target/*.jar application.jar
 RUN rm -rf target
 RUN java -Djarmode=layertools -jar application.jar extract
