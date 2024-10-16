@@ -1,5 +1,7 @@
 package br.com.ecommerce.products.infra.entity.manufacturer;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -8,7 +10,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Embeddable
-public class Address {
+public class Address implements Serializable {
 
     @Column(length = 100)
     private String street;

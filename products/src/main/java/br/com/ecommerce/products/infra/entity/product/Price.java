@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.infra.entity.product;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -11,7 +12,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Embeddable
-public class Price {
+public class Price implements Serializable {
 
     private BigDecimal currentPrice;
     private BigDecimal originalPrice;

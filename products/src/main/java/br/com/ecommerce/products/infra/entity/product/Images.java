@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.infra.entity.product;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -7,17 +8,18 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.FetchType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @Embeddable
-public class Images {
+public class Images implements Serializable {
 
     private String mainImage;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> additionalImages = new HashSet<>();
 
     public Images(String mainImagem, Set<String> images) {

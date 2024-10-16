@@ -1,5 +1,7 @@
 package br.com.ecommerce.products.infra.entity.product;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -10,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Embeddable
-public class Stock {
+public class Stock implements Serializable {
 
 	@Column(nullable = false)
 	private Integer unit;

@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.infra.entity.manufacturer;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity(name = "Manufacturer")
 @Table(name = "manufacturers")
-public class Manufacturer {
+public class Manufacturer implements Serializable {
 
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
