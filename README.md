@@ -66,7 +66,9 @@ This is an old project that I created at the beginning of the year, and this rep
 
 ### Swagger UI
 
-To access the OpenAPI documentation with Swagger UI, run the containers and go to http://localhost:9092/swagger-ui/index.html (Gateway). The documentation can be accessed centrally via the Gateway using the URL already mentioned, and also via the API itself (accounts, products, orders, carts, payments).
+The application also has detailed documentation made with OpenAPI and Swagger UI.
+
+To access it, run the containers and access the [documentation entry point](http://localhost:9092/swagger-ui/index.html) (Gateway). The documentation can be accessed centrally through the Gateway and also through the individual API itself (accounts, products, orders, cart, payments).
 
 > **Notes:**
 >
@@ -110,10 +112,11 @@ To access the OpenAPI documentation with Swagger UI, run the containers and go t
 - To create a product, you must provide a category and a manufacturer
   - Products are created without a price, and you must price them later
 - Allows you to create product promotions
-  - When the application starts, it checks all products whose promotions have already expired and restores them to their default state.
   - Promotions use a scheduler to schedule the end of promotions.
   - Every time the application starts, it checks all products whose promotions expire within 1 hour, defining a scheduler that triggers the change of the promotional price to the original price.
   - At every zero hour, it also checks all products whose promotions expire within 1 hour and defines a scheduler for each one.
+  - When the application starts, it checks all products whose promotions have already expired and restores them to their default state.
+  - All promotion products are cached for best performance.
 
 ---
 
@@ -228,11 +231,7 @@ Raise the containers:
 
 #### Line endings in "mvnw" file causing error on deploy (CRLF vs LF)
 
-If you are running the application on a Linux environment after cloning the repository on a Windows machine, you might encounter issues with the `mvnw` script due to line endings being converted to CRLF (Windows format) instead of LF (Unix format). This can cause the script to fail, especially when running Maven commands like:
-
-    mvn clean install -DskipTests
-
-This error is typically related to the line endings issue.
+If you are running the application on a Linux environment after cloning the repository on a Windows machine, you might encounter issues with the `mvnw` script due to line endings being converted to CRLF (Windows format) instead of LF (Unix format). This can cause the script to fail, especially when running Maven commands like `mvn clean install -DskipTests`.
 
 To fix this:
 
@@ -247,9 +246,7 @@ To fix this:
      sed -i 's/\r$//' mvnw
      ```
 
-Once you've ensured the correct line endings, run the following command to build and start the containers:
-
-    docker-compose up --build
+After ensuring the correct line endings, raise the containers
 
 </details>
 
