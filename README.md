@@ -47,15 +47,16 @@ This is an old project that I created at the beginning of the year, and this rep
 <details>
   <summary><h2>🛠️ Tecnologies</h2></summary>
 
-- [Swagger]()
-- [Docker](https://www.docker.com/)
-- [TestContainers](https://testcontainers.com/)
-- [RabbitMQ](https://www.rabbitmq.com/)
-- [MySQL](https://dev.mysql.com/downloads/connector/j/)
-- [MongoDB](https://www.mongodb.com)
-- [H2](https://www.h2database.com/html/main.html)
-- [JWT](https://github.com/auth0/java-jwt)
 - [Spring Boot]()
+- [MongoDB](https://www.mongodb.com)
+- [MySQL](https://dev.mysql.com/downloads/connector/j/)
+- [Redis](https://redis.io/docs/latest/)
+- [RabbitMQ](https://www.rabbitmq.com/)
+- [Swagger](https://swagger.io/)
+- [JWT](https://github.com/auth0/java-jwt)
+- [Docker](https://www.docker.com/)
+- [H2](https://www.h2database.com/html/main.html)
+- [TestContainers](https://testcontainers.com/)
 
 </details>
 
@@ -267,7 +268,7 @@ The project is still under development, is currently using development settings.
 - [x] Create fallbacks for failures between services
 - [x] Create detailed API documentation with OpenAPI and group all documentations into Gateway
 - [x] Create test routine with Github Actions
-- [ ] Implement caching with Redis
+- [x] Implement caching with Redis in the Products service
 - [ ] Sending emails regarding orders
 <!-- - [ ] Allow users to have multiple addresses -->
 <!-- - [ ] Integrate the Payments service with a real payment API, making the service fully functional -->
