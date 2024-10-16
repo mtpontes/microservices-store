@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -74,30 +74,30 @@ class ProductServiceIntegrationTest {
         @Autowired ManufacturerRepository manufacturerRepository,
         @Autowired ProductUtils productUtils
     ) {
-        productsPersisted = IntStream.range(0, 3)
-            .mapToObj(flux -> {
-                Department department = departmentUtils.getDepartmentInstance();
-                department = departmentRepository.save(department);
-                
-                Category category = categoryUtils.getCategoryInstance(department);
-                department.addCategory(category);
-                categoryRepository.save(category);
-                departmentRepository.save(department);
+        productsPersisted = Stream.generate(() -> {
+            Department department = departmentUtils.getDepartmentInstance();
+            department = departmentRepository.save(department);
+            
+            Category category = categoryUtils.getCategoryInstance(department);
+            department.addCategory(category);
+            categoryRepository.save(category);
+            departmentRepository.save(department);
 
-                Phone phone = phoneUtils.getPhoneInstance();
-                Address address = addressUtils.getAddressInstance();
-                Manufacturer manufacturer = manufacturerUtils.getManufacturerInstance(phone, address);
-                manufacturerRepository.save(manufacturer);
-                
-                Price price = priceUtils.getPriceInstance();
-                Stock stock = stockUtils.getStockInstance();
-                Product product = productUtils.getProductInstance(price, stock, category, manufacturer);
-                repository.save(product);
-                manufacturer.addProduct(product);
-                manufacturerRepository.save(manufacturer);
-                return product;
-            })
-            .toList();
+            Phone phone = phoneUtils.getPhoneInstance();
+            Address address = addressUtils.getAddressInstance();
+            Manufacturer manufacturer = manufacturerUtils.getManufacturerInstance(phone, address);
+            manufacturerRepository.save(manufacturer);
+            
+            Price price = priceUtils.getPriceInstance();
+            Stock stock = stockUtils.getStockInstance();
+            Product product = productUtils.getProductInstance(price, stock, category, manufacturer);
+            repository.save(product);
+            manufacturer.addProduct(product);
+            manufacturerRepository.save(manufacturer);
+            return product; 
+        })
+        .limit(3)
+        .toList();
     }
 
     @Test
