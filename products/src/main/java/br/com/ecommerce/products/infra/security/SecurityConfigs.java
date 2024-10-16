@@ -57,7 +57,7 @@ public class SecurityConfigs {
                 .requestMatchers("/admin/products/**").hasAnyRole("ADMIN", "EMPLOYEE")
                 .requestMatchers("/internal/**").access((authentication, requestContext) -> {
                     log.debug("GATEWAY NAME: {}", gatewayName);
-                    boolean isGatewayOrigin = Optional.ofNullable(requestContext.getRequest().getHeader("X-Forwarded-by"))
+                    boolean isGatewayOrigin = Optional.ofNullable(requestContext.getRequest().getHeader("X-Forwarded-By"))
                         .map(header -> header.equalsIgnoreCase(gatewayName))
                         .orElse(false);
                     

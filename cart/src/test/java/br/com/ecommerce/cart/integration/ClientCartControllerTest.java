@@ -245,7 +245,6 @@ class ClientCartControllerTest {
         // act
         ResultActions act = mvc.perform(put(basePath + "/merge")
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", userId)
             .content(anonCartRefereceDTOJson.write(requestBody).getJson()));
 
         // assert

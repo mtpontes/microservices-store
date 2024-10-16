@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -20,8 +19,8 @@ public class GlobalExceptionHandler {
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
-	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -105,21 +104,6 @@ public class GlobalExceptionHandler {
 				unsupportedMediaType.value(),
 				unsupportedMediaType.getReasonPhrase(),
 				message));
-	}
-
-	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
-		MissingRequestHeaderException ex
-	) {
-		String headerName = ex.getHeaderName();
-		if (headerName.equalsIgnoreCase("X-auth-user-id"))
-			return ResponseEntity
-				.status(unauthorized.value())
-				.body(new ResponseErrorWithoutMessage(
-					unauthorized.value(), 
-					unauthorized.getReasonPhrase()));
-
-		return this.handleError500(ex);
 	}
 
 	@ExceptionHandler(Exception.class)

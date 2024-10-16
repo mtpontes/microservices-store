@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.common.exception.CustomForbiddenException;
+import br.com.ecommerce.common.exception.InvalidTokenException;
 import br.com.ecommerce.orders.api.dto.exception.ResponseError;
 import br.com.ecommerce.orders.api.dto.exception.ResponseErrorWithoutMessage;
 import br.com.ecommerce.orders.infra.exception.exceptions.OrderNotFoundException;
@@ -29,8 +31,9 @@ public class GlobalExceptionHandler {
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
-	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+	private final HttpStatus forbidden = HttpStatus.FORBIDDEN;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -145,6 +148,27 @@ public class GlobalExceptionHandler {
 
         return this.handleError500(ex);
     }
+
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<?> handleError401(InvalidTokenException ex) {
+		log.debug("INVALID TOKEN EXCEPTION MESSAGE: {}", ex.getMessage());
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
+				InvalidTokenException.DEFAULT_MESSAGE));
+	}
+
+	@ExceptionHandler(CustomForbiddenException.class)
+	public ResponseEntity<?> handleError403(CustomForbiddenException ex) {
+		return ResponseEntity
+			.status(forbidden.value())
+			.body(new ResponseError(
+				forbidden.value(),
+				forbidden.getReasonPhrase(),
+				ex.getMessage()));
+	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError500(Exception ex) {

@@ -19,6 +19,8 @@ import br.com.ecommerce.cart.api.dto.exception.ResponseErrorWithoutMessage;
 import br.com.ecommerce.cart.infra.exception.exceptions.CartNotFoundException;
 import br.com.ecommerce.cart.infra.exception.exceptions.EmptyCartException;
 import br.com.ecommerce.cart.infra.exception.exceptions.ProductNotFoundException;
+import br.com.ecommerce.common.exception.CustomForbiddenException;
+import br.com.ecommerce.common.exception.InvalidTokenException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +34,8 @@ public class GlobalExceptionHandler {
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+	private final HttpStatus forbidden = HttpStatus.FORBIDDEN;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError= HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -114,6 +118,20 @@ public class GlobalExceptionHandler {
 				HTTP_MESSAGE_NOT_READABLE_EXCEPTION));
 	}
 
+	@ExceptionHandler(MissingRequestHeaderException.class)
+	public ResponseEntity<?> handlerMissingRequestHeaderException(MissingRequestHeaderException ex) {
+		String headerName = ex.getHeaderName();
+		if (headerName.contains("X-anon-cart-id")) 
+			return ResponseEntity
+				.badRequest()
+				.body(new ResponseError(
+					badRequest.value(), 
+					badRequest.getReasonPhrase(),
+					ex.getMessage()));
+
+		return this.handleError500(ex);
+	}
+
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<ResponseError> handlerErro415(HttpMediaTypeNotSupportedException ex) {
 		String unsupported = Optional.ofNullable(ex.getContentType())
@@ -132,18 +150,25 @@ public class GlobalExceptionHandler {
 				message));
 	}
 
-	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<?> handlerMissingRequestHeaderException(MissingRequestHeaderException ex) {
-		String headerName = ex.getHeaderName();
-		if (headerName.contains("X-anon-cart-id")) 
-			return ResponseEntity
-				.badRequest()
-				.body(new ResponseError(
-					badRequest.value(), 
-					badRequest.getReasonPhrase(),
-					ex.getMessage()));
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<?> handleError401(InvalidTokenException ex) {
+		log.debug("INVALID TOKEN EXCEPTION MESSAGE: {}", ex.getMessage());
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
+				InvalidTokenException.DEFAULT_MESSAGE));
+	}
 
-		return this.handleError500(ex);
+	@ExceptionHandler(CustomForbiddenException.class)
+	public ResponseEntity<?> handleError403(CustomForbiddenException ex) {
+		return ResponseEntity
+			.status(forbidden.value())
+			.body(new ResponseError(
+				forbidden.value(),
+				forbidden.getReasonPhrase(),
+				ex.getMessage()));
 	}
 
 	@ExceptionHandler(Exception.class)

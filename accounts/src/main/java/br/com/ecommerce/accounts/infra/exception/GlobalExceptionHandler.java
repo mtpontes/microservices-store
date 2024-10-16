@@ -10,7 +10,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -18,8 +17,12 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import br.com.ecommerce.accounts.api.dto.exception.ResponseError;
 import br.com.ecommerce.accounts.api.dto.exception.ResponseErrorWithoutMessage;
+import br.com.ecommerce.common.exception.CustomForbiddenException;
+import br.com.ecommerce.common.exception.InvalidTokenException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	
@@ -27,8 +30,9 @@ public class GlobalExceptionHandler {
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
-	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+	private final HttpStatus forbidden= HttpStatus.FORBIDDEN;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
 	
@@ -146,20 +150,26 @@ public class GlobalExceptionHandler {
 				message));
     }
 
-	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
-		MissingRequestHeaderException ex
-	) {
-		String headerName = ex.getHeaderName();
-		if (headerName.equalsIgnoreCase("X-auth-user-id"))
-			return ResponseEntity
-				.status(unauthorized.value())
-				.body(new ResponseErrorWithoutMessage(
-					unauthorized.value(), 
-					unauthorized.getReasonPhrase()));
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<?> handleError401(InvalidTokenException ex) {
+		log.debug("INVALID TOKEN EXCEPTION MESSAGE: {}", ex.getMessage());
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
+				InvalidTokenException.DEFAULT_MESSAGE));
+	}
 
-        return this.handleError500(ex);
-    }
+	@ExceptionHandler(CustomForbiddenException.class)
+	public ResponseEntity<?> handleError403(CustomForbiddenException ex) {
+		return ResponseEntity
+			.status(forbidden.value())
+			.body(new ResponseError(
+				forbidden.value(),
+				forbidden.getReasonPhrase(),
+				CustomForbiddenException.DEFAULT_MESSAGE));
+	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError500(Exception ex) {

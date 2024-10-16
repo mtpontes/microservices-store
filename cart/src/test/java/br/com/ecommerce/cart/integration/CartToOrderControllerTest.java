@@ -119,7 +119,6 @@ class CartToOrderControllerTest {
 
         Set<String> productIds = new HashSet<>(Set.of(userCartPersisted.getProducts().iterator().next().getId()));
         OrderDataDTO responseBody = new OrderDataDTO();
-        String invalidId = emptyUserCart.getId();
 
         when(orderClient.createOrder(anyString(), anySet()))
             .thenReturn(responseBody);
@@ -128,7 +127,6 @@ class CartToOrderControllerTest {
         String requestBody = collectionOfIdsJson.write(productIds).getJson();
         ResultActions act = mvc.perform(post(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", invalidId)
             .content(requestBody));
 
         // assert
@@ -165,7 +163,6 @@ class CartToOrderControllerTest {
 
         Set<String> productIds = new HashSet<>(Set.of());
         OrderDataDTO responseBody = new OrderDataDTO();
-        String invalidId = emptyUserCart.getId();
 
         when(orderClient.createOrder(anyString(), anySet()))
             .thenReturn(responseBody);
@@ -174,7 +171,6 @@ class CartToOrderControllerTest {
         String requestBody = collectionOfIdsJson.write(productIds).getJson();
         ResultActions act = mvc.perform(post(basePath)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("X-auth-user-id", invalidId)
             .content(requestBody));
 
         // assert

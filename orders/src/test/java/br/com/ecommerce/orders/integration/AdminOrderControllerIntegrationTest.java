@@ -158,7 +158,6 @@ class AdminOrderControllerIntegrationTest {
         mvc.perform(
             patch(basePath + "/" + orderId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", 1)
         )
         // assert
         .andExpect(status().isNoContent());
@@ -171,7 +170,6 @@ class AdminOrderControllerIntegrationTest {
         mvc.perform(
             patch(basePath + "/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-auth-user-id", "1")
         )
         // assert
         .andExpect(status().isForbidden());

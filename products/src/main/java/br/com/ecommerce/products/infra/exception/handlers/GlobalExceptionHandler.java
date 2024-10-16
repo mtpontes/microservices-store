@@ -8,25 +8,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import br.com.ecommerce.common.exception.CustomForbiddenException;
+import br.com.ecommerce.common.exception.InvalidTokenException;
 import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.ManufacturerNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	private final String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Malformed or unexpected json format";
 
 	private final HttpStatus notFound = HttpStatus.NOT_FOUND;
-	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+	private final HttpStatus forbidden = HttpStatus.FORBIDDEN;
+	private final HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;
 	private final HttpStatus unsupportedMediaType = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 	private final HttpStatus internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -41,17 +45,17 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(DepartmentNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError400(DepartmentNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError404(DepartmentNotFoundException ex) {
 		return ResponseEntity
-			.badRequest()
+			.status(notFound.value())
 			.body(new ResponseError(
-				badRequest.value(),
-				badRequest.getReasonPhrase(),
+				notFound.value(),
+				notFound.getReasonPhrase(),
 				ex.getMessage()));
 	}
 
 	@ExceptionHandler(CategoryNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError400(CategoryNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError404(CategoryNotFoundException ex) {
 		return ResponseEntity
 			.badRequest()
 			.body(new ResponseError(
@@ -61,22 +65,22 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(ManufacturerNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError400(ManufacturerNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError404(ManufacturerNotFoundException ex) {
 		return ResponseEntity
-			.badRequest()
+			.status(notFound.value())
 			.body(new ResponseError(
-				badRequest.value(),
-				badRequest.getReasonPhrase(),
+				notFound.value(),
+				notFound.getReasonPhrase(),
 				ex.getMessage()));
 	}
 
 	@ExceptionHandler(ProductNotFoundException.class)
-	public ResponseEntity<ResponseError> handleError400(ProductNotFoundException ex) {
+	public ResponseEntity<ResponseError> handleError404(ProductNotFoundException ex) {
 		return ResponseEntity
-			.badRequest()
+			.status(notFound.value())
 			.body(new ResponseError(
-				badRequest.value(),
-				badRequest.getReasonPhrase(),
+				notFound.value(),
+				notFound.getReasonPhrase(),
 				ex.getMessage()));
 	}
 
@@ -146,20 +150,26 @@ public class GlobalExceptionHandler {
 				message));
 	}
 
-	@ExceptionHandler(MissingRequestHeaderException.class)
-	public ResponseEntity<ResponseErrorWithoutMessage> handlerMissingRequestHeaderException(
-		MissingRequestHeaderException ex
-	) {
-		String headerName = ex.getHeaderName();
-		if (headerName.equalsIgnoreCase("X-auth-user-id"))
-			return ResponseEntity
-				.status(unauthorized.value())
-				.body(new ResponseErrorWithoutMessage(
-					unauthorized.value(), 
-					unauthorized.getReasonPhrase()));
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<?> handleError401(InvalidTokenException ex) {
+		log.debug("INVALID TOKEN EXCEPTION MESSAGE: {}", ex.getMessage());
+		return ResponseEntity
+			.status(unauthorized.value())
+			.body(new ResponseError(
+				unauthorized.value(),
+				unauthorized.getReasonPhrase(),
+				InvalidTokenException.DEFAULT_MESSAGE));
+	}
 
-        return this.handleError500(ex);
-    }
+	@ExceptionHandler(CustomForbiddenException.class)
+	public ResponseEntity<?> handleError403(CustomForbiddenException ex) {
+		return ResponseEntity
+			.status(forbidden.value())
+			.body(new ResponseError(
+				forbidden.value(),
+				forbidden.getReasonPhrase(),
+				ex.getMessage()));
+	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError500(Exception ex) {
