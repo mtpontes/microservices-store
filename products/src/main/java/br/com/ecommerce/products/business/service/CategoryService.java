@@ -1,5 +1,7 @@
 package br.com.ecommerce.products.business.service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
 import br.com.ecommerce.products.api.dto.category.UpdateCategoryDTO;
 import br.com.ecommerce.products.api.mapper.CategoryMapper;
 import br.com.ecommerce.products.business.validator.UniqueNameCategoryValidator;
+import br.com.ecommerce.products.infra.config.CacheName;
 import br.com.ecommerce.products.infra.entity.category.Category;
 import br.com.ecommerce.products.infra.exception.exceptions.CategoryNotFoundException;
 import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
@@ -44,6 +47,12 @@ public class CategoryService {
             .orElseThrow(DepartmentNotFoundException::new);
     }
 
+    @Cacheable(cacheNames = CacheName.CATEGORIES, key = """
+            #root.methodName + ':' +
+            #name + ':' +
+            #pageable.pageNumber + ':' +
+            #pageable.pageSize + ':'
+            """)
     public Page<SimpleDataCategoryDTO> getAllByParams(
         String name, 
         Pageable pageable
@@ -59,6 +68,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = CacheName.CATEGORIES, allEntries = true)
     public SimpleDataCategoryDTO update(Long id, UpdateCategoryDTO dto) {
         uniqueNameValidator.validate(dto.getName());
         return categoryRepository.findById(id)

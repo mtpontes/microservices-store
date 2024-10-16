@@ -35,7 +35,7 @@ public class DepartmentController implements IDepartmentController{
 	@GetMapping
 	public ResponseEntity<Page<SimpleDataDepartmentDTO>> getAllDepartments(
 		@RequestParam(required = false) String name,
-		Pageable pageable
+		@PageableDefault Pageable pageable
 	) {
 		return ResponseEntity.ok(departmentService.getAllDepartments(name, pageable));
 	}

@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
-import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
 import br.com.ecommerce.products.api.dto.product.CompletePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.CreateProductDTO;
 import br.com.ecommerce.products.api.dto.product.DataProductDTO;
@@ -20,19 +20,18 @@ import br.com.ecommerce.products.api.dto.product.DataProductStockDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
 import br.com.ecommerce.products.api.dto.product.ProductUnitsRequestedDTO;
-import br.com.ecommerce.products.api.dto.product.SimplePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.StockWriteOffDTO;
 import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
-import br.com.ecommerce.products.api.mapper.CategoryMapper;
-import br.com.ecommerce.products.api.mapper.ManufacturerMapper;
 import br.com.ecommerce.products.api.mapper.PriceMapper;
 import br.com.ecommerce.products.api.mapper.ProductMapper;
 import br.com.ecommerce.products.api.mapper.StockMapper;
+import br.com.ecommerce.products.api.mapper.factory.ProductDTOFactory;
 import br.com.ecommerce.products.business.validator.UniqueNameProductValidator;
+import br.com.ecommerce.products.infra.config.CacheName;
 import br.com.ecommerce.products.infra.entity.category.Category;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.product.Price;
@@ -43,6 +42,7 @@ import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundExcep
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.infra.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,29 +56,36 @@ public class ProductService {
 	private final CategoryRepository categoryRepository;
 	private final ManufacturerRepository manufacturerRepository;
 
+	private final ProductDTOFactory dtoFactory;
+
 	private final PriceMapper priceMapper;
 	private final StockMapper stockMapper;
 	private final ProductMapper productMapper;
-	private final CategoryMapper categoryMapper;
-	private final ManufacturerMapper manufacturerMapper;
 
 	private final UniqueNameProductValidator uniqueNameValidator;
 
-	private final PriceJobService scheduler;
+	private final PriceJobService priceScheduler;
 
 
+	@Cacheable(cacheNames = CacheName.PRODUCTS, key = "#id")
 	public DataProductDTO getProduct(Long id) {
 		return productRepository.findById(id)
-			.map(this::createDataProductDTO)
+			.map(dtoFactory::createDataProductDTO)
 			.orElseThrow(ProductNotFoundException::new);
 	}
 
-	public InternalProductDataDTO getProductPriceInternal(Long id) {
-		return productRepository.findById(id)
-			.map(productMapper::toInternalProductDataDTO)
-			.orElseThrow(ProductNotFoundException::new);
-	}
-
+	@Cacheable(
+		cacheNames = CacheName.PRODUCTS, 
+		key = """
+			#root.methodName + ':' +
+			#name + ':' +
+			#categoryName + ':' +
+			#minPrice + ':' +
+			#maxPrice + ':' +
+			#manufacturer + ':' +
+			#pageable.pageNumber + ':' +
+			#pageable.pageSize + ':'
+			""")
 	public Page<DataProductDTO> getAllProductWithParams(
 		String name, 
 		String categoryName, 
@@ -95,7 +102,7 @@ public class ProductService {
 			manufacturer,
 			pageable 
 		)
-		.map(this::createDataProductDTO);
+		.map(dtoFactory::createDataProductDTO);
 	}
 
 	public List<Product> checkWichProductsExceedsStock(List<ProductUnitsRequestedDTO> productsRequest) {
@@ -112,6 +119,7 @@ public class ProductService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
 	public UpdateProductResponseDTO updateProductData(Long id, UpdateProductDTO dto) {
 		uniqueNameValidator.validate(dto.getName());
 		return productRepository.findById(id)
@@ -124,6 +132,7 @@ public class ProductService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
 	public UpdateProductPriceResponseDTO updateProductPrice(Long id, UpdatePriceDTO dto) {
 		return productRepository.findById(id)
 			.map(p -> {
@@ -136,6 +145,7 @@ public class ProductService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
 	public UpdateProductPriceResponseDTO switchCurrentPriceToOriginal(Long id) {
 		return productRepository.findById(id)
 			.map(p -> {
@@ -143,34 +153,42 @@ public class ProductService {
 				return productRepository.save(p);
 			})
 			.stream()
-				.peek(product -> scheduler.removeRedundantSchedulePromotion(product.getId()))
+				.peek(product -> priceScheduler.removeRedundantSchedulePromotion(product.getId()))
 				.findFirst()
 			.map(this::createUpdateProductPriceResponseDTO)
 			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	@Transactional
-	public UpdateProductPriceResponseDTO switchCurrentPriceToPromotional(Long productId, LocalDateTime endOfPromotion) {
-		return productRepository.findById(productId)
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
+	public UpdateProductPriceResponseDTO switchCurrentPriceToPromotional(Long id, LocalDateTime endOfPromotion) {
+		return productRepository.findById(id)
 			.map(product -> {
 				product.switchPriceToPromotional(endOfPromotion);
 				return productRepository.save(product);
 			})
 			.stream()
-				.peek(p -> scheduler.createScheduleForEndOfPromotion(productId, endOfPromotion))
+				.peek(p -> priceScheduler.createScheduleForEndOfPromotion(id, endOfPromotion))
 				.findFirst()
 			.map(this::createUpdateProductPriceResponseDTO)
 			.orElseThrow(ProductNotFoundException::new);
 	}
 
 	@Transactional
-	public DataProductStockDTO updateStockByProductId(Long productId, DataStockDTO dto) {
-		Product target = productRepository.getReferenceById(productId);
-		target.updateStock(dto.getUnit());
-		return stockMapper.toDataProductStock(target);
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
+	public DataProductStockDTO updateStockByProductId(Long id, DataStockDTO dto) {
+		try {
+			Product target = productRepository.getReferenceById(id);
+			target.updateStock(dto.getUnit());
+			return stockMapper.toDataProductStock(target);
+
+		} catch (EntityNotFoundException e) {
+			throw new ProductNotFoundException(e);
+		}
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, allEntries = true)
 	public void updateStocks(List<StockWriteOffDTO> dto) {
 		Map<Long, Integer> writeOffValueMap = dto.stream()
 			.collect(Collectors.toMap(
@@ -199,9 +217,10 @@ public class ProductService {
 		categoryRepository.save(category);
 		manufacturerRepository.save(manufacturer);
 		
-		return this.createDataProductDTO(product);
+		return dtoFactory.createDataProductDTO(product);
 	}
 
+	@Cacheable(value = CacheName.PRODUCTS)
 	public Map<String, InternalProductDataDTO> getAllProductsByListOfIds(Set<Long> productsIds) {
 		return productRepository.findAllById(productsIds).stream()
 			.collect(Collectors.toMap(
@@ -241,16 +260,6 @@ public class ProductService {
 			.findFirst()
 			.orElseThrow(ProductNotFoundException::new);
     }
-
-	private DataProductDTO createDataProductDTO(Product product) {
-		SimplePriceDataDTO priceData = priceMapper.toSimplePriceDataDTO(product.getPrice());
-		DataStockDTO stockData = stockMapper.toDataStockDTO(product.getStock());
-		SimpleDataCategoryDTO categoryData = categoryMapper.toSimpleDataCategoryDTO(product.getCategory());
-		SimpleDataManufacturerDTO manufacturerData = manufacturerMapper.toSimpleDataManufacturerDTO(
-			product.getManufacturer());
-
-		return productMapper.toDataProductDTO(product, priceData, stockData, categoryData, manufacturerData);
-	}
 
 	private UpdateProductPriceResponseDTO createUpdateProductPriceResponseDTO(Product product) {
 		CompletePriceDataDTO priceData = priceMapper.toCompletePriceDataDTO(product.getPrice());
