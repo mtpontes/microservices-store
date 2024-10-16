@@ -15,7 +15,7 @@ public class RabbitMQTestContainerConfig {
     @DynamicPropertySource
     @SuppressWarnings("resource")
     public RabbitMQContainer getRabbitContainer(DynamicPropertyRegistry registry) {
-        try (RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:3.7.25-management-alpine")
+        try (RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:4-management-alpine")
                 .withExposedPorts(5672, 15672)) {
             registry.add("spring.rabbitmq.port", () -> rabbit.getAmqpPort());
             registry.add("eureka.client.enabled", () -> false);

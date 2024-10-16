@@ -43,7 +43,7 @@ services:
       retries: 10
 
   rabbitmq:
-    image: rabbitmq:4-management
+    image: rabbitmq:4-management-alpine
     restart: unless-stopped
     env_file: ./repo/env/rabbitmq.env
     volumes:
