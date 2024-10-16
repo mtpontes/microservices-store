@@ -86,7 +86,8 @@ public class GlobalExceptionHandler {
 		var fields = ex.getFieldErrors().stream()
 			.collect(Collectors.toMap(f -> f.getField().toString(), f -> f.getDefaultMessage()));
 
-		return ResponseEntity.badRequest()
+		return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(),
 				badRequest.getReasonPhrase(),
@@ -96,7 +97,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HandlerMethodValidationException.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError400(HandlerMethodValidationException ex) {
 		return ResponseEntity
-			.status(badRequest.value())
+			.badRequest()
 			.body(new ResponseErrorWithoutMessage(
 				badRequest.value(),
 				badRequest.getReasonPhrase()));
@@ -104,7 +105,8 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ResponseError> handlerErro400IllegalArgumentException(IllegalArgumentException ex) {
-		return ResponseEntity.badRequest()
+		return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(), 
 				badRequest.getReasonPhrase(),
@@ -113,7 +115,8 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ResponseError> handleError400HttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        return ResponseEntity.badRequest()
+        return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(),
 				badRequest.getReasonPhrase(),

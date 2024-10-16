@@ -1,5 +1,7 @@
 package br.com.ecommerce.products.api.dto.product;
 
+import java.io.Serializable;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +14,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataStockDTO {
+public class DataStockDTO implements Serializable {
 
 	@NotNull
 	private Integer unit;

@@ -6,4 +6,8 @@ public class ProductNotFoundException extends RuntimeException {
     public ProductNotFoundException() {
         super(defaultMessage);
     }
+    
+    public ProductNotFoundException(Throwable exception) {
+        super(defaultMessage, exception);
+    }
 }

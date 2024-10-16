@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.infra.entity.manufacturer;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import br.com.ecommerce.products.infra.entity.tools.interfaces.Formatter;
@@ -10,7 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Embeddable
-public class Phone {
+public class Phone implements Serializable {
 
     private String value;
 

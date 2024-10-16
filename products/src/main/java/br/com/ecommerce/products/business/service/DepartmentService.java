@@ -2,6 +2,8 @@ package br.com.ecommerce.products.business.service;
 
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import br.com.ecommerce.products.api.dto.department.UpdateDepartmentoDTO;
 import br.com.ecommerce.products.api.mapper.CategoryMapper;
 import br.com.ecommerce.products.api.mapper.DepartmentMapper;
 import br.com.ecommerce.products.business.validator.UniqueNameDepartmentValidator;
+import br.com.ecommerce.products.infra.config.CacheName;
 import br.com.ecommerce.products.infra.entity.department.Department;
 import br.com.ecommerce.products.infra.exception.exceptions.DepartmentNotFoundException;
 import br.com.ecommerce.products.infra.repository.DepartmentRepository;
@@ -29,7 +32,11 @@ public class DepartmentService {
     private final CategoryMapper categoryMapper;
 
 
-
+    @Cacheable(cacheNames = CacheName.DEPARTMENTS, key = """
+            #name + ':' +
+            #pageable.pageNumber + ':' +
+            #pageable.pageSize + ':'
+            """)
     public Page<SimpleDataDepartmentDTO> getAllDepartments(String name, Pageable pageable) {
         return departmentRepository.findAllByParams(name, pageable)
             .map(departmentMapper::toSimpleDataDepartmentDTO);
@@ -54,6 +61,7 @@ public class DepartmentService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = CacheName.DEPARTMENTS, allEntries = true)
     public SimpleDataDepartmentDTO updateDepartment(Long id, UpdateDepartmentoDTO data) {
         uniqueNameValidator.validate(data.getName());
         return departmentRepository.findById(id)
@@ -66,6 +74,7 @@ public class DepartmentService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = CacheName.DEPARTMENTS, allEntries = true)
     public void destroyDepartment(Long id) {
         departmentRepository.deleteById(id);
     }

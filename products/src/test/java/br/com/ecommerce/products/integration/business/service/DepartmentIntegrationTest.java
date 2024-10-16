@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -41,8 +41,7 @@ class DepartmentIntegrationTest {
         @Autowired CategoryUtils categoryUtils,
         @Autowired CategoryRepository categoryRepository
     ) {
-        departmentsPersisted = IntStream.range(0, 3)
-            .mapToObj(flux -> {
+        departmentsPersisted = Stream.generate(() -> {
                 Department department = departmentUtils.getDepartmentInstance();
                 department = departmentRepository.save(department);
                 
@@ -53,6 +52,7 @@ class DepartmentIntegrationTest {
                 departmentRepository.save(department);
                 return department;
             })
+            .limit(3)
             .toList();
     }
 

@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -88,8 +88,7 @@ class AdminProductControllerIntegrationTest {
         @Autowired ManufacturerRepository manufacturerRepository,
         @Autowired ProductUtils productUtils
     ) {
-        productsPersisted = IntStream.range(0, 3)
-            .mapToObj(flux -> {
+        productsPersisted = Stream.generate(() -> {
                 Department department = departmentUtils.getDepartmentInstance();
                 department = departmentRepository.save(department);
                 
@@ -111,6 +110,7 @@ class AdminProductControllerIntegrationTest {
                 manufacturerRepository.save(manufacturer);
                 return product;
             })
+            .limit(3)
             .toList();
     }
 

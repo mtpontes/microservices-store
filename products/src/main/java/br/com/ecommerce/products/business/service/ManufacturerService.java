@@ -2,6 +2,8 @@ package br.com.ecommerce.products.business.service;
 
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import br.com.ecommerce.products.api.dto.manufacturer.UpdateManufacturerDTO;
 import br.com.ecommerce.products.api.mapper.AddressMapper;
 import br.com.ecommerce.products.api.mapper.ManufacturerMapper;
 import br.com.ecommerce.products.business.validator.UniqueNameManufacturerValidator;
+import br.com.ecommerce.products.infra.config.CacheName;
 import br.com.ecommerce.products.infra.entity.manufacturer.Address;
 import br.com.ecommerce.products.infra.entity.manufacturer.Manufacturer;
 import br.com.ecommerce.products.infra.entity.manufacturer.Phone;
@@ -36,6 +39,12 @@ public class ManufacturerService {
 	private final UniqueNameManufacturerValidator uniqueNameValidator;
 
 
+	@Cacheable(cacheNames = CacheName.MANUFACTURERS, key = """
+		#name + ':' +
+		#contactPerson + ':' +
+		#pageable.pageNumber + ':' +
+		#pageable.pageSize + ':'
+		""")
 	public Page<SimpleDataManufacturerDTO> getAllSimpleDataManufacturers(
 		String name,
 		String contactPerson,
@@ -45,6 +54,14 @@ public class ManufacturerService {
 			.map(manufacturerMapper::toSimpleDataManufacturerDTO);
 	}
 
+	@Cacheable(cacheNames = CacheName.MANUFACTURERS, key = """
+		#name + ':' +
+		#phone + ':' +
+		#email + ':' +
+		#contactPerson + ':' +
+		#pageable.pageNumber + ':' +
+		#pageable.pageSize + ':'
+		""")
 	public Page<DataManufacturerDTO> getAllManufacturers(
 		String name, 
 		String phone, 
@@ -52,18 +69,14 @@ public class ManufacturerService {
 		String contactPerson, 
 		Pageable pageable
 	) {
-		return repository.findAllByParams(
-			name,
-			phone,
-			email,
-			contactPerson,
-			pageable)
+		return repository.findAllByParams(name, phone, email, contactPerson, pageable)
 			.map(manufacturer -> {
 				DataAddressDTO address = addressMapper.toDataAddressDTO(manufacturer.getAddress());
 				return manufacturerMapper.toDataManufacturerDTO(manufacturer, address);
 			});
 	}
 
+	@Cacheable(cacheNames = CacheName.MANUFACTURERS, key = "#id")
 	public DataManufacturerDTO getManufacturer(Long id) {
 		return repository.findById(id)
 			.map(manufacturer -> {
@@ -84,6 +97,7 @@ public class ManufacturerService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = CacheName.MANUFACTURERS, allEntries = true)
 	public DataManufacturerDTO updateManufacturer(Long id, UpdateManufacturerDTO dto) {
 		uniqueNameValidator.validate(dto.getName());
 		return repository.findById(id)

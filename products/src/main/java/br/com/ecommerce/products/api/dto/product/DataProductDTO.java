@@ -1,5 +1,7 @@
 package br.com.ecommerce.products.api.dto.product;
 
+import java.io.Serializable;
+
 import br.com.ecommerce.products.api.dto.category.SimpleDataCategoryDTO;
 import br.com.ecommerce.products.api.dto.manufacturer.SimpleDataManufacturerDTO;
 import br.com.ecommerce.products.infra.entity.product.Images;
@@ -14,7 +16,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataProductDTO {
+public class DataProductDTO implements Serializable {
 
 	private Long id;
 	private String name;

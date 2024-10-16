@@ -1,5 +1,6 @@
 package br.com.ecommerce.products.infra.entity.category;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity(name = "Category")
 @Table(name = "categories")
-public class Category {
+public class Category implements Serializable {
 
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

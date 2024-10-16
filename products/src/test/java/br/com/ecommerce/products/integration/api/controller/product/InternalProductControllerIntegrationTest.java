@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -76,8 +77,7 @@ class InternalProductControllerIntegrationTest {
         @Autowired ManufacturerRepository manufacturerRepository,
         @Autowired ProductUtils productUtils
     ) {
-        productsPersisted = IntStream.range(0, 3)
-            .mapToObj(flux -> {
+        productsPersisted = Stream.generate(() -> {
                 Department department = departmentUtils.getDepartmentInstance();
                 department = departmentRepository.save(department);
                 
@@ -101,6 +101,7 @@ class InternalProductControllerIntegrationTest {
                 categoryRepository.save(category);
                 return product;
             })
+            .limit(3)
             .collect(Collectors.toList());
     }
 

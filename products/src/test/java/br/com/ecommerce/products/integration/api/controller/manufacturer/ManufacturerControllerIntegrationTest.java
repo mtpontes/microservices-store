@@ -5,7 +5,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,14 +46,13 @@ class ManufacturerControllerIntegrationTest {
         @Autowired PhoneUtils phoneUtils,
         @Autowired AddressUtils addressUtils
     ) {
-        manufacturersPersisted = IntStream.range(0, 2)
-            .mapToObj(flux -> {
+        manufacturersPersisted = Stream.generate(() -> {
                 Phone phone = phoneUtils.getPhoneInstance();
                 Address address = addressUtils.getAddressInstance();
                 return manufacturerUtils.getManufacturerInstance(phone, address);
             })
-            .toList();
-        repository.saveAll(manufacturersPersisted);
+            .limit(3)
+            .collect(Collectors.collectingAndThen(Collectors.toList(), result -> repository.saveAll(result)));
     }
 
 

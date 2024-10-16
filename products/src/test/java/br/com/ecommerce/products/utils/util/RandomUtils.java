@@ -13,7 +13,7 @@ public class RandomUtils {
 
 
     public Long getRandomLong() {
-        return Long.valueOf(random.nextInt(100));
+        return random.nextLong(100);
     }
 
     public Integer getRandomInt() {

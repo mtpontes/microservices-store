@@ -31,11 +31,10 @@ import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
-import br.com.ecommerce.products.api.mapper.CategoryMapper;
-import br.com.ecommerce.products.api.mapper.ManufacturerMapper;
 import br.com.ecommerce.products.api.mapper.PriceMapper;
 import br.com.ecommerce.products.api.mapper.ProductMapper;
 import br.com.ecommerce.products.api.mapper.StockMapper;
+import br.com.ecommerce.products.api.mapper.factory.ProductDTOFactory;
 import br.com.ecommerce.products.business.service.PriceJobService;
 import br.com.ecommerce.products.business.service.ProductService;
 import br.com.ecommerce.products.business.validator.UniqueNameProductValidator;
@@ -63,20 +62,20 @@ class ProductServiceUnitTest {
     private ManufacturerRepository manufacturerRepository;
 
     @Mock
-    private PriceJobService job;
+    private ProductDTOFactory dtoFactory;
+
     @Mock
     private PriceMapper priceMapper;
     @Mock
     private StockMapper stockMapper;
     @Mock
     private ProductMapper productMapper;
-    @Mock
-    private CategoryMapper categoryMapper;
-    @Mock
-    private ManufacturerMapper manufacturerMapper;
 
     @Mock
     private UniqueNameProductValidator uniqueNameValidator;
+
+    @Mock
+    private PriceJobService priceScheduler;
 
     @InjectMocks
     private ProductService service;

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -53,12 +53,12 @@ class ManufacturerServiceIntegrationTest {
         @Autowired PhoneUtils phoneUtils,
         @Autowired AddressUtils addressUtils
     ) {
-        manufacturersPersisted = IntStream.range(0, 2)
-            .mapToObj(flux -> {
+        manufacturersPersisted = Stream.generate(() -> {
                 Phone phone = phoneUtils.getPhoneInstance();
                 Address address = addressUtils.getAddressInstance();
                 return manufacturerUtils.getManufacturerInstance(phone, address);
             })
+            .limit(2)
             .toList();
         repository.saveAll(manufacturersPersisted);
     }

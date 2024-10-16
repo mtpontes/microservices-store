@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -61,14 +61,13 @@ class AdminManufacturerControllerIntegrationTest {
         @Autowired PhoneUtils phoneUtils,
         @Autowired AddressUtils addressUtils
     ) {
-        manufacturersPersisted = IntStream.range(0, 3)
-            .mapToObj(flux -> {
+        manufacturersPersisted = Stream.generate(() -> {
                 Phone phone = phoneUtils.getPhoneInstance();
                 Address address = addressUtils.getAddressInstance();
                 return manufacturerUtils.getManufacturerInstance(phone, address);
             })
-            .collect(Collectors.toList());
-        repository.saveAll(manufacturersPersisted);
+            .limit(3)
+            .collect(Collectors.collectingAndThen(Collectors.toList(), result -> repository.saveAll(result)));
     }
 
     @Rollback

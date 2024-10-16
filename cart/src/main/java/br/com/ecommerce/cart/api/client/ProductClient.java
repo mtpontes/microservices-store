@@ -20,11 +20,6 @@ public interface ProductClient {
 	Map<String, InternalProductDataDTO> getPrices(@RequestParam("productIds") Set<String> productsId);
 
 	@GetMapping(
-		value = "/internal/products/prices/{productId}",
-		headers = {"Content-Type: application/json"})
-	InternalProductDataDTO getPrice(@PathVariable("productId") String productId);
-
-	@GetMapping(
 		value = "/internal/products/exists/{productId}",
 		headers = {"Content-Type: application/json"})
 	ResponseEntity<Void> existsProduct(@PathVariable("productId") String productId);

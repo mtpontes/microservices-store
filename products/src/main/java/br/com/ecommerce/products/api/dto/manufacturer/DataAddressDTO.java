@@ -1,5 +1,7 @@
 package br.com.ecommerce.products.api.dto.manufacturer;
 
+import java.io.Serializable;
+
 import br.com.ecommerce.products.infra.entity.manufacturer.Address;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataAddressDTO {
+public class DataAddressDTO implements Serializable {
 
     @NotBlank
     private String street;
