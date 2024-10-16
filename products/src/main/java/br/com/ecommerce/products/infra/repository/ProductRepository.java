@@ -32,9 +32,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 
     boolean existsByName(String name);
 
-    @Query("SELECT p FROM Product p WHERE p.price.onPromotion = true AND p.price.endOfPromotion BETWEEN :now AND :oneHourLater")
-    Set<Product> findAllOnPromotionEndingWithinNextHour(LocalDateTime now, LocalDateTime oneHourLater);
+    @Query("SELECT p FROM Product p WHERE p.price.onPromotion = true AND p.price.endOfPromotion BETWEEN :init AND :hoursLater")
+    Set<Product> findAllOnPromotionEndingBetween(LocalDateTime init, LocalDateTime hoursLater);
 
-    @Query("SELECT p FROM Product p WHERE p.price.onPromotion = true AND p.price.endOfPromotion < CURRENT_TIMESTAMP")
-    Set<Product> findAllWithExpiredPromotions();
+    @Query("SELECT p FROM Product p WHERE p.price.onPromotion = true AND p.price.endOfPromotion < :now")
+    Set<Product> findAllWithExpiredPromotions(LocalDateTime now);
+
+    @Query("SELECT p FROM Product p WHERE p.price.onPromotion = true AND p.price.endOfPromotion > :now")
+    Set<Product> findAllPromotionalProducts(LocalDateTime now);
+    
+
 }
