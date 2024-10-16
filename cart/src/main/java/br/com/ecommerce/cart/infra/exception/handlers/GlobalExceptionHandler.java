@@ -65,7 +65,8 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(EmptyCartException.class)
 	public ResponseEntity<ResponseError> handlerError400(EmptyCartException ex) {
-		return ResponseEntity.badRequest()
+		return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(),
 				badRequest.getReasonPhrase(),
@@ -76,7 +77,8 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ResponseError> handleError400(MethodArgumentNotValidException ex) {
 		var fields = ex.getFieldErrors().stream()
 			.collect(Collectors.toMap(f -> f.getField().toString(), f -> f.getDefaultMessage()));
-		return ResponseEntity.badRequest()
+		return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(),
 				badRequest.getReasonPhrase(),
@@ -86,7 +88,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HandlerMethodValidationException.class)
 	public ResponseEntity<ResponseErrorWithoutMessage> handleError400(HandlerMethodValidationException ex) {
 		return ResponseEntity
-			.status(badRequest.value())
+			.badRequest()
 			.body(new ResponseErrorWithoutMessage(
 				badRequest.value(),
 				badRequest.getReasonPhrase()));
@@ -94,7 +96,8 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ResponseError> handlerErro400(IllegalArgumentException ex) {
-		return ResponseEntity.badRequest()
+		return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(), 
 				badRequest.getReasonPhrase(),
@@ -103,7 +106,8 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ResponseError> handlerErro400(HttpMessageNotReadableException ex) {
-		return ResponseEntity.badRequest()
+		return ResponseEntity
+			.badRequest()
 			.body(new ResponseError(
 				badRequest.value(), 
 				badRequest.getReasonPhrase(),
@@ -132,7 +136,8 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?> handlerMissingRequestHeaderException(MissingRequestHeaderException ex) {
 		String headerName = ex.getHeaderName();
 		if (headerName.contains("X-anon-cart-id")) 
-			return ResponseEntity.badRequest()
+			return ResponseEntity
+				.badRequest()
 				.body(new ResponseError(
 					badRequest.value(), 
 					badRequest.getReasonPhrase(),
@@ -144,7 +149,8 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseError> handleError500(Exception ex) {
 		ex.printStackTrace();
-		return ResponseEntity.internalServerError()
+		return ResponseEntity
+			.internalServerError()
 			.body(new ResponseError(
 				internalServerError.value(),
 				internalServerError.getReasonPhrase(),
