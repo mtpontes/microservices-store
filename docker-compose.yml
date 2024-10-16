@@ -19,7 +19,7 @@ services:
       - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
-      start_period: 30s
+      start_period: 20s
       interval: 15s
       timeout: 5s
       retries: 10
@@ -37,7 +37,7 @@ services:
       - "27017:27017"
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "127.0.0.1/test", "--eval", "'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"]
-      start_period: 30s
+      start_period: 20s
       interval: 15s
       timeout: 5s
       retries: 10
@@ -54,10 +54,24 @@ services:
       - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      start_period: 30s
+      start_period: 20s
       interval: 15s
       timeout: 5s
       retries: 10
+
+  redis:
+    image: redis:7.2
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   eureka-service:
     build:
@@ -133,6 +147,7 @@ services:
       - ./repo/env/springdoc.env
     environment:
       DB_HOST: mysql
+      REDIS_HOST: redis
       RABBIT_HOST: rabbitmq
       EUREKA_HOST: eureka-service
       GATEWAY_NAME: gateway
@@ -142,6 +157,8 @@ services:
       - microservices-network
     depends_on:
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
