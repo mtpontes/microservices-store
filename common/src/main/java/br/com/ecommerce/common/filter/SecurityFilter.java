@@ -15,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import br.com.ecommerce.common.exception.CustomForbiddenException;
+import br.com.ecommerce.common.exception.InvalidTokenException;
 import br.com.ecommerce.common.jwt.TokenDecoderService;
 import br.com.ecommerce.common.user.UserDetailsImpl;
 import jakarta.servlet.FilterChain;
@@ -75,18 +77,18 @@ public class SecurityFilter extends OncePerRequestFilter {
     private String getUserId(DecodedJWT jwtDecoded) {
         return Optional.ofNullable(jwtDecoded.getClaim("userId"))
             .map(Claim::asString)
-            .orElseThrow(() -> new RuntimeException("Missing header 'X-auth-user-id'"));
+            .orElseThrow(() -> new InvalidTokenException("User ID not found in JWT claim"));
     }
 
     private String getUserUsername(DecodedJWT jwtDecoded) {
         return Optional.ofNullable(jwtDecoded.getSubject())
-            .orElseThrow(() -> new RuntimeException("Missing header 'X-auth-user-username'"));
+            .orElseThrow(() -> new InvalidTokenException("User username not found in JWT claim"));
     }
 
     private String getUserRoles(DecodedJWT jwtDecoded) {
         return Optional.ofNullable(jwtDecoded.getClaim("roles"))
             .map(Claim::asString)
-            .orElseThrow(() -> new RuntimeException("Missing header 'X-auth-user-role'"));
+            .orElseThrow(() -> new CustomForbiddenException("User roles not found in JWT claim"));
     }
 
     private UserDetails createUserRepresentation(DecodedJWT jwt) {
