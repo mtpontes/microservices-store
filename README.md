@@ -77,8 +77,6 @@ To access it, run the containers and access the [documentation entry point](http
 > - Endpoints with "Internal" prefix do not accept external calls
 > - The Accounts service is responsible for always creating a default administrator user, using the ADMIN_USERNAME and ADMIN_PASSWORD environment variables
 
----
-
 <details>
   <summary><h3> Authentication and Authorization Flow</h3></summary>
 
