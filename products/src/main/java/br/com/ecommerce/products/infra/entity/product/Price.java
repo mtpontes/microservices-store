@@ -8,7 +8,9 @@ import java.util.Optional;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @ToString
 @Embeddable
@@ -17,7 +19,8 @@ public class Price implements Serializable {
     private BigDecimal currentPrice;
     private BigDecimal originalPrice;
     private BigDecimal promotionalPrice;
-    private LocalDateTime endOfPromotion;
+    private LocalDateTime startPromotion;
+    private LocalDateTime endPromotion;
     private boolean onPromotion;
 
     public Price() {
@@ -30,46 +33,56 @@ public class Price implements Serializable {
         this.onPromotion = false;
     }
 
-    public Price(BigDecimal originalPrice, BigDecimal promotionalPrice) {
-        this.originalPrice = checkPrice(originalPrice);
-        this.promotionalPrice = checkPromotionPrice(promotionalPrice);
-        this.currentPrice = originalPrice;
-        this.onPromotion = false;
+    public void setPromotionalPrice(BigDecimal newPromotionalPrice) {
+        this.promotionalPrice = this.checkPromotionPrice(newPromotionalPrice);
     }
-
      
-    public void currentToOriginal() {
+    public void closePromotion() {
         this.currentPrice = this.originalPrice;
-        this.endOfPromotion = null;
+        this.endPromotion = null;
+        this.startPromotion = null;
         this.onPromotion = false;
     }
-    
-    public void currentToPromotional(LocalDateTime endPromotion) {
-        this.endOfPromotion = Optional.ofNullable(endPromotion)
-            .filter(date -> date.isAfter(LocalDateTime.now()))
-            .orElseThrow(() -> new IllegalArgumentException("Enter a valid end date for the promotion"));
 
+    public void initiateAPromotion() {
         this.currentPrice = Optional.ofNullable(this.promotionalPrice)
             .filter(promo -> promo.compareTo(BigDecimal.ZERO) > 0)
-            .orElseThrow(() -> new IllegalArgumentException("It is not possible to change the current price as the " + 
-                "promotional price is null"));
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unable to start a promotion because the promotional price is null"));
         this.onPromotion = true;
+    }
+
+    public void setStartPromotion(LocalDateTime start) {
+        if (this.isPastDate(start)) 
+            throw new IllegalArgumentException("Invalid start date, please enter a future date");
+        if (this.promotionalPrice == null)
+            throw new IllegalArgumentException(
+                "It is not possible to schedule a promotion while the promotional price of the product is non-existent");
+        this.startPromotion = start;
+    }
+    
+    public void setEndPromotion(LocalDateTime end) {
+        if (this.isPastDate(end)) throw new IllegalArgumentException("Invalid end date, please enter a future date");
+        this.endPromotion = end;
     }
 
     private BigDecimal checkPrice(BigDecimal price) {
         return Optional.ofNullable(price)
             .filter(original -> original.compareTo(BigDecimal.ZERO) > 0)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Price must be a positive value"));
+            .orElseThrow(() -> new IllegalArgumentException("Price must be a positive value"));
     }
 
     private BigDecimal checkPromotionPrice(BigDecimal promotional) {
         if (promotional == null) return null; 
 
         return Optional.of(promotional)
-            .filter(promo -> promo.compareTo(this.originalPrice) < 0)
             .filter(promo -> promo.compareTo(BigDecimal.ZERO) > 0)
+            .filter(promo -> promo.compareTo(this.originalPrice) < 0)
             .orElseThrow(() -> new IllegalArgumentException(
-                "Promotional price must be a lower than original Price"));
+                "The promotional price must be lower than the original price and must not be equal to zero"));
+    }
+
+    private boolean isPastDate(LocalDateTime date) {
+        return date.isBefore(LocalDateTime.now());
     }
 }

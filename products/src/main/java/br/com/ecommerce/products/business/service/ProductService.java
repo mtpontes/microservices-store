@@ -20,12 +20,15 @@ import br.com.ecommerce.products.api.dto.product.DataProductStockDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
 import br.com.ecommerce.products.api.dto.product.ProductUnitsRequestedDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionResponseDTO;
 import br.com.ecommerce.products.api.dto.product.StockWriteOffDTO;
 import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
+import br.com.ecommerce.products.api.dto.product.UpdatePromotionalPriceDTO;
 import br.com.ecommerce.products.api.mapper.PriceMapper;
 import br.com.ecommerce.products.api.mapper.ProductMapper;
 import br.com.ecommerce.products.api.mapper.StockMapper;
@@ -42,6 +45,8 @@ import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundExcep
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.infra.repository.ProductRepository;
+import br.com.ecommerce.products.infra.scheduling.scheduler.PriceJobScheduler;
+import br.com.ecommerce.products.infra.scheduling.scheduler.PriceJobScheduler.PromotionOperation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -64,7 +69,9 @@ public class ProductService {
 
 	private final UniqueNameProductValidator uniqueNameValidator;
 
-	private final PriceJobService priceScheduler;
+	private final PriceJobScheduler priceScheduler;
+
+	private final PromotionService promotionService;
 
 
 	@Cacheable(cacheNames = CacheName.PRODUCTS, key = "#id")
@@ -135,41 +142,70 @@ public class ProductService {
 	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
 	public UpdateProductPriceResponseDTO updateProductPrice(Long id, UpdatePriceDTO dto) {
 		return productRepository.findById(id)
-			.map(p -> {
-				Price newPrice = priceMapper.toPrice(dto);
-				p.updatePrice(newPrice);
-				return productRepository.save(p);
-			})
-			.map(this::createUpdateProductPriceResponseDTO)
-			.orElseThrow(ProductNotFoundException::new);
-	}
-
-	@Transactional
-	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
-	public UpdateProductPriceResponseDTO switchCurrentPriceToOriginal(Long id) {
-		return productRepository.findById(id)
-			.map(p -> {
-				p.switchPriceToOriginal();
-				return productRepository.save(p);
-			})
-			.stream()
-				.peek(product -> priceScheduler.removeRedundantSchedulePromotion(product.getId()))
-				.findFirst()
-			.map(this::createUpdateProductPriceResponseDTO)
-			.orElseThrow(ProductNotFoundException::new);
-	}
-
-	@Transactional
-	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
-	public UpdateProductPriceResponseDTO switchCurrentPriceToPromotional(Long id, LocalDateTime endOfPromotion) {
-		return productRepository.findById(id)
 			.map(product -> {
-				product.switchPriceToPromotional(endOfPromotion);
+				Price newPrice = priceMapper.toPrice(dto);
+				product.updatePrice(newPrice);
 				return productRepository.save(product);
 			})
-			.stream()
-				.peek(p -> priceScheduler.createScheduleForEndOfPromotion(id, endOfPromotion))
-				.findFirst()
+			.map(this::createUpdateProductPriceResponseDTO)
+			.orElseThrow(ProductNotFoundException::new);
+	}
+
+	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
+	public UpdateProductPriceResponseDTO updateProductPricePromotional(Long id, UpdatePromotionalPriceDTO dto) {
+		return productRepository.findById(id)
+			.map(product -> {
+				product.getPrice().setPromotionalPrice(dto.getPrice());
+				return productRepository.save(product);
+			})
+			.map(this::createUpdateProductPriceResponseDTO)
+			.orElseThrow(ProductNotFoundException::new);
+	}
+
+	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
+	public UpdateProductPriceResponseDTO startPromotionImediatly(Long id, LocalDateTime endPromotion) {
+		return productRepository.findById(id)
+			.map(product -> {
+				product.getPrice().setEndPromotion(endPromotion);
+				product.startPromotion();
+				productRepository.save(product);
+
+				priceScheduler.createSchedulerForPromotionEnd(product.getId(), endPromotion);
+				promotionService.createCacheForProductOnPromotion(product);
+				return product;
+			})
+			.map(this::createUpdateProductPriceResponseDTO)
+			.orElseThrow(ProductNotFoundException::new);
+	}
+
+	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
+	public SchedulePromotionResponseDTO schedulePromotion(Long id, SchedulePromotionDTO data) {
+		return productRepository.findById(id)
+			.map(product -> {
+				product.getPrice().setStartPromotion(data.getStart());
+				product.getPrice().setEndPromotion(data.getEnd());
+				product = productRepository.save(product);
+
+				priceScheduler.createSchedulerForPromotionStart(product.getId(), data.getStart(), data.getEnd());
+				return product;
+			})
+			.map(productMapper::toSchedulePromotionResponseDTO)
+			.orElseThrow(ProductNotFoundException::new);
+	}
+
+	@Transactional
+	@CacheEvict(cacheNames = CacheName.PRODUCTS, key = "#id")
+	public UpdateProductPriceResponseDTO closePromotion(Long id) {
+		return productRepository.findById(id)
+			.map(product -> {
+				product.endPromotion();
+				product = productRepository.save(product);
+				priceScheduler.removeRedundantSchedulePromotion(product.getId(), PromotionOperation.END_PROMOTION);
+				return product;
+			})
 			.map(this::createUpdateProductPriceResponseDTO)
 			.orElseThrow(ProductNotFoundException::new);
 	}
@@ -191,13 +227,11 @@ public class ProductService {
 	@CacheEvict(cacheNames = CacheName.PRODUCTS, allEntries = true)
 	public void updateStocks(List<StockWriteOffDTO> dto) {
 		Map<Long, Integer> writeOffValueMap = dto.stream()
-			.collect(Collectors.toMap(
-				StockWriteOffDTO::getProductId, StockWriteOffDTO::getUnit));
+			.collect(Collectors.toMap(StockWriteOffDTO::getProductId, p -> (p.getUnit() < 0) ? p.getUnit() : Math.negateExact(p.getUnit())));
 		
-		productRepository.findAllById(dto.stream()
-			.map(StockWriteOffDTO::getProductId)
-			.toList())
-				.forEach(p -> p.updateStock(writeOffValueMap.get(p.getId())));
+		Set<Long> ids = dto.stream().map(StockWriteOffDTO::getProductId).collect(Collectors.toSet());
+		productRepository.findAllById(ids)
+			.forEach(p -> p.updateStock(writeOffValueMap.get(p.getId())));
 	}
 
 	@Transactional

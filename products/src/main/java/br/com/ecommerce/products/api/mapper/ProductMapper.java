@@ -12,6 +12,7 @@ import br.com.ecommerce.products.api.dto.product.DataProductDTO;
 import br.com.ecommerce.products.api.dto.product.DataProductPriceDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.InternalProductDataDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionResponseDTO;
 import br.com.ecommerce.products.api.dto.product.SimplePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
@@ -101,5 +102,9 @@ public class ProductMapper {
         return Optional.ofNullable(data)
             .map(p -> new DataProductPriceDTO(p.getId(), p.getPrice().getCurrentPrice()))
             .orElse(null);
+    }
+
+    public SchedulePromotionResponseDTO toSchedulePromotionResponseDTO(Product data) {
+        return new SchedulePromotionResponseDTO(data.getId(), data.getName(), data.getPrice());
     }
 }

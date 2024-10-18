@@ -25,7 +25,7 @@ class PriceTest {
             Price price = new Price(positiveOriginalPrice);
             assertEquals(positiveOriginalPrice, price.getOriginalPrice());
             assertEquals(expectedCurrentPrice, price.getCurrentPrice());
-            assertEquals(expectedEndPromotion, price.getEndOfPromotion());
+            assertEquals(expectedEndPromotion, price.getEndPromotion());
             assertFalse(price.isOnPromotion());
         });
     }
@@ -37,7 +37,8 @@ class PriceTest {
         final BigDecimal expectedCurrentPrice = positiveOriginalPrice;
 
         assertDoesNotThrow(() -> {
-            Price price = new Price(positiveOriginalPrice, positivePromotionalPrice);
+            Price price = new Price(positiveOriginalPrice);
+            price.setPromotionalPrice(positivePromotionalPrice);
             assertEquals(positiveOriginalPrice, price.getOriginalPrice());
             assertEquals(positivePromotionalPrice, price.getPromotionalPrice());
             assertEquals(expectedCurrentPrice, price.getCurrentPrice());
@@ -49,30 +50,28 @@ class PriceTest {
         final BigDecimal positiveOriginalPrice = BigDecimal.valueOf(50);
 
         assertDoesNotThrow(() -> {
-            Price price = new Price(positiveOriginalPrice, null);
+            Price price = new Price(positiveOriginalPrice);
             assertEquals(positiveOriginalPrice, price.getOriginalPrice());
         });
     }
 
     @Test
-    void testCreatePrice_onlyWithOriginalPriceNull() {
-        final BigDecimal nullValue = BigDecimal.valueOf(0);
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> new Price(nullValue, null));
-    }
+    void testCreatePrice_withOriginalPriceEqualsZeroAndLowerThanZero() {
+        // arrange
+        final BigDecimal nullValue = null;
+        final BigDecimal zero = BigDecimal.ZERO;
+        final BigDecimal negative = BigDecimal.valueOf(50).negate();
 
-    @Test
-    void testCreatePrice_withOriginalPriceNegative() {
-        final BigDecimal negative = BigDecimal.valueOf(-50);
+        // assert
         assertThrows(
             IllegalArgumentException.class,
-            () -> new Price(negative, null));
-
-        final BigDecimal zero = BigDecimal.valueOf(0);
+            () -> new Price(nullValue));
         assertThrows(
             IllegalArgumentException.class,
-            () -> new Price(zero, null));
+            () -> new Price(zero));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new Price(negative));
     }
 
     @Test
@@ -83,28 +82,115 @@ class PriceTest {
 
         assertThrows(
             IllegalArgumentException.class,
-            () -> new Price(original, promotionalEquals));
+            () -> {
+                Price price = new Price(original);
+                price.setPromotionalPrice(promotionalEquals);
+            });
 
         assertThrows(
             IllegalArgumentException.class,
-            () -> new Price(original, promotionalGreaterThan));
+            () -> {
+                Price price = new Price(original);
+                price.setPromotionalPrice(promotionalGreaterThan);
+            });
     }
 
     @Test
-    void testSwitchCurrentPrice() {
+    void testSetPromotionalPrice() {
+        // arrange
+        final Price price = new Price(BigDecimal.TEN);
+        final var originalPrice = price.getOriginalPrice();
+        
+        // act and assert
+        final var greaterThanOriginalPrice = originalPrice.multiply(BigDecimal.TEN);
+
+        assertDoesNotThrow(() -> price.setPromotionalPrice(null)); // accepts null
+        
+        assertThrows(
+            IllegalArgumentException.class, 
+            () -> price.setPromotionalPrice(BigDecimal.ZERO));
+        
+        assertThrows(
+            IllegalArgumentException.class, 
+            () -> price.setPromotionalPrice(BigDecimal.TEN.negate()));
+        
+        assertThrows(
+            IllegalArgumentException.class, 
+            () -> price.setPromotionalPrice(greaterThanOriginalPrice));
+    }
+
+    @Test
+    void testSetStartPromotion() {
+        // arrange
+        final Price price = new Price(BigDecimal.TEN);
+        
+        // act and assert
+        final var pastDate = LocalDateTime.now().minusDays(1);
+        assertThrows(IllegalArgumentException.class, () -> price.setStartPromotion(pastDate));
+        
+        // the product does not have a defined promotionalPrice
+        final var validDate = LocalDateTime.now().plusDays(1);
+        assertThrows(IllegalArgumentException.class, () -> price.setStartPromotion(validDate));
+    }
+
+    @Test
+    void testSetEndPromotion() {
+        // arrange
+        final Price price = new Price(BigDecimal.TEN);
+        
+        // act and assert
+        final var pastDate = LocalDateTime.now().minusDays(1);
+        assertThrows(IllegalArgumentException.class, () -> price.setStartPromotion(pastDate));
+    }
+
+    @Test
+    void testInitiateAPromotion01() {
+        // arrange
         final BigDecimal original = BigDecimal.valueOf(50);
         final BigDecimal promotional = original.divide(BigDecimal.valueOf(2));
-        final Price price = new Price(original, promotional);
         final LocalDateTime endOfPromotion = LocalDateTime.now().plusDays(1);
+        final Price price = new Price(original);
+        price.setPromotionalPrice(promotional);
         
-        price.currentToPromotional(endOfPromotion);
+        // act
+        price.setEndPromotion(endOfPromotion);
+        price.initiateAPromotion();
+
+        // assert
         assertEquals(price.getPromotionalPrice(), price.getCurrentPrice());
-        assertEquals(endOfPromotion, price.getEndOfPromotion());
+        assertEquals(endOfPromotion, price.getEndPromotion());
         assertTrue(price.isOnPromotion());
+    }
+
+    @Test
+    void testInitiateAPromotion02_withoutAPromotionalPrice() {
+        // arrange
+        final BigDecimal original = BigDecimal.valueOf(50);
+        final LocalDateTime endOfPromotion = LocalDateTime.now().plusDays(1);
+        final Price price = new Price(original);
         
-        price.currentToOriginal();
+        // act
+        price.setEndPromotion(endOfPromotion);
+        assertThrows(IllegalArgumentException.class, () -> price.initiateAPromotion());
+    }
+
+    @Test
+    void testClosePromotion() {
+        // arrange
+        final BigDecimal original = BigDecimal.valueOf(50);
+        final BigDecimal promotional = original.divide(BigDecimal.valueOf(2));
+        final LocalDateTime endOfPromotion = LocalDateTime.now().plusDays(1);
+        final Price price = new Price(original);
+        price.setPromotionalPrice(promotional);
+        
+        // act
+        price.setEndPromotion(endOfPromotion);
+        price.initiateAPromotion();
+        price.closePromotion();
+
+        // assert
         assertEquals(price.getOriginalPrice(), price.getCurrentPrice());
-        assertEquals(null, price.getEndOfPromotion());
+        assertEquals(null, price.getEndPromotion());
         assertFalse(price.isOnPromotion());
     }
 }

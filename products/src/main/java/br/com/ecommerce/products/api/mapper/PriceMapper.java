@@ -13,9 +13,13 @@ import br.com.ecommerce.products.infra.entity.product.Price;
 public class PriceMapper {
 
     public Price toPrice(UpdatePriceDTO data) {
-        return Optional.ofNullable(data)
-            .map(p -> new Price(p.getOriginalPrice(), data.getPromotionalPrice()))
-            .orElse(null);
+        return new Price(data.getPrice());
+    }
+
+    public Price toPriceWithPromotionalPrice(Price origin, UpdatePriceDTO data) {
+        Price price = new Price(origin.getOriginalPrice());
+        price.setPromotionalPrice(data.getPrice());
+        return price;
     }
 
     public CompletePriceDataDTO toCompletePriceDataDTO(Price data) {
@@ -25,7 +29,8 @@ public class PriceMapper {
                 p.getOriginalPrice(), 
                 p.getPromotionalPrice(), 
                 p.isOnPromotion(),
-                p.getEndOfPromotion()))
+                p.getStartPromotion(),
+                p.getEndPromotion()))
             .orElse(null);
     }
 
@@ -35,7 +40,8 @@ public class PriceMapper {
                 p.getCurrentPrice(),
                 p.getOriginalPrice(), 
                 data.isOnPromotion(),
-                data.getEndOfPromotion()))
+                data.getStartPromotion(),
+                data.getEndPromotion()))
             .orElse(null);
     }
 }

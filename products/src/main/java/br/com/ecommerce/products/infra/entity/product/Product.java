@@ -105,12 +105,12 @@ public class Product implements Serializable {
 		this.price = price;
 	}
 
-	public void switchPriceToOriginal() {
-		this.price.currentToOriginal();
+	public void endPromotion() {
+		this.price.closePromotion();
 	}
 
-	public void switchPriceToPromotional(LocalDateTime endOfPromotion) {
-		this.price.currentToPromotional(endOfPromotion);
+	public void startPromotion() {
+		this.price.initiateAPromotion();
 	}
 
 	private <T> T notNull(T attribute, String attributeName) {
