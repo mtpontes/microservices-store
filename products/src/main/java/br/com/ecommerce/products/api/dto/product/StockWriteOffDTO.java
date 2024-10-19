@@ -18,6 +18,6 @@ public class StockWriteOffDTO {
 
 	public StockWriteOffDTO(Long productId, Integer unit) {
 		this.productId = productId;
-		this.unit = Math.negateExact(unit);
+		this.unit = unit > 0 ? Math.negateExact(unit) : unit;
 	} 
 }

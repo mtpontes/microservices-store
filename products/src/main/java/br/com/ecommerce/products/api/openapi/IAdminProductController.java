@@ -15,11 +15,14 @@ import br.com.ecommerce.products.api.dto.product.DataProductDTO;
 import br.com.ecommerce.products.api.dto.product.DataProductStockDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.EndOfPromotionDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
+import br.com.ecommerce.products.api.dto.product.UpdatePromotionalPriceDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -160,26 +163,27 @@ public interface IAdminProductController {
     );
     
     @Operation(
-        summary = "Update product prices",
+        summary = "Update product price",
         description = 
             """
-            Updates the prices of a product.
+            Updates the default price of a product, the `originalPrice` attribute. Along with it, the
+            `currentPrice` attribute, which represents the final value of the product.
+
+            ### Requirements
+            1. When you set a new price, you are not just changing the `originalPrice` attribute, you are changing the entire 
+            the Price object. All data related to it will be lost, such as promotional price, promotion, dates
+            start and end of promotion.
     
             ### Validations:
     
-            1. **Negative values are not allowed**: All prices must be positive numbers.
-            2. **'promotionalPrice' must be less than 'originalPrice'**: The promotional price, if present, must 
-            always be less than the original price.
-    
-            ### Optional Fields:
-            - `promotionalPrice`: Can be null.
+            1. **Negative or zero values ​​are not allowed**: The price must be a positive value greater than 0.
     
             ### Notes:
             - `currentPrice`: This is considered the final price of the product. By default, the 
             `currentPrice` is equal to the `originalPrice`. If you want the promotional price to be considered 
-            the current price, use the endpoint `/products/{productId}/prices/switch-to-promotional` to create 
-            a promotion period for the product. The promotion sets the `currentPrice` to the value of `promotionalPrice` for a 
-            determined period.
+            the current price, use the endpoint `/products/{productId}/prices/promotion` to create a promotion or
+            use the `/products/{productId}/prices/promotion/schedule` endpoint to schedule a promotion. 
+            The promotion sets the `currentPrice` to the value of `promotionalPrice` for a determined period.
             """,
         responses = {
             @ApiResponse(
@@ -203,6 +207,40 @@ public interface IAdminProductController {
     );
     
     @Operation(
+        summary = "Update product promotional price",
+        description = 
+            """
+            Updates the promotional price of a product.
+    
+            ### Validations:
+    
+            1. **Null is allowed**: This is a way for you to remove the value from `promotionalPrice`
+            2. **Negative or zero values ​​are not allowed**: The price must be a positive value greater than 0.
+            3. **Must be less than 'originalPrice'**: The promotional price, must always be less than the original 
+            price.
+            """,
+        responses = {
+            @ApiResponse(
+                description = "Success", 
+                responseCode = "200",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SimpleDataDepartmentDTO.class)
+            )), 
+            @ApiResponse(
+                description = "Invalid field values", 
+                responseCode = "400",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseError.class)
+            ))
+        })
+    public ResponseEntity<UpdateProductPriceResponseDTO> updatePromotionalPrice(
+        @PathVariable Long productId, 
+        @RequestBody UpdatePromotionalPriceDTO dto
+    );
+    
+    @Operation(
         summary = "Start a promotion",
         description = 
             """
@@ -212,7 +250,7 @@ public interface IAdminProductController {
         
             ### Requirements:
             - The `promotionalPrice` must be set on the product before using this endpoint.
-            - An expiration date (`endOfPromotion`) for the promotion must be provided.
+            - An expiration date (`endPromotion`) for the promotion must be provided.
         
             ### Transition Rules:
             - **During the promotion**: The `currentPrice` reflects the value of `promotionalPrice`.
@@ -238,19 +276,61 @@ public interface IAdminProductController {
                     schema = @Schema(implementation = ResponseError.class)
             ))
         })
-    public ResponseEntity<UpdateProductPriceResponseDTO> switchCurrentPriceToPromotionalPrice(
+    public ResponseEntity<UpdateProductPriceResponseDTO> iniciatePromotion(
         @PathVariable Long productId,
         @RequestBody @Valid EndOfPromotionDTO requestBody
+    );
+
+    @Operation(
+        summary = "Schedule promotion",
+        description = 
+            """
+            It does the same thing as the `Start a promotion` endpoint, with the difference that you can provide a 
+            promotion start date and an end date. The system takes care of the rest, automating the 
+            the beginning and end of the promotion.
+        
+            ### Requisitos:
+            - `promotionalPrice` must be set in the product before using this endpoint.
+            - An expiration date (`endPromotion`) must be provided for the promotion.
+        
+            ### Transition Rules:
+            -**During the promotion**: The `currentPrice` reflects the value of `promotionalPrice`.
+            -**After promotion ends**: The `current Price` reverts to the `original Price` value.
+            
+            ### Validações:
+            1. **Past dates are not allowed**: The due date must be in the future.
+            2. **The promotional price must be lower than the original price**.
+            """,
+        responses = {
+            @ApiResponse(
+                description = "Success", 
+                responseCode = "200",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SimpleDataDepartmentDTO.class)
+            )), 
+            @ApiResponse(
+                description = "Invalid field values", 
+                responseCode = "400",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseError.class)
+            ))
+        })
+    public ResponseEntity<SchedulePromotionResponseDTO> schedulePromotion(
+		@PathVariable Long productId,
+		@RequestBody @Valid SchedulePromotionDTO requestBody
     );
     
     @Operation(
         summary = "End promotion",
         description = 
             """
-            Returns the product to its normal state, restoring the `currentPrice` to the value of `originalPrice`.
+            Força o término da promoção de um produto. Retorna o produto ao seu estado normal, restaurando 
+            `currentPrice` para o valor de `originalPrice`.
     
-            - The final price of the product will be updated to the original value that was configured before the promotion.
-            - No additional information needs to be provided for this operation.
+            - The final price of the product will be updated to the original value that was configured before the 
+            promotion.
             """,
         responses = {
             @ApiResponse(
@@ -261,7 +341,7 @@ public interface IAdminProductController {
                     schema = @Schema(implementation = SimpleDataDepartmentDTO.class)
             ))
         })
-    public ResponseEntity<UpdateProductPriceResponseDTO> switchCurrentPriceToOriginalPrice(@PathVariable Long productId);
+    public ResponseEntity<UpdateProductPriceResponseDTO> finalizePromotion(@PathVariable Long productId);
     
     @Operation(
         summary = "Add main product image",

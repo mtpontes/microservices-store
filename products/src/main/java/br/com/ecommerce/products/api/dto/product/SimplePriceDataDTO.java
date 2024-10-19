@@ -16,5 +16,6 @@ public class SimplePriceDataDTO implements Serializable {
     private BigDecimal currentPrice;
     private BigDecimal originalPrice;
     private boolean onPromotion;
-    private LocalDateTime endOfPromotion;
+    private LocalDateTime startPromotion;
+    private LocalDateTime endPromotion;
 }

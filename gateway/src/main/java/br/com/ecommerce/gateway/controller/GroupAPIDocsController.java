@@ -48,7 +48,7 @@ public class GroupAPIDocsController {
                     String.format("%s/%s/v3/api-docs", url, service), 
                     "Microservice: " + service.toUpperCase())));
         swaggerConfig.put("urls", swaggerUrls);
-        log.debug("ROTAS: {}", swaggerConfig);
+        log.debug("ROUTES: {}", swaggerConfig);
         return swaggerConfig;
     }
 }
