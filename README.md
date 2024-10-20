@@ -107,14 +107,30 @@ To access it, run the containers and access the [documentation entry point](http
 ### Products
 - Allows you to create departments, categories, manufacturers and products
 - To create a category, you must create a department
+
 - To create a product, you must provide a category and a manufacturer
-  - Products are created without a price, and you must price them later
+  - Products are created without:
+    - Main image and image collection
+    - Standard and promotional prices
+    - Stock
+
 - Allows you to create product promotions
-  - Promotions use a scheduler to schedule the end of promotions.
-  - Every time the application starts, it checks all products whose promotions expire within 1 hour, defining a scheduler that triggers the change of the promotional price to the original price.
-  - At every zero hour, it also checks all products whose promotions expire within 1 hour and defines a scheduler for each one.
-  - When the application starts, it checks all products whose promotions have already expired and restores them to their default state.
-  - All promotion products are cached for best performance.
+  - Promotions use a scheduler to schedule the start and end of promotions.
+  - All promotional products are cached. When a product goes on sale, it is also cached.
+
+  - Promotions can be:
+    - Immediate promotions: Creates a promotion immediately, only informing the end date of the promotion.
+    - Scheduled promotions: Schedule a promotion informing the start and end date.
+  
+  - When starting the system:
+    - It checks all products whose promotions have expired and restores them to their default state.
+    - Defines a scheduler for all products that will enter the promotion within an hour, which triggers the start of a product's promotion.
+    - Defines a scheduler for all products whose promotions expire within 1 hour, which triggers the end of a product's promotion.
+    - Caches all products that are on sale.
+
+  - Every zero hour:
+    - Defines a scheduler for all products that will enter the promotion within 1 hour.
+    - Sets a scheduler for all products that the promotion will expire within an hour.
 
 ---
 
