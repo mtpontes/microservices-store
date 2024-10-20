@@ -2,7 +2,6 @@ package br.com.ecommerce.products.infra.config;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import br.com.ecommerce.products.business.service.PromotionService;
@@ -24,12 +23,7 @@ public class PromotionsConfig {
     @PostConstruct
     public void removeExpiredPromotions() {
         this.promotionService.removeExpiredPromotions();
-        this.promotionService.createSchedulerForPromotionsThatWillExpire();
-    }
-
-    @Scheduled(cron = "0 0 * * * *")
-    public void schedulePromotionReverser() {
-        this.promotionService.createSchedulerForPromotionsThatWillExpire();
+        this.promotionService.createScheduleForPromotionsThatWillExpire();
     }
 
     @PostConstruct

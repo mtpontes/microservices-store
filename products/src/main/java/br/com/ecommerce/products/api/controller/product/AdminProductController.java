@@ -19,16 +19,21 @@ import br.com.ecommerce.products.api.dto.product.DataProductDTO;
 import br.com.ecommerce.products.api.dto.product.DataProductStockDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.EndOfPromotionDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionDTO;
+import br.com.ecommerce.products.api.dto.product.SchedulePromotionResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductImagesResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
+import br.com.ecommerce.products.api.dto.product.UpdatePromotionalPriceDTO;
 import br.com.ecommerce.products.api.openapi.IAdminProductController;
 import br.com.ecommerce.products.business.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/admin/products")
@@ -69,24 +74,40 @@ public class AdminProductController implements IAdminProductController {
 	@PutMapping("/{productId}/prices")
 	public ResponseEntity<UpdateProductPriceResponseDTO> updatePrice(
 		@PathVariable Long productId, 
-		@RequestBody UpdatePriceDTO dto
+		@RequestBody @Valid UpdatePriceDTO dto
 	) {
 		return ResponseEntity.ok(service.updateProductPrice(productId, dto));
 	}
 
-	@PutMapping("/{productId}/prices/switch-to-promotional")
-	public ResponseEntity<UpdateProductPriceResponseDTO> switchCurrentPriceToPromotionalPrice(
+	@PutMapping("/{productId}/prices/promotion")
+	public ResponseEntity<UpdateProductPriceResponseDTO> updatePromotionalPrice(
+		@PathVariable Long productId, 
+		@RequestBody @Valid UpdatePromotionalPriceDTO dto
+	) {
+		return ResponseEntity.ok(service.updateProductPricePromotional(productId, dto));
+	}
+
+	@PutMapping("/{productId}/prices/promotion/start")
+	public ResponseEntity<UpdateProductPriceResponseDTO> iniciatePromotion(
 		@PathVariable Long productId,
 		@RequestBody @Valid EndOfPromotionDTO requestBody
 	) {
-		return ResponseEntity.ok(service.switchCurrentPriceToPromotional(productId, requestBody.getEndOfPromotion()));
+		return ResponseEntity.ok(service.startPromotionImediatly(productId, requestBody.getEndPromotion()));
 	}
 
-	@PutMapping("/{productId}/prices/switch-to-original")
-	public ResponseEntity<UpdateProductPriceResponseDTO> switchCurrentPriceToOriginalPrice(
+	@PutMapping("/{productId}/prices/promotion/schedule")
+	public ResponseEntity<SchedulePromotionResponseDTO> schedulePromotion(
+		@PathVariable Long productId,
+		@RequestBody @Valid SchedulePromotionDTO requestBody
+	) {
+		return ResponseEntity.ok(service.schedulePromotion(productId, requestBody));
+	}
+
+	@PutMapping("/{productId}/prices/promotion/end")
+	public ResponseEntity<UpdateProductPriceResponseDTO> finalizePromotion(
 		@PathVariable Long productId
 	) {
-		return ResponseEntity.ok(service.switchCurrentPriceToOriginal(productId));
+		return ResponseEntity.ok(service.closePromotion(productId));
 	}
 
 	@PatchMapping("/{productId}/images")

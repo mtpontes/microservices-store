@@ -1,11 +1,12 @@
 package br.com.ecommerce.products.unit.business.service;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,20 +24,21 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.quartz.Scheduler;
 
-import br.com.ecommerce.products.api.dto.product.CompletePriceDataDTO;
 import br.com.ecommerce.products.api.dto.product.DataStockDTO;
 import br.com.ecommerce.products.api.dto.product.StockWriteOffDTO;
 import br.com.ecommerce.products.api.dto.product.UpdatePriceDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductPriceResponseDTO;
 import br.com.ecommerce.products.api.dto.product.UpdateProductResponseDTO;
+import br.com.ecommerce.products.api.dto.product.UpdatePromotionalPriceDTO;
 import br.com.ecommerce.products.api.mapper.PriceMapper;
 import br.com.ecommerce.products.api.mapper.ProductMapper;
 import br.com.ecommerce.products.api.mapper.StockMapper;
 import br.com.ecommerce.products.api.mapper.factory.ProductDTOFactory;
-import br.com.ecommerce.products.business.service.PriceJobService;
 import br.com.ecommerce.products.business.service.ProductService;
+import br.com.ecommerce.products.business.service.PromotionService;
 import br.com.ecommerce.products.business.validator.UniqueNameProductValidator;
 import br.com.ecommerce.products.infra.entity.product.Price;
 import br.com.ecommerce.products.infra.entity.product.Product;
@@ -45,6 +47,7 @@ import br.com.ecommerce.products.infra.exception.exceptions.ProductNotFoundExcep
 import br.com.ecommerce.products.infra.repository.CategoryRepository;
 import br.com.ecommerce.products.infra.repository.ManufacturerRepository;
 import br.com.ecommerce.products.infra.repository.ProductRepository;
+import br.com.ecommerce.products.infra.scheduling.scheduler.PriceJobScheduler;
 import br.com.ecommerce.products.utils.builder.ProductTestBuilder;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +63,11 @@ class ProductServiceUnitTest {
     private CategoryRepository categoryRepository;
     @Mock
     private ManufacturerRepository manufacturerRepository;
+    @Mock
+    private Scheduler scheduler;
+    @Mock
+    private PromotionService promotionService;
+
 
     @Mock
     private ProductDTOFactory dtoFactory;
@@ -75,7 +83,7 @@ class ProductServiceUnitTest {
     private UniqueNameProductValidator uniqueNameValidator;
 
     @Mock
-    private PriceJobService priceScheduler;
+    private PriceJobScheduler priceScheduler;
 
     @InjectMocks
     private ProductService service;
@@ -140,7 +148,8 @@ class ProductServiceUnitTest {
     @DisplayName("Unit - updateProductPrice - Must update product price by product ID")
     void updateProductPriceTest() {
         // arrange
-        Price price = new Price(BigDecimal.valueOf(50), BigDecimal.valueOf(25));
+        Price price = new Price(BigDecimal.valueOf(50));
+        price.setPromotionalPrice(BigDecimal.valueOf(25));
         Product product = new ProductTestBuilder()
             .price(price)
             .build();
@@ -148,9 +157,8 @@ class ProductServiceUnitTest {
         when(repository.findById(anyLong()))
             .thenReturn(Optional.of(product));
 
-        Price newPrice = new Price(BigDecimal.valueOf(100), BigDecimal.valueOf(50));
-        UpdatePriceDTO requestBody = new UpdatePriceDTO(
-            newPrice.getOriginalPrice(), newPrice.getPromotionalPrice());
+        Price newPrice = new Price(BigDecimal.valueOf(100));
+        UpdatePriceDTO requestBody = new UpdatePriceDTO(newPrice.getOriginalPrice());
 
         when(priceMapper.toPrice(eq(requestBody)))
             .thenReturn(newPrice);
@@ -158,9 +166,8 @@ class ProductServiceUnitTest {
         when(repository.save(eq(product)))
             .thenReturn(product);
 
-        UpdateProductPriceResponseDTO response = new UpdateProductPriceResponseDTO();  
         when(productMapper.toUpdateProductPriceResponseDTO(eq(product), any()))
-            .thenReturn(response);
+            .thenReturn(new UpdateProductPriceResponseDTO());
 
         // act
         service.updateProductPrice(1L, requestBody);
@@ -170,56 +177,56 @@ class ProductServiceUnitTest {
             .toUpdateProductPriceResponseDTO(productCaptor.capture(), any());
         Price result = productCaptor.getValue().getPrice();
 
-        assertEquals(requestBody.getOriginalPrice(), result.getOriginalPrice());
-        assertEquals(requestBody.getOriginalPrice(), result.getCurrentPrice());
+        assertEquals(requestBody.getPrice(), result.getOriginalPrice());
+        assertEquals(requestBody.getPrice(), result.getCurrentPrice());
+        assertNull(result.getPromotionalPrice());
+        assertNull(result.getStartPromotion());
+        assertNull(result.getEndPromotion());
     }
 
     @Test
-    @DisplayName("Unit - updateProductPrice - Must update product price by product ID")
-    void switchCurrentPriceToOriginalPriceTest() {
+    @DisplayName("Unit - updateProductPricePromotional - Must update product `promotionalPrice`")
+    void updateProductPricePromotional() {
         // arrange
-        Price price = new Price(BigDecimal.valueOf(50), BigDecimal.valueOf(25));
+        Price price = new Price(BigDecimal.valueOf(50));
         Product product = new ProductTestBuilder()
             .price(price)
             .build();
-
+        
         when(repository.findById(anyLong()))
             .thenReturn(Optional.of(product));
-
+        
+        UpdatePromotionalPriceDTO requestBody = new UpdatePromotionalPriceDTO(BigDecimal.valueOf(price.getCurrentPrice().intValue() / 2));
+        
         when(repository.save(eq(product)))
             .thenReturn(product);
-
-        Price productPrice = product.getPrice();
-;
-        var response = new UpdateProductPriceResponseDTO(
-            product.getId(),
-            product.getName(),
-            new CompletePriceDataDTO(
-                productPrice.getCurrentPrice(),
-                productPrice.getOriginalPrice(),
-                productPrice.getPromotionalPrice(),
-                productPrice.isOnPromotion(),
-                productPrice.getEndOfPromotion())
-        );
+        
+        UpdateProductPriceResponseDTO response = new UpdateProductPriceResponseDTO();  
         when(productMapper.toUpdateProductPriceResponseDTO(eq(product), any()))
             .thenReturn(response);
 
+        final BigDecimal expectedCurrentPrice = price.getOriginalPrice();
+        final BigDecimal expectedOriginalPrice =  expectedCurrentPrice;
+        final BigDecimal expectedPromotionalPrice = requestBody.getPrice();
+
         // act
-        service.switchCurrentPriceToOriginal(1L);
+        service.updateProductPricePromotional(1L, requestBody);
 
         // assert
-        verify(productMapper)
-            .toUpdateProductPriceResponseDTO(productCaptor.capture(), any());
+        verify(repository).save(productCaptor.capture());
         Price result = productCaptor.getValue().getPrice();
 
-        assertEquals(price.getOriginalPrice(), result.getCurrentPrice());
+        assertEquals(expectedCurrentPrice, result.getCurrentPrice());
+        assertEquals(expectedOriginalPrice, result.getOriginalPrice());
+        assertEquals(expectedPromotionalPrice, result.getPromotionalPrice());
     }
 
     @Test
-    @DisplayName("Unit - updateProductPrice - Must update product price by product ID")
-    void switchCurrentPriceToPromotionalPriceTest() {
+    @DisplayName("Unit - startPromotionImediatly")
+    void startPromotionImediatlyTest() {
         // arrange
-        Price price = new Price(BigDecimal.valueOf(50), BigDecimal.valueOf(25));
+        Price price = new Price(BigDecimal.valueOf(50));
+        price.setPromotionalPrice(BigDecimal.valueOf(25));
         Product product = new ProductTestBuilder()
             .price(price)
             .build();
@@ -231,29 +238,64 @@ class ProductServiceUnitTest {
         when(repository.save(eq(product)))
             .thenReturn(product);
 
-        Price productPrice = product.getPrice();
-        var response = new UpdateProductPriceResponseDTO(
-            product.getId(),
-            product.getName(),
-            new CompletePriceDataDTO(
-                productPrice.getCurrentPrice(),
-                productPrice.getOriginalPrice(),
-                productPrice.getPromotionalPrice(),
-                productPrice.isOnPromotion(),
-                productPrice.getEndOfPromotion())
-        );
         when(productMapper.toUpdateProductPriceResponseDTO(eq(product), any()))
-            .thenReturn(response);
+            .thenReturn(new UpdateProductPriceResponseDTO());
 
         // act
-        service.switchCurrentPriceToPromotional(1L, endOfPromotion);
-
-        // assert
+        service.startPromotionImediatly(1L, endOfPromotion);
         verify(productMapper)
             .toUpdateProductPriceResponseDTO(productCaptor.capture(), any());
         Price result = productCaptor.getValue().getPrice();
 
-        assertEquals(price.getPromotionalPrice(), result.getCurrentPrice());
+        final var expectedCurrentPrice = price.getPromotionalPrice();
+        final var expectedOriginalPrice = price.getOriginalPrice();
+        final var expectedPromotionalPrice = price.getPromotionalPrice();;
+
+        // assert
+        assertEquals(expectedCurrentPrice, result.getCurrentPrice());
+        assertEquals(expectedOriginalPrice, result.getOriginalPrice());
+        assertEquals(expectedPromotionalPrice, result.getPromotionalPrice());
+        assertEquals(endOfPromotion, result.getEndPromotion());
+        assertNull(result.getStartPromotion());
+    }
+
+    @Test
+    @DisplayName("Unit - endPromotion - End of promotion period")
+    void endPromotionTest() {
+        // arrange
+        Price price = new Price(BigDecimal.valueOf(50));
+        price.setPromotionalPrice(BigDecimal.valueOf(25));
+        Product product = new ProductTestBuilder()
+            .price(price)
+            .build();
+
+        when(repository.findById(anyLong()))
+            .thenReturn(Optional.of(product));
+
+        when(repository.save(eq(product)))
+            .thenReturn(product);
+
+        when(productMapper.toUpdateProductPriceResponseDTO(eq(product), any()))
+            .thenReturn(new UpdateProductPriceResponseDTO());
+
+        // act
+        service.closePromotion(1L);
+        verify(productMapper)
+            .toUpdateProductPriceResponseDTO(productCaptor.capture(), any());
+        Price result = productCaptor.getValue().getPrice();
+
+        final var expectedCurrentPrice = price.getOriginalPrice();
+        final var expectedOriginalPrice = price.getOriginalPrice();
+        final var expectedPromotionalPrice = price.getPromotionalPrice();
+
+        // assert
+        assertEquals(price.getOriginalPrice(), result.getCurrentPrice());
+
+        assertEquals(expectedCurrentPrice, result.getCurrentPrice());
+        assertEquals(expectedOriginalPrice, result.getOriginalPrice());
+        assertEquals(expectedPromotionalPrice, result.getPromotionalPrice());
+        assertNull(result.getEndPromotion());
+        assertNull(result.getStartPromotion());
     }
 
     @Test
@@ -290,29 +332,40 @@ class ProductServiceUnitTest {
     @DisplayName("Unit - updateStocks - Must update stocks of multiple products")
     void updateStocksTes01() {
         // arrange
-        List<Product> products = List.of(
+        List<Product> products_1 = List.of(
             new ProductTestBuilder().id(1L).stock(new Stock(100)).build(),
             new ProductTestBuilder().id(2L).stock(new Stock(200)).build(),
             new ProductTestBuilder().id(3L).stock(new Stock(300)).build()
         );
+        List<Product> products_2 = products_1.stream().toList();
 
-        List<StockWriteOffDTO> stockWriteOff = List.of(
+        List<StockWriteOffDTO> stockWriteOff_1 = List.of(
             new StockWriteOffDTO(1L, 100),
             new StockWriteOffDTO(2L, 200),
             new StockWriteOffDTO(3L, 300)
         );
+        List<StockWriteOffDTO> stockWriteOff_2 = stockWriteOff_1.stream()
+            .map(s -> new StockWriteOffDTO(s.getProductId(), Math.negateExact(s.getUnit())))
+            .toList();
 
-        when(repository.findAllById(anyList()))
-            .thenReturn(products);
+        when(repository.findAllById(anySet())).thenReturn(products_1);
+        when(repository.findAllById(anySet())).thenReturn(products_2);
 
         // act
-        service.updateStocks(stockWriteOff);
+        service.updateStocks(stockWriteOff_1);
+        service.updateStocks(stockWriteOff_2);
+        final int ZERO = 0;
 
         // assert
         assertAll(
-            () -> assertEquals(0, products.get(0).getStock().getUnit()),
-            () -> assertEquals(0, products.get(1).getStock().getUnit()),
-            () -> assertEquals(0, products.get(2).getStock().getUnit())
+            () -> assertEquals(ZERO, products_1.get(0).getStock().getUnit()),
+            () -> assertEquals(ZERO, products_1.get(1).getStock().getUnit()),
+            () -> assertEquals(ZERO, products_1.get(2).getStock().getUnit())
+        );
+        assertAll(
+            () -> assertEquals(ZERO, products_2.get(0).getStock().getUnit()),
+            () -> assertEquals(ZERO, products_2.get(1).getStock().getUnit()),
+            () -> assertEquals(ZERO, products_2.get(2).getStock().getUnit())
         );
     }
 }

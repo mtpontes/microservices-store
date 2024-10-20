@@ -19,5 +19,7 @@ public class CompletePriceDataDTO {
     private BigDecimal promotionalPrice;
     private boolean onPromotion;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-    private LocalDateTime endOfPromotion;
+    private LocalDateTime startPromotion;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime endPromotion;
 }
