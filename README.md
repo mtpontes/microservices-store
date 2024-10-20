@@ -125,11 +125,11 @@ To access it, run the containers and access the [documentation entry point](http
   - When starting the system:
     - It checks all products whose promotions have expired and restores them to their default state.
     - Defines a scheduler for all products that will enter the promotion within an hour, which triggers the start of a product's promotion.
-    - Defines a scheduler for all products whose promotions expire within 1 hour, which triggers the end of a product's promotion.
+    - Defines a scheduler for all products whose promotions expire within an hour, which triggers the end of a product's promotion.
     - Caches all products that are on sale.
 
   - Every zero hour:
-    - Defines a scheduler for all products that will enter the promotion within 1 hour.
+    - Defines a scheduler for all products that will enter the promotion within an hour.
     - Sets a scheduler for all products that the promotion will expire within an hour.
 
 ---
