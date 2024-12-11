@@ -281,13 +281,12 @@ The project is still under development, is currently using development settings.
 - [x] Create test routine with Github Actions
 - [x] Implement caching with Redis in the Products service
 - [ ] Sending emails regarding orders
-<!-- - [ ] Allow users to have multiple addresses -->
-<!-- - [ ] Integrate the Payments service with a real payment API, making the service fully functional -->
+- [ ] Integrate the Payments service with a real payment API, making the service fully functional
 
 ### Security
 - [x] Implement Spring Security
 - [x] Each microservice should be able to decode the JWT token, eliminating the need for the Auth microservice
-- [ ] Implement OAuth2 with 2FA
+<!-- - [ ] Implement OAuth2 with 2FA -->
 
 ### New services
 - [x] Cart
