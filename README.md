@@ -288,10 +288,10 @@ The project is still under development, is currently using development settings.
 - [x] Each microservice should be able to decode the JWT token, eliminating the need for the Auth microservice
 <!-- - [ ] Implement OAuth2 with 2FA -->
 
-### New services
-- [x] Cart
-- [ ] Evaluation
-- [ ] DiscountCoupon
+<!-- ### New services
+- [x] Cart -->
+<!-- - [ ] Evaluation
+- [ ] DiscountCoupon -->
 
 <!-- ### Infra
 - [ ] Create and handle dead letter exchanges
