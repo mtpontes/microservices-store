@@ -71,7 +71,6 @@ The application also has detailed documentation made with OpenAPI and Swagger UI
 To access it, run the containers and access the [documentation entry point](http://localhost:9092/swagger-ui/index.html) (Gateway). The documentation can be accessed centrally through the Gateway and also through the individual API itself (accounts, products, orders, cart, payments).
 
 > [!NOTE]\
->
 > - Endpoints with the prefix "Admin" require you to be logged in as a user with ADMIN or EMPLOYEE permission
 > - Endpoints with the prefix "Client" only work with users with CLIENT permission
 > - Endpoints with "Internal" prefix do not accept external calls
