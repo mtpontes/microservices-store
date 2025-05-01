@@ -1,7 +1,5 @@
 # Microsservices Store
 
-## 🔎 About the project
-
 E-Commerce Store is a REST API for an e-commerce store, based on microservices architecture, with both operations performed by the customer and operations performed by administrators.
 
 This is an old project that I created at the beginning of the year, and this repository is intended for a complete refactoring of the project.
